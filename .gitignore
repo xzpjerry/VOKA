@@ -1,3 +1,6 @@
 docs/VOKA-PRD.html
 .DS_Store
 .claude/worktrees/
+node_modules/
+dist/
+.browser-test/
