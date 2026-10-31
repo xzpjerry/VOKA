@@ -157,6 +157,12 @@ describe("range hit testing", () => {
     const token = { ...recognize("achieve") } as unknown as Token;
     expect(
       gloss(token, config, {
+        fields: { GlossNative: "实现；达到", GlossTarget: "custom" },
+        cards: [],
+      }),
+    ).toBe("实现；达到");
+    expect(
+      gloss(token, config, {
         fields: { GlossNative: "", GlossTarget: "custom" },
         cards: [],
       }),

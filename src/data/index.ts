@@ -1,5 +1,5 @@
 /** Offline packs are separate files with independent licensing. Call loadData once before lookup. */
-export const DATA_VERSION = "en-2026.10";
+export const DATA_VERSION = "en-2026.10.1";
 export const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 export type Level = (typeof LEVELS)[number];
 export interface Entry {
@@ -39,7 +39,7 @@ const format = (groups: Record<string, string[]>) =>
     .join(" · ");
 
 export function createData(packs: any[]) {
-  const [cefr, octa, oewn, cmu, fallback, morphology] = packs;
+  const [cefr, octa, oewn, cmu, fallback, morphology, native] = packs;
   const levels = new Map<string, { level: Level; variants: string[] }>();
   for (const pack of [cefr, octa]) {
     for (const [lemma, [level, variants]] of Object.entries(
@@ -78,6 +78,7 @@ export function createData(packs: any[]) {
     return aliases.get(lemma) ?? lemma;
   };
   const dictionary = oewn.entries as Dictionary;
+  const nativeGlosses = (native?.entries ?? {}) as Dictionary;
   const hasDictionary = (lemma: string) => Object.hasOwn(dictionary, lemma);
   function lookupEntry(
     key: string,
@@ -86,11 +87,16 @@ export function createData(packs: any[]) {
     const info = levels.get(lemma);
     const spellings = [lemma, ...(info?.variants ?? [])];
     const glosses: Record<string, string[]> = {};
+    const nativeByPos: Record<string, string[]> = {};
     for (const word of spellings) {
       for (const [pos, definitions] of Object.entries(dictionary[word] ?? {}))
         glosses[pos] = [
           ...new Set([...(glosses[pos] ?? []), ...definitions]),
         ].slice(0, 2);
+      for (const [pos, senses] of Object.entries(nativeGlosses[word] ?? {}))
+        nativeByPos[pos] = [
+          ...new Set([...(nativeByPos[pos] ?? []), ...senses]),
+        ].slice(0, 3);
     }
     let reading =
       spellings
@@ -109,7 +115,7 @@ export function createData(packs: any[]) {
       level: info?.level ?? "",
       Variants: info?.variants.join("; ") ?? "",
       Reading: reading,
-      GlossNative: "",
+      GlossNative: format(nativeByPos),
       GlossTarget: format(glosses),
       dictionaryStatus: found ? "found" : "missing",
       message: found ? "" : "词典没有",
@@ -169,6 +175,7 @@ export function loadData(read: ReadPack = readPack): Promise<Data> {
       "readings",
       "oewn-readings",
       "morphology",
+      "gloss-zh",
     ].map(read),
   )
     .then(createData)

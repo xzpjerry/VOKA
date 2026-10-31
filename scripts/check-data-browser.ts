@@ -80,6 +80,24 @@ try {
     assert.match(tip.text!, pattern);
     console.log(id, tip.text);
   }
+  await worker.evaluate(() =>
+    chrome.storage.local.set({ glossLanguage: "native", nativeLanguage: "zh" }),
+  );
+  await new Promise((done) => setTimeout(done, 1500));
+  const targetBox = await (await page.$("#target"))!.boundingBox();
+  await page.mouse.move(
+    targetBox!.x + targetBox!.width / 2,
+    targetBox!.y + targetBox!.height / 2,
+  );
+  const nativeTip = await page.evaluate(() => {
+    const el = document
+      .querySelector("#voka-drawer")!
+      .shadowRoot!.querySelector<HTMLElement>("[role=tooltip]")!;
+    return { hidden: el.hidden, text: el.textContent };
+  });
+  assert.equal(nativeTip.hidden, false);
+  assert.match(nativeTip.text!, /[\u4e00-\u9fff]/);
+  console.log("native", nativeTip.text);
   const extensionId = worker.url().split("/")[2];
   const options = await browser.newPage();
   await options.goto(`chrome-extension://${extensionId}/options.html`);
@@ -93,6 +111,8 @@ try {
     "Open English WordNet",
     "Carnegie Mellon",
     "Princeton",
+    "VOKA-generated",
+    "deepseek/deepseek-flash",
   ])
     assert(text.includes(source));
   const heading = await options.$$eval("h2", (els) =>

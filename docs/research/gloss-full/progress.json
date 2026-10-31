@@ -1,0 +1,37 @@
+{
+  "status": "partial",
+  "generatedAt": "2026-10-31T13:46:28.093152+00:00",
+  "models": [
+    "deepseek/deepseek-flash",
+    "gpt-6-luna"
+  ],
+  "batchSize": 100,
+  "batchesTotal": 745,
+  "batchesCached": 346,
+  "batchesRemaining": 399,
+  "lemmasTotal": 74441,
+  "lemmasDone": 34599,
+  "lemmasMissing": 39842,
+  "byConfiguration": {
+    "deepseek/deepseek-flash": {
+      "batches": 342,
+      "lemmas": 34199
+    },
+    "gpt-6-luna (effort max)": {
+      "batches": 4,
+      "lemmas": 400
+    }
+  },
+  "byModel": {
+    "deepseek/deepseek-flash": {
+      "batches": 342,
+      "lemmas": 34199
+    },
+    "gpt-6-luna": {
+      "batches": 4,
+      "lemmas": 400
+    }
+  },
+  "resumeCommand": "python3 tools/gloss/generate.py --model gpt-6-luna --effort max --timeout 1800 --workers 4 --batch-size 100",
+  "note": "Partial pack for development; missing native glosses fall back to GlossTarget."
+}

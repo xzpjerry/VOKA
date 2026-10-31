@@ -9,6 +9,8 @@ still invalid is reported and listed in the generated pack as missing lemmas.
 Standard library only. The CLI uses the provider credentials already configured
 for OpenCode; this tool never reads, prints or invents API keys.
 """
+from __future__ import annotations
+
 import argparse
 import concurrent.futures
 import datetime
@@ -30,7 +32,8 @@ BATCHES = CACHE / "batches"
 OUT = ROOT / "public/data"
 RESEARCH = ROOT / "docs/research/gloss-full"
 LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"]
-MODEL = "deepseek/deepseek-flash"
+DEFAULT_MODEL = "deepseek/deepseek-flash"
+OPENCODE_PREFIXES = ("opencode/", "deepseek/")
 DATA_VERSION = "en-2026.10.1"
 GENERATED_DATE = "2026-10-31"
 OEWN_SOURCE = (
@@ -59,10 +62,51 @@ def sha256(value: str) -> str:
     return hashlib.sha256(value.encode()).hexdigest()
 
 
-def cli_version() -> str | None:
+def runner_for(model: str) -> str:
+    """OpenCode for provider-prefixed models; Codex CLI otherwise (pilot models)."""
+    return "opencode" if model.startswith(OPENCODE_PREFIXES) else "codex"
+
+
+def output_schema() -> dict:
+    return {
+        "type": "object",
+        "properties": {
+            "words": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "lemma": {"type": "string"},
+                        "glosses": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "pos": {"type": "string"},
+                                    "senses": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                    },
+                                },
+                                "required": ["pos", "senses"],
+                                "additionalProperties": False,
+                            },
+                        },
+                    },
+                    "required": ["lemma", "glosses"],
+                    "additionalProperties": False,
+                },
+            }
+        },
+        "required": ["words"],
+        "additionalProperties": False,
+    }
+
+
+def cli_version(executable: str) -> str | None:
     try:
         result = subprocess.run(
-            ["opencode", "--version"], capture_output=True, text=True, timeout=30
+            [executable, "--version"], capture_output=True, text=True, timeout=30
         )
     except OSError:
         return None
@@ -160,11 +204,38 @@ def opencode_answer(stdout: str) -> tuple[str, list[str]]:
     return "".join(parts), errors
 
 
-def run_cli(request: str, cwd: str, timeout: int) -> dict:
+def run_cli(request: str, model: str, cwd: str, timeout: int, effort: str = "low") -> dict:
+    runner = runner_for(model)
     started = time.monotonic()
+    answer_path = None
+    if runner == "opencode":
+        command = ["opencode", "run", "--format", "json", "-m", model]
+    else:
+        # The same Codex invocation as the pilot: ephemeral, read-only, empty cwd.
+        fd, answer_path = tempfile.mkstemp(dir=cwd, prefix="answer-", suffix=".json")
+        os.close(fd)
+        command = [
+            "codex",
+            "exec",
+            "--ignore-user-config",
+            "--ephemeral",
+            "--skip-git-repo-check",
+            "--sandbox",
+            "read-only",
+            "-m",
+            model,
+            "-c",
+            f'model_reasoning_effort="{effort}"',
+            "--json",
+            "--output-schema",
+            str(Path(cwd) / "schema.json"),
+            "-o",
+            answer_path,
+            "-",
+        ]
     try:
         proc = subprocess.run(
-            ["opencode", "run", "--format", "json", "-m", MODEL],
+            command,
             input=request,
             text=True,
             capture_output=True,
@@ -173,6 +244,8 @@ def run_cli(request: str, cwd: str, timeout: int) -> dict:
         )
         stdout, stderr, returncode = proc.stdout, proc.stderr, proc.returncode
     except subprocess.TimeoutExpired as error:
+        if answer_path:
+            Path(answer_path).unlink(missing_ok=True)
         return {
             "returncode": None,
             "seconds": round(time.monotonic() - started, 3),
@@ -181,7 +254,13 @@ def run_cli(request: str, cwd: str, timeout: int) -> dict:
             "error_events": [],
             "retryable": True,
         }
-    answer, error_events = opencode_answer(stdout)
+    if runner == "opencode":
+        answer, error_events = opencode_answer(stdout)
+    else:
+        answer, error_events = "", []
+        if answer_path and Path(answer_path).exists():
+            answer = Path(answer_path).read_text()
+            Path(answer_path).unlink(missing_ok=True)
     retryable = returncode != 0 or not answer.strip()
     if TRANSPORT_MARKERS.search(stderr) or any(
         TRANSPORT_MARKERS.search(value) for value in error_events
@@ -216,6 +295,7 @@ def read_cache(round_no: int, request_sha: str) -> dict | None:
 
 def generate_one(
     prompt: str,
+    model: str,
     round_no: int,
     index: int,
     batch: list[dict],
@@ -223,16 +303,20 @@ def generate_one(
     timeout: int,
     max_attempts: int,
     backoff: float,
+    effort: str = "low",
 ) -> dict:
     request = request_for(prompt, batch)
     request_sha = sha256(request)
     cached = read_cache(round_no, request_sha)
-    if cached is not None:
+    # Transport failures are not finished work: retry them on the next run.
+    # The request hash is model-independent: a cached batch is reused even when
+    # a later run selects another model, which is what keeps a mixed pack cheap.
+    if cached is not None and not cached.get("transport_error"):
         return {"index": index, "cached": True, "record": cached, "lemmas": batch}
     attempt = 0
     while True:
         attempt += 1
-        result = run_cli(request, cwd, timeout)
+        result = run_cli(request, model, cwd, timeout, effort)
         if result["retryable"] and attempt < max_attempts:
             delay = min(backoff * (2 ** (attempt - 1)), 60) + random.random()
             print(
@@ -243,12 +327,16 @@ def generate_one(
             time.sleep(delay)
             continue
         record = {
-            "model": MODEL,
+            "model": model,
+            "runner": runner_for(model),
+            "effort": effort if runner_for(model) == "codex" else None,
             "round": round_no,
             "index": index,
             "lemmas": [word["lemma"] for word in batch],
             "request_sha256": request_sha,
-            "cli_version": cli_version(),
+            "cli_version": cli_version(
+                "opencode" if runner_for(model) == "opencode" else "codex"
+            ),
             "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "seconds": result["seconds"],
             "returncode": result["returncode"],
@@ -292,26 +380,43 @@ def result_for(record: dict | None, lemma: str):
     return None
 
 
+def valid_result_for(record: dict | None, word: dict):
+    """Prefer a valid duplicate when a model repeats a lemma in one batch."""
+    if record and isinstance(record.get("data"), dict):
+        for value in record["data"].get("words", []):
+            if isinstance(value, dict) and value.get("lemma") == word["lemma"]:
+                if not validate(word, value):
+                    return value
+    return result_for(record, word["lemma"])
+
+
 def collect_round(
     round_no: int, batches: list[list[dict]]
-) -> tuple[dict[str, dict], dict[str, list[str]], dict]:
+) -> tuple[dict[str, dict], dict[str, list[str]], dict, dict[str, dict]]:
     valid: dict[str, dict] = {}
     invalid: dict[str, list[str]] = {}
+    sources: dict[str, dict] = {}
     extras: set[str] = set()
     missing_batches = 0
     parse_errors = 0
+    format_invalid = 0
+    missing_words = 0
     seconds = 0.0
     expected = 0
+    models: dict[str, int] = {}
     for batch in batches:
         expected += len(batch)
         request_sha = sha256(request_for(PROMPT, batch))
         record = read_cache(round_no, request_sha)
         if record is None:
             missing_batches += 1
+            missing_words += len(batch)
             for word in batch:
                 invalid[word["lemma"]] = ["batch result missing"]
             continue
         seconds += float(record.get("seconds") or 0)
+        model = record.get("model", "unknown")
+        models[model] = models.get(model, 0) + 1
         if record.get("parse_error") or record.get("transport_error"):
             parse_errors += 1
         if isinstance(record.get("data"), dict):
@@ -322,11 +427,21 @@ def collect_round(
             }
             extras.update(returned - {word["lemma"] for word in batch})
         for word in batch:
-            errors = validate(word, result_for(record, word["lemma"]))
+            result = valid_result_for(record, word)
+            errors = validate(word, result)
             if errors:
+                if not record.get("parse_error") and not record.get("transport_error"):
+                    format_invalid += 1
                 invalid[word["lemma"]] = errors
             else:
-                valid[word["lemma"]] = result_for(record, word["lemma"])
+                valid[word["lemma"]] = result
+                sources[word["lemma"]] = {
+                    "model": model,
+                    "runner": record.get("runner", "opencode"),
+                    "effort": record.get("effort"),
+                    "round": round_no,
+                    "batch": record.get("index"),
+                }
     return valid, invalid, {
         "round": round_no,
         "words": expected,
@@ -335,12 +450,16 @@ def collect_round(
         "batches": len(batches),
         "missingBatches": missing_batches,
         "parseErrors": parse_errors,
+        "formatInvalidWords": format_invalid,
+        "unprocessedWords": missing_words,
         "unexpectedLemmas": sorted(extras),
+        "models": models,
         "generationSeconds": round(seconds, 3),
-    }
+    }, sources
 
 
 def run_round(
+    model: str,
     round_no: int,
     words: list[dict],
     batch_size: int,
@@ -349,10 +468,11 @@ def run_round(
     timeout: int,
     max_attempts: int,
     backoff: float,
-) -> dict:
+    effort: str = "low",
+):
     batches = [words[i : i + batch_size] for i in range(0, len(words), batch_size)]
     if not batches:
-        return {"round": round_no, "words": 0, "batches": 0}
+        return {}, {}, {"round": round_no, "words": 0, "batches": 0}, {}
     print(
         f"round {round_no}: {len(words)} words in {len(batches)} batches, "
         f"{workers} workers",
@@ -368,7 +488,7 @@ def run_round(
         nonlocal done, generated, failures
         index, batch = pair
         result = generate_one(
-            PROMPT, round_no, index, batch, cwd, timeout, max_attempts, backoff
+            PROMPT, model, round_no, index, batch, cwd, timeout, max_attempts, backoff, effort
         )
         with lock:
             done += 1
@@ -392,15 +512,15 @@ def run_round(
         return result
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
-        for _ in concurrent.futures.as_completed(
+        for future in concurrent.futures.as_completed(
             pool.submit(work, pair) for pair in enumerate(batches)
         ):
-            pass
-    valid, invalid, stats = collect_round(round_no, batches)
+            future.result()
+    valid, invalid, stats, sources = collect_round(round_no, batches)
     stats["wallSeconds"] = round(time.monotonic() - started, 3)
     stats["generated"] = generated
     stats["issues"] = failures
-    return valid, invalid, stats
+    return valid, invalid, stats, sources
 
 
 def level_of(words: list[dict]) -> dict[str, str]:
@@ -441,13 +561,94 @@ def write_spot_check(words: list[dict], valid: dict[str, dict]) -> None:
     print(f"spot check: {len(rows)} rows -> {RESEARCH / 'spot-check.csv'}", flush=True)
 
 
+def provenance(record: dict) -> str:
+    model = record.get("model", "unknown")
+    effort = record.get("effort")
+    return f"{model} (effort {effort})" if effort else model
+
+
+def model_label(models: list[str]) -> str:
+    return models[0] if len(models) == 1 else "mixed: " + ", ".join(models)
+
+
+def write_progress(
+    words: list[dict],
+    entries: dict[str, dict],
+    missing: list[str],
+    sources: dict[str, dict],
+    batch_size: int,
+) -> None:
+    """Exact resume state, including which model produced each cached batch."""
+    records = []
+    for path in BATCHES.glob("r0-*.json"):
+        try:
+            record = json.loads(path.read_text())
+            if not record.get("transport_error"):
+                records.append(record)
+        except (json.JSONDecodeError, OSError):
+            continue
+    by_configuration: dict[str, dict] = {}
+    for record in records:
+        label = provenance(record)
+        by_configuration.setdefault(label, {"batches": 0, "lemmas": 0})["batches"] += 1
+    for lemma in entries:
+        label = provenance(sources.get(lemma, {}))
+        by_configuration.setdefault(label, {"batches": 0, "lemmas": 0})["lemmas"] += 1
+    by_model_batches: dict[str, int] = {}
+    for record in records:
+        model = record.get("model", "unknown")
+        by_model_batches[model] = by_model_batches.get(model, 0) + 1
+    by_model_lemmas: dict[str, int] = {}
+    for lemma in entries:
+        model = sources.get(lemma, {}).get("model", "unknown")
+        by_model_lemmas[model] = by_model_lemmas.get(model, 0) + 1
+    models = sorted(set(by_model_batches) | set(by_model_lemmas))
+    total_batches = (len(words) + batch_size - 1) // batch_size
+    progress = {
+        "status": "complete" if not missing else "partial",
+        "generatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "models": models,
+        "batchSize": batch_size,
+        "batchesTotal": total_batches,
+        "batchesCached": len(records),
+        "batchesRemaining": max(0, total_batches - len(records)),
+        "lemmasTotal": len(words),
+        "lemmasDone": len(entries),
+        "lemmasMissing": len(missing),
+        "byConfiguration": by_configuration,
+        "byModel": {
+            model: {
+                "batches": by_model_batches.get(model, 0),
+                "lemmas": by_model_lemmas.get(model, 0),
+            }
+            for model in models
+        },
+        "resumeCommand": (
+            "python3 tools/gloss/generate.py --model gpt-6-luna "
+            f"--effort max --timeout 1800 --workers 4 --batch-size {batch_size}"
+        ),
+        "note": (
+            "Complete pack."
+            if not missing
+            else "Partial pack for development; missing native glosses fall back to GlossTarget."
+        ),
+    }
+    RESEARCH.mkdir(parents=True, exist_ok=True)
+    dump(RESEARCH / "progress.json", progress)
+    print("progress -> docs/research/gloss-full/progress.json", flush=True)
+    return progress
+
+
 def assemble(
     words: list[dict],
     valid: dict[str, dict],
+    sources: dict[str, dict],
     rounds: list[dict],
     prompt_sha: str,
     started_at: str,
     wall_seconds: float,
+    batch_size: int,
+    failures: dict[str, list[str]],
 ) -> None:
     entries = {}
     missing = []
@@ -458,15 +659,21 @@ def assemble(
             continue
         groups = {group["pos"]: group["senses"] for group in result["glosses"]}
         entries[word["lemma"]] = groups
+    models = sorted(
+        {sources.get(lemma, {}).get("model", "unknown") for lemma in entries}
+    ) or ["unknown"]
+    configurations = sorted({provenance(sources.get(lemma, {})) for lemma in entries})
+    label = model_label(configurations)
     attribution = (
         "VOKA-generated Simplified Chinese native glosses derived from Open English "
         "WordNet 2025 (CC BY 4.0; includes Princeton WordNet material). Generated "
-        f"with model {MODEL} (DeepSeek V4.1 Flash 1017) through the OpenCode CLI on "
+        f"with model(s) {', '.join(configurations)} through Codex/OpenCode CLI on "
         f"{GENERATED_DATE}; prompt SHA-256 {prompt_sha}. Modifications: generated "
         "per single-word OEWN lemma, grouped by OEWN POS, at most three senses per "
         "POS and at most ten Han characters per sense. Chinese text is VOKA's own; "
         "no ECDICT or Wiktionary data is included."
     )
+    progress = write_progress(words, entries, missing, sources, batch_size)
     pack = {
         "source": [OEWN_SOURCE],
         "sourcePack": "oewn.json",
@@ -474,11 +681,15 @@ def assemble(
         "version": "2025",
         "generatedDate": GENERATED_DATE,
         "dataVersion": DATA_VERSION,
-        "model": MODEL,
+        "model": label,
+        "models": models,
+        "configurations": configurations,
+        "byConfiguration": progress["byConfiguration"],
         "prompt": "tools/gloss/prompt.txt",
         "promptSha256": prompt_sha,
         "attribution": attribution,
         "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "complete": not missing,
         "entryCount": len(entries),
         "sourceLemmaCount": len(words),
         "missingCount": len(missing),
@@ -500,25 +711,32 @@ def assemble(
     gzip_size = len(gzip.compress(raw, mtime=0))
     print(
         f"gloss-zh.json: {len(entries)} entries, {len(raw)} raw, "
-        f"{gzip_size} gzip; {len(missing)} missing",
+        f"{gzip_size} gzip; {len(missing)} missing; models {models}",
         flush=True,
     )
     update_metadata(pack, len(raw), gzip_size)
     stats = {
-        "model": MODEL,
+        "model": label,
+        "models": models,
+        "complete": not missing,
         "promptSha256": prompt_sha,
         "generatedDate": GENERATED_DATE,
         "dataVersion": DATA_VERSION,
         "sourceLemmaCount": len(words),
         "entryCount": len(entries),
         "missingCount": len(missing),
-        "formatInvalidAfterRetries": len(missing),
-        "formatValidRate": round(len(entries) / len(words) * 100, 4) if words else 0,
+        "formatInvalidAfterRetries": rounds[-1].get("formatInvalidWords", 0) if rounds else 0,
+        "unprocessedCount": rounds[-1].get("unprocessedWords", 0) if rounds else len(missing),
+        "coveragePercent": round(len(entries) / len(words) * 100, 4) if words else 0,
         "missingLemmas": missing,
         "generationSeconds": round(
             sum(float(item.get("generationSeconds") or 0) for item in rounds), 3
         ),
         "wallSeconds": round(wall_seconds, 3),
+        "batchesCached": progress["batchesCached"],
+        "batchesTotal": progress["batchesTotal"],
+        "byModel": progress["byModel"],
+        "byConfiguration": progress["byConfiguration"],
         "rounds": rounds,
         "byLevel": {
             level: {
@@ -536,6 +754,7 @@ def assemble(
     }
     RESEARCH.mkdir(parents=True, exist_ok=True)
     dump(RESEARCH / "stats.json", stats)
+    dump(RESEARCH / "failures.json", {lemma: failures.get(lemma, ["not processed"]) for lemma in missing})
     write_spot_check(words, valid)
     print(json.dumps(stats["byLevel"], ensure_ascii=False), flush=True)
 
@@ -572,12 +791,18 @@ def update_metadata(pack: dict, raw_size: int, gzip_size: int) -> None:
     attributions_path.write_text(
         json.dumps(metadata, ensure_ascii=False, indent=2) + "\n"
     )
+    import gzip
+    attribution_raw = attributions_path.read_bytes()
+    ordered["attributions.json"] = {"raw": len(attribution_raw), "gzip": len(gzip.compress(attribution_raw, mtime=0))}
+    sizes_path.write_text(json.dumps(ordered, indent=2) + "\n")
     print("updated sizes.json and attributions.json", flush=True)
 
 
 def main() -> None:
     global PROMPT
     parser = argparse.ArgumentParser()
+    parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument("--effort", default="low", choices=["low", "medium", "high", "xhigh", "max"])
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--batch-size", type=int, default=100)
     parser.add_argument("--retries", type=int, default=2)
@@ -592,19 +817,21 @@ def main() -> None:
         parser.error("workers must be 1..32")
     if not 1 <= args.batch_size <= 200:
         parser.error("batch size must be 1..200")
+    if not args.model.strip():
+        parser.error("model must not be empty")
 
     PROMPT = (ROOT / "tools/gloss/prompt.txt").read_text()
     prompt_sha = sha256(PROMPT)
     words, oewn_sha = corpus()
     print(
-        f"{len(words)} OEWN lemmas; prompt {prompt_sha[:16]}; oewn {oewn_sha[:16]}",
+        f"{len(words)} OEWN lemmas; prompt {prompt_sha[:16]}; oewn {oewn_sha[:16]}; "
+        f"model {args.model} ({runner_for(args.model)})",
         flush=True,
     )
     CACHE.mkdir(parents=True, exist_ok=True)
     BATCHES.mkdir(parents=True, exist_ok=True)
     manifest_path = CACHE / "manifest.json"
     manifest = {
-        "model": MODEL,
         "promptSha256": prompt_sha,
         "oewnSha256": oewn_sha,
         "batchSize": args.batch_size,
@@ -623,16 +850,20 @@ def main() -> None:
     started_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
     started = time.monotonic()
     valid: dict[str, dict] = {}
+    sources: dict[str, dict] = {}
     rounds: list[dict] = []
+    invalid: dict[str, list[str]] = {}
     pending = words
     if args.limit_batches:
         pending = words[: args.limit_batches * args.batch_size]
     if not args.assemble_only:
         with tempfile.TemporaryDirectory(prefix="voka-gloss-") as cwd:
+            dump(Path(cwd) / "schema.json", output_schema())
             for round_no in range(args.retries + 1):
                 if not pending:
                     break
-                found, invalid, stats = run_round(
+                found, invalid, stats, found_sources = run_round(
+                    args.model,
                     round_no,
                     pending,
                     args.batch_size,
@@ -641,8 +872,10 @@ def main() -> None:
                     args.timeout,
                     args.max_attempts,
                     args.backoff,
+                    args.effort,
                 )
                 valid.update(found)
+                sources.update(found_sources)
                 rounds.append(stats)
                 print(json.dumps(stats, ensure_ascii=False), flush=True)
                 pending = [word for word in pending if word["lemma"] in invalid]
@@ -654,11 +887,12 @@ def main() -> None:
             ]
             if not pending:
                 break
-            found, invalid, stats = collect_round(
+            found, invalid, stats, found_sources = collect_round(
                 round_no,
                 [pending[i : i + args.batch_size] for i in range(0, len(pending), args.batch_size)],
             )
             valid.update(found)
+            sources.update(found_sources)
             rounds.append(stats)
             pending = [word for word in pending if word["lemma"] in invalid]
 
@@ -674,10 +908,13 @@ def main() -> None:
     assemble(
         words,
         valid,
+        sources,
         rounds,
         prompt_sha,
         started_at,
         time.monotonic() - started,
+        args.batch_size,
+        invalid,
     )
 
 
