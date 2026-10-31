@@ -1,0 +1,19 @@
+{
+  "model": "opencode/deepseek-v4.1-flash-free",
+  "runner": "opencode",
+  "cli_version": "opencode v2.2.5",
+  "batch": 7,
+  "count": 25,
+  "request_sha256": "c5e203873c298364c9684e48446ffa2b2e3c49f74373706f87bb1f13fa769daf",
+  "command": [
+    "opencode",
+    "run",
+    "--format",
+    "json",
+    "-m",
+    "opencode/deepseek-v4.1-flash-free"
+  ],
+  "seconds": 21.877,
+  "returncode": 0,
+  "output_sha256": "44a12149370e1257467d6d3c48ad8f76511a5a9b501e82600a0d7b1a75699ca0"
+}

@@ -91,5 +91,49 @@
       "reasoning_output_tokens": 41
     },
     "errors": {}
+  },
+  "opencode/deepseek-v4.1-flash-free": {
+    "format_invalid_words": 0,
+    "unexpected_lemmas": [],
+    "by_level": {
+      "A1": {
+        "words": 40,
+        "format_invalid": 0
+      },
+      "A2": {
+        "words": 40,
+        "format_invalid": 0
+      },
+      "B1": {
+        "words": 40,
+        "format_invalid": 0
+      },
+      "B2": {
+        "words": 40,
+        "format_invalid": 0
+      },
+      "C1": {
+        "words": 40,
+        "format_invalid": 0
+      },
+      "C2": {
+        "words": 40,
+        "format_invalid": 0
+      },
+      "Unleveled": {
+        "words": 60,
+        "format_invalid": 0
+      }
+    },
+    "seconds": 366.286,
+    "usage": {
+      "input_tokens": 49096,
+      "cached_input_tokens": 76160,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 8681,
+      "reasoning_output_tokens": 38210,
+      "cost_usd": 0
+    },
+    "errors": {}
   }
 }

@@ -1,0 +1,300 @@
+{
+  "words": [
+    {
+      "lemma": "cocky",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "自负的",
+            "傲慢的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "comrade",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "同志",
+            "同伴"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "cub",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "毛头小子",
+            "男孩"
+          ]
+        },
+        {
+          "pos": "v",
+          "senses": [
+            "产崽"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "darky",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "黑人蔑称"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "desalination",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "脱盐",
+            "海水淡化"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "dimorphic",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "二态的",
+            "双型的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "disarrangement",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "紊乱",
+            "混乱"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "electrotherapist",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "电疗师"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "engorgement",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "充血",
+            "暴食"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "flickering",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "闪烁的",
+            "摇曳的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "gantrisin",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "磺胺药"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "hydrocephaly",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "脑积水"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "industrialist",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "工业家",
+            "实业家"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "infolding",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "内褶",
+            "内折"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "interpellate",
+      "glosses": [
+        {
+          "pos": "v",
+          "senses": [
+            "质询"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "laid-back",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "悠闲的",
+            "放松的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "lidocaine",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "利多卡因"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "macadamise",
+      "glosses": [
+        {
+          "pos": "v",
+          "senses": [
+            "铺碎石路"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "measured",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "有节奏的",
+            "格律的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "mesomorphic",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "肌肉发达的",
+            "中胚层型的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "mimetic",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "模仿的",
+            "拟态的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "misestimate",
+      "glosses": [
+        {
+          "pos": "v",
+          "senses": [
+            "误估",
+            "算错"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "nandu",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "美洲鸵"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "neo-renaissance",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "新文艺复兴式"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "neolithic",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "新石器时代的"
+          ]
+        }
+      ]
+    }
+  ]
+}

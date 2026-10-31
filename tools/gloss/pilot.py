@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Standard-library-only, resumable Codex CLI gloss pilot (never full-corpus)."""
+"""Standard-library-only, resumable Codex/OpenCode CLI gloss pilot (never full-corpus)."""
 import argparse, csv, hashlib, json, random, re, subprocess, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'docs/research/gloss-pilot'
 LEVELS = ['A1','A2','B1','B2','C1','C2']
-MODELS = ['gpt-6-luna','gpt-6.1-sol']
+MODELS = ['gpt-6-luna','gpt-6.1-sol','opencode/deepseek-v4.1-flash-free']
+OPENCODE_MODELS = {'opencode/deepseek-v4.1-flash-free'}
+MODEL_DIRS = {'opencode/deepseek-v4.1-flash-free':'deepseek-v4.1-flash-free'}
 LABELS = {'n':'n.','v':'v.','a':'adj.','r':'adv.'}
 SEED = 20261031
+
+def model_dir(model):
+    return MODEL_DIRS.get(model, model)
 
 def dump(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n')
@@ -58,13 +63,29 @@ def validate(word, result):
             if not isinstance(s,str) or not re.fullmatch(r'[\u3400-\u4dbf\u4e00-\u9fff\U00020000-\U000323af]{1,10}',s): errors.append('sense must be 1..10 Han characters')
     return sorted(set(errors))
 
+def opencode_answer(events_path):
+    """Concatenate the final text parts emitted by `opencode run --format json`."""
+    parts=[]
+    for line in events_path.read_text().splitlines():
+        if not line.strip(): continue
+        event=json.loads(line)
+        if event.get('type')=='text': parts.append(event['part']['text'])
+    return ''.join(parts)
+
+def cli_version(executable):
+    try:
+        result = subprocess.run([executable,'--version'],capture_output=True,text=True,timeout=30)
+    except OSError:
+        return None
+    return (result.stdout or result.stderr).strip() or None
+
 def generate(model, batch_size):
     words = json.loads((OUT/'sample.json').read_text())['words']
     if not 1 <= len(words) <= 300 or len({w['lemma'] for w in words}) != len(words):
         raise ValueError('Pilot requires 1..300 unique lemmas')
     prompt = (ROOT/'tools/gloss/prompt.txt').read_text()
     schema = {'type':'object','properties':{'words':{'type':'array','items':{'type':'object','properties':{'lemma':{'type':'string'},'glosses':{'type':'array','items':{'type':'object','properties':{'pos':{'type':'string'},'senses':{'type':'array','items':{'type':'string'}}},'required':['pos','senses'],'additionalProperties':False}}},'required':['lemma','glosses'],'additionalProperties':False}}},'required':['words'],'additionalProperties':False}
-    folder = OUT/model
+    folder = OUT/model_dir(model)
     folder.mkdir(exist_ok=True)
     # An empty cwd prevents project AGENTS instructions from contaminating generation.
     with tempfile.TemporaryDirectory(prefix='voka-gloss-') as cwd:
@@ -78,36 +99,65 @@ def generate(model, batch_size):
             if meta_path.exists():
                 meta=json.loads(meta_path.read_text())
                 if meta['request_sha256'] != request_hash: raise ValueError('Cache input changed; use a fresh output directory')
-                if meta['returncode'] == 0 and stem.with_suffix('.json').exists():
-                    json.loads(stem.with_suffix('.json').read_text())
+                if meta['returncode'] == 0 and (stem.with_suffix('.json').exists() or meta.get('parse_error')):
+                    if stem.with_suffix('.json').exists():
+                        json.loads(stem.with_suffix('.json').read_text())
                     continue
             stem.with_suffix('.prompt.txt').write_text(request)
-            command = ['codex','exec','--ignore-user-config','--ephemeral','--skip-git-repo-check','--sandbox','read-only','-m',model,'-c','model_reasoning_effort="low"','--json','--output-schema',str(schema_path),'-o',str(stem.with_suffix('.json')),'-']
             started=time.monotonic()
-            with stem.with_suffix('.events.jsonl').open('w') as events, stem.with_suffix('.stderr.txt').open('w') as stderr:
-                proc=subprocess.run(command,input=request,text=True,stdout=events,stderr=stderr,cwd=cwd,timeout=600)
-            meta={'model':model,'batch':i//batch_size,'count':len(batch),'request_sha256':request_hash,'command':command,'seconds':round(time.monotonic()-started,3),'returncode':proc.returncode}
+            if model in OPENCODE_MODELS:
+                # OpenCode has no JSON Schema flag; the shared prompt still asks for bare JSON.
+                command = ['opencode','run','--format','json','-m',model]
+                with stem.with_suffix('.events.jsonl').open('w') as events, stem.with_suffix('.stderr.txt').open('w') as stderr:
+                    proc=subprocess.run(command,input=request,text=True,stdout=events,stderr=stderr,cwd=cwd,timeout=600)
+                answer = opencode_answer(stem.with_suffix('.events.jsonl'))
+                stem.with_suffix('.answer.txt').write_text(answer)
+                meta={'model':model,'runner':'opencode','cli_version':cli_version('opencode'),'batch':i//batch_size,'count':len(batch),'request_sha256':request_hash,'command':command,'seconds':round(time.monotonic()-started,3),'returncode':proc.returncode,'output_sha256':hashlib.sha256(answer.encode()).hexdigest()}
+                if proc.returncode == 0:
+                    try:
+                        data = json.loads(answer)
+                        if not isinstance(data,dict) or not isinstance(data.get('words'),list):
+                            raise ValueError('answer must be an object with a words array')
+                    except (json.JSONDecodeError, ValueError) as error:
+                        meta['parse_error'] = str(error)
+                    else:
+                        dump(stem.with_suffix('.json'),data)
+            else:
+                command = ['codex','exec','--ignore-user-config','--ephemeral','--skip-git-repo-check','--sandbox','read-only','-m',model,'-c','model_reasoning_effort="low"','--json','--output-schema',str(schema_path),'-o',str(stem.with_suffix('.json')),'-']
+                with stem.with_suffix('.events.jsonl').open('w') as events, stem.with_suffix('.stderr.txt').open('w') as stderr:
+                    proc=subprocess.run(command,input=request,text=True,stdout=events,stderr=stderr,cwd=cwd,timeout=600)
+                meta={'model':model,'runner':'codex','cli_version':cli_version('codex'),'batch':i//batch_size,'count':len(batch),'request_sha256':request_hash,'command':command,'seconds':round(time.monotonic()-started,3),'returncode':proc.returncode}
             dump(meta_path,meta)
             print(model,i//batch_size,meta['seconds'],proc.returncode,flush=True)
-            if proc.returncode: raise RuntimeError(f'Codex failed; see {stem}.stderr.txt')
+            if proc.returncode: raise RuntimeError(f'CLI failed; see {stem}.stderr.txt')
+            if meta.get('parse_error'): print(f'{model} {i//batch_size}: invalid JSON answer: {meta["parse_error"]}',flush=True)
 
 def compare():
     words=json.loads((OUT/'sample.json').read_text())['words']
     results={}; stats={}
     for model in MODELS:
+        folder=OUT/model_dir(model)
         by_lemma={}; duplicates=set(); usage={}; seconds=0
-        for path in sorted((OUT/model).glob('[0-9][0-9].json')):
+        for path in sorted(folder.glob('[0-9][0-9].json')):
             data=json.loads(path.read_text())
             for value in data['words']:
                 lemma=value.get('lemma')
                 if lemma in by_lemma: duplicates.add(lemma)
                 by_lemma[lemma]=value
-        for path in sorted((OUT/model).glob('*.events.jsonl')):
+        for path in sorted(folder.glob('*.events.jsonl')):
             for line in path.read_text().splitlines():
                 event=json.loads(line)
                 if event.get('type')=='turn.completed':
                     for key,value in event.get('usage',{}).items(): usage[key]=usage.get(key,0)+value
-        for path in (OUT/model).glob('*.meta.json'): seconds+=json.loads(path.read_text())['seconds']
+                elif event.get('type')=='step_finish':
+                    tokens=event.get('part',{}).get('tokens',{})
+                    usage['input_tokens']=usage.get('input_tokens',0)+tokens.get('input',0)
+                    usage['cached_input_tokens']=usage.get('cached_input_tokens',0)+tokens.get('cache',{}).get('read',0)
+                    usage['cache_write_input_tokens']=usage.get('cache_write_input_tokens',0)+tokens.get('cache',{}).get('write',0)
+                    usage['output_tokens']=usage.get('output_tokens',0)+tokens.get('output',0)
+                    usage['reasoning_output_tokens']=usage.get('reasoning_output_tokens',0)+tokens.get('reasoning',0)
+                    usage['cost_usd']=round(usage.get('cost_usd',0)+event.get('part',{}).get('cost',0),6)
+        for path in folder.glob('*.meta.json'): seconds+=json.loads(path.read_text())['seconds']
         errors={w['lemma']:validate(w,by_lemma.get(w['lemma'])) for w in words}
         for lemma in duplicates:
             if lemma in errors: errors[lemma].append('duplicate word')
@@ -120,13 +170,13 @@ def compare():
             return value['lemma']+'　'+'　'.join(LABELS.get(g['pos'],g['pos'])+' '+'；'.join(g['senses']) for g in value['glosses'])
         except (KeyError, TypeError):
             return json.dumps(value, ensure_ascii=False)
-    columns=['lemma','level','POS','OEWN sense summary','cheap-model gloss','mid-model gloss','cheap format-valid','mid format-valid','cheap_ok (Y/N)','mid_ok (Y/N)','notes']
+    columns=['lemma','level','POS','OEWN sense summary','cheap-model gloss','mid-model gloss','deepseek-model gloss','cheap format-valid','mid format-valid','deepseek format-valid','cheap_ok (Y/N)','mid_ok (Y/N)','deepseek_ok (Y/N)','notes']
     rows=[]
     for w in words:
         row=[w['lemma'],w['level'],', '.join(LABELS.get(p,p) for p in w['pos']),' | '.join(LABELS.get(p,p)+' '+'; '.join(w['oewn'][p]) for p in w['pos'])]
         row += [display(results[m][0].get(w['lemma'])) for m in MODELS]
         row += ['N' if results[m][1][w['lemma']] else 'Y' for m in MODELS]
-        rows.append(row+['','',''])
+        rows.append(row+['','','',''])
     with (OUT/'comparison.csv').open('w',encoding='utf-8-sig',newline='') as f:
         writer=csv.writer(f,lineterminator="\n"); writer.writerow(columns); writer.writerows(rows)
     escape=lambda x: x.replace('|','\\|').replace('\n',' ')
