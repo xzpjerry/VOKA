@@ -596,29 +596,31 @@ def write_progress(
     batch_size: int,
 ) -> None:
     """Exact resume state, including which model produced each cached batch."""
-    expected_hashes = {
-        sha256(request_for(PROMPT, words[index:index + batch_size]))
-        for index in range(0, len(words), batch_size)
-    }
-    accepted_hashes = {value.get("request_sha256") for value in sources.values()}
+    word_map = {word["lemma"]: word for word in words}
     records = []
     timing_records = []
     for path in BATCHES.glob("r*-*.json"):
         try:
             record = json.loads(path.read_text())
-            if not record.get("transport_error") and record.get("request_sha256") in expected_hashes | accepted_hashes:
-                timing_records.append(record)
-                if record.get("round") == 0:
-                    records.append(record)
-        except (json.JSONDecodeError, OSError):
+            batch = [word_map[lemma] for lemma in record["lemmas"]]
+            if record.get("request_sha256") != sha256(request_for(PROMPT, batch)):
+                continue
+            timing_records.append(record)
+            if record.get("round") == 0 and not record.get("transport_error"):
+                records.append(record)
+        except (json.JSONDecodeError, OSError, KeyError):
             continue
     by_configuration: dict[str, dict] = {}
     for record in records:
         label = provenance(record)
-        by_configuration.setdefault(label, {"batches": 0, "lemmas": 0})["batches"] += 1
+        by_configuration.setdefault(label, {"batches": 0, "retryBatches": 0, "lemmas": 0})["batches"] += 1
+    for record in timing_records:
+        if record.get("round", 0) > 0:
+            label = provenance(record)
+            by_configuration.setdefault(label, {"batches": 0, "retryBatches": 0, "lemmas": 0})["retryBatches"] += 1
     for lemma in entries:
         label = provenance(sources.get(lemma, {}))
-        by_configuration.setdefault(label, {"batches": 0, "lemmas": 0})["lemmas"] += 1
+        by_configuration.setdefault(label, {"batches": 0, "retryBatches": 0, "lemmas": 0})["lemmas"] += 1
     by_model_batches: dict[str, int] = {}
     for record in records:
         model = record.get("model", "unknown")
@@ -819,10 +821,10 @@ def assemble(
         f"({stats['formatViolationRateAfterRetries']:.4f}%). "
         f"Unprocessed words: {stats['unprocessedCount']:,}; "
         "coverage and format compliance are separate measures.", "",
-        "| Model / effort | Round-0 batches | Valid lemmas |", "|---|---:|---:|",
+        "| Model / effort | Round-0 batches | Retry batches | Valid lemmas |", "|---|---:|---:|---:|",
     ]
     for configuration, counts in progress["byConfiguration"].items():
-        report.append(f"| {configuration} | {counts['batches']} | {counts['lemmas']} |")
+        report.append(f"| {configuration} | {counts['batches']} | {counts['retryBatches']} | {counts['lemmas']} |")
     report += ["", "Timing from cached requests (parallel call durations overlap):", ""]
     for configuration, timing in progress["timingByConfiguration"].items():
         report.append(f"- {configuration}: {timing['callSeconds']:,.3f} cumulative call seconds; "

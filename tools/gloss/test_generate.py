@@ -62,6 +62,23 @@ class GeneratorTests(unittest.TestCase):
         self.assertEqual(progress["batchesRemaining"], 1)
         self.assertEqual(progress["byConfiguration"], {})
 
+    def test_progress_counts_retries_separately(self):
+        words = [dict(lemma="test")]
+        request_hash = generate.sha256(generate.request_for("prompt", words))
+        with tempfile.TemporaryDirectory() as cwd, patch.object(generate, "BATCHES", Path(cwd)), patch.object(generate, "RESEARCH", Path(cwd)), patch.object(generate, "PROMPT", "prompt", create=True):
+            for round_no, model, effort in [(0, "deepseek/deepseek-flash", None), (1, "gpt-6-luna", "max")]:
+                generate.dump(Path(cwd) / f"r{round_no}-test.json", {
+                    "request_sha256": request_hash, "lemmas": ["test"],
+                    "round": round_no, "model": model, "effort": effort,
+                })
+            progress = generate.write_progress(words, {"test": {}}, [], {
+                "test": {"model": "gpt-6-luna", "effort": "max"},
+            }, 100)
+        self.assertEqual(progress["batchesCached"], 1)
+        self.assertEqual(progress["byConfiguration"]["gpt-6-luna (effort max)"], {
+            "batches": 0, "retryBatches": 1, "lemmas": 1,
+        })
+
 
 if __name__ == "__main__":
     unittest.main()
