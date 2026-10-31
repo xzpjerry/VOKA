@@ -1,4 +1,5 @@
 import { LEVELS, loadData } from "../data";
+import { selectCandidate } from "../reading";
 import { normalizeKey } from "../key";
 import { cardContext } from "./contexts";
 import { updateGlossCss } from "./gloss";
@@ -66,9 +67,12 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       const data = await loadData();
       return Object.fromEntries(
         message.words.map((word: string) => {
-          const lemma = data.lemmaCandidates(word)[0] ?? word;
-          const entry = data.lookupEntry(lemma);
-          return [word, { key: normalizeKey(entry.lemma), entry }];
+          const candidates = data.lemmaCandidates(word).map(data.lookupEntry);
+          const match = selectCandidate(word, candidates) ?? {
+            key: normalizeKey(data.lookupEntry(word).lemma),
+            entry: data.lookupEntry(word),
+          };
+          return [word, { ...match, candidates }];
         }),
       );
     })().then(

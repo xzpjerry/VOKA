@@ -53,12 +53,23 @@ export function recognize(
   lemmatizer: Lemmatizer,
   lookupEntry: (key: string) => Token["entry"] | undefined,
 ) {
-  for (const lemma of lemmatizer.candidates(surface)) {
-    const key = normalizeKey(lemma),
-      entry = lookupEntry(key);
-    if (entry) return { key, entry };
-  }
-  return null;
+  return selectCandidate(surface, lemmatizer.candidates(surface)
+    .map((lemma) => lookupEntry(normalizeKey(lemma)))
+    .filter((entry): entry is Token["entry"] => !!entry));
+}
+/** Pure ADR-0001 selection; ungraded entries sort after all CEFR levels. */
+export function selectCandidate(surface: string, entries: Token["entry"][]) {
+  const rank = (entry: Token["entry"]) => {
+    const index = levels.indexOf(entry.level as Level);
+    return index < 0 ? levels.length : index;
+  };
+  const entry = [...entries].sort((a, b) =>
+    rank(a) - rank(b) ||
+    Number(normalizeKey(b.lemma) === normalizeKey(surface)) -
+      Number(normalizeKey(a.lemma) === normalizeKey(surface)) ||
+    a.lemma.localeCompare(b.lemma),
+  )[0];
+  return entry ? { key: normalizeKey(entry.lemma), entry } : null;
 }
 export const excludedSelector =
   'input,textarea,code,pre,kbd,samp,script,style,nav,footer,[role="navigation"],[hidden],[aria-hidden="true"],#voka-drawer';
@@ -88,6 +99,7 @@ export type Token = {
     GlossTarget: string;
     dictionaryStatus?: "found" | "missing";
   };
+  candidates?: Token["entry"][];
   recognized: boolean;
   range: Range;
   style: HighlightStyle | null;

@@ -21,7 +21,7 @@ export class DynamicReading {
   private revision = 0;
   private known = new Set<string>(); // Also caches Keys absent from Anki.
   readonly states: Record<string, WordState> = {};
-  private resolved = new Map<string, { key: string; entry: Token["entry"] }>();
+  private resolved = new Map<string, { key: string; entry: Token["entry"]; candidates?: Token["entry"][] }>();
   private stopped = false;
   private draining = false;
   private timer?: ReturnType<typeof setTimeout>;
@@ -33,7 +33,7 @@ export class DynamicReading {
     private changed: (tokens: Token[]) => void = () => {},
     private resolve?: (
       words: string[],
-    ) => Promise<Record<string, { key: string; entry: Token["entry"] }>>,
+    ) => Promise<Record<string, { key: string; entry: Token["entry"]; candidates?: Token["entry"][] }>>,
   ) {}
   get tokens() {
     return [...this.blocks.values()].flat();
@@ -77,6 +77,17 @@ export class DynamicReading {
       }
     }
     if (touched) this.changed(this.tokens);
+  }
+  /** Replace every occurrence of this surface, including future incremental scans. */
+  choose(surface: string, match: { key: string; entry: Token["entry"] }) {
+    const previous = this.resolved.get(surface);
+    this.resolved.set(surface, { ...previous, ...match });
+    for (const token of this.tokens) {
+      if (token.range.toString().toLowerCase() !== surface) continue;
+      if (token.style) this.highlights[token.style].delete(token.range);
+      Object.assign(token, match, { style: null, recognized: true });
+    }
+    this.refresh(match.key);
   }
   private remove(block: Element) {
     for (const token of this.blocks.get(block) ?? [])
@@ -178,6 +189,7 @@ export class DynamicReading {
           for (const token of tokens) {
             const match = this.resolved.get(token.entry.lemma);
             if (match) {
+              token.candidates = match.candidates;
               token.key = match.key;
               token.entry = match.entry;
               token.recognized = true;
