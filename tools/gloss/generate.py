@@ -452,6 +452,7 @@ def collect_round(
                     "effort": record.get("effort"),
                     "round": round_no,
                     "batch": record.get("index"),
+                    "request_sha256": request_sha,
                 }
     return valid, invalid, {
         "round": round_no,
@@ -595,12 +596,17 @@ def write_progress(
     batch_size: int,
 ) -> None:
     """Exact resume state, including which model produced each cached batch."""
+    expected_hashes = {
+        sha256(request_for(PROMPT, words[index:index + batch_size]))
+        for index in range(0, len(words), batch_size)
+    }
+    accepted_hashes = {value.get("request_sha256") for value in sources.values()}
     records = []
     timing_records = []
     for path in BATCHES.glob("r*-*.json"):
         try:
             record = json.loads(path.read_text())
-            if not record.get("transport_error"):
+            if not record.get("transport_error") and record.get("request_sha256") in expected_hashes | accepted_hashes:
                 timing_records.append(record)
                 if record.get("round") == 0:
                     records.append(record)

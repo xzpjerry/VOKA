@@ -24,11 +24,11 @@
     "gzip": 23883
   },
   "gloss-zh.json": {
-    "raw": 1852653,
-    "gzip": 562987
+    "raw": 2106381,
+    "gzip": 651554
   },
   "attributions.json": {
-    "raw": 30932,
-    "gzip": 9373
+    "raw": 30934,
+    "gzip": 9378
   }
 }

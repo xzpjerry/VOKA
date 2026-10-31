@@ -1,87 +1,80 @@
 ﻿CEFR level,lemma,OEWN glosses,generated native gloss
-A1,airplane,n. an aircraft that has a fixed wing and is powered by propellers or jets,n. 飞机
-A1,almost,adv. (of actions or states) slightly short of or not quite accomplished; all but,adv. 几乎
-A1,around,adv. in the area or vicinity; by a circular or circuitous route,adv. 附近；绕道
-A1,article,n. nonfictional prose forming an independent part of a publication; one of a class of artifacts | v. bind by a contract; especially for a training period,n. 文章；物品　v. 订约
-A1,band,"n. an unofficial association of people or groups; instrumentalists not including string players | v. bind or tie together, as with a band; attach a ring to the foot of, in order to identify",n. 团体；乐队　v. 捆扎；环志
-A1,better,adj. (comparative of ‘good’) superior to another (of the same class or set or kind) in excellence or quality or desirability or suitability; more highly skilled than another; (comparative of ‘good’) changed for the better in health or fitness | n. something superior in quality or condition or effect; someone who bets | adv. comparative of ‘well’; in a better or more excellent manner or more advantageously or attractively or to a greater degree etc.; from a position of superiority or authority | v. surpass in excellence; to make better,adj. 更好的；好转的　n. 较好者；打赌者　adv. 更好地；更　v. 胜过；改善
-A1,blow,n. a powerful stroke with the fist or a weapon; an impact (as from a collision) | v. exhale hard; be blowing or storming,n. 重击；撞击　v. 吹气；刮风
-A1,bowl,n. a round vessel that is open at the top; used chiefly for holding grains or liquids; a concave shape with an open top | v. roll (a ball); hurl a cricket ball from one end of the pitch towards the batsman at the other end,n. 碗；碗状　v. 滚球；投球
-A1,breakfast,n. the first meal of the day (usually in the morning) | v. eat an early morning meal; provide breakfast for,n. 早餐　v. 吃早餐；供早餐
-A1,bring,v. take something or somebody with oneself somewhere; cause to come into a particular state or condition,v. 带来；使处于
-A1,build,n. constitution of the human body; alternative names for the body of a human being | v. make by combining materials and parts; form or accumulate steadily,n. 体格；身材　v. 建造；积聚
-A1,bus,n. a vehicle carrying many passengers; used for public transport; the topology of a network whose components are connected by a busbar | v. send or move around by bus; ride in a bus,n. 公共汽车；总线　v. 用巴士运送；乘巴士
-A1,call,n. a method of contacting a person by phone; a loud utterance; often in protest or opposition | v. assign a specified (usually proper) name to; ascribe a quality to or give a name of a common noun that reflects a quality,n. 电话；呼喊　v. 命名；称为
-A1,celebration,n. a joyful occasion for special festivities to mark some happy event; any joyous diversion,n. 庆祝活动；欢乐活动
-A1,college,n. the body of faculty and students of a college; an institution of higher education created to educate and grant degrees; often a part of a university,n. 学院师生；学院
-A1,color,adj. having or capable of producing colors | n. a visual attribute of things that results from the light they emit or transmit or reflect; interest and variety and intensity | v. add color to; affect as in thought or feeling,adj. 彩色的　n. 颜色；生动　v. 着色；影响
-A1,dog,n. a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds; a dull unattractive unpleasant girl or woman | v. go after with the intent to catch,n. 狗；丑女人　v. 尾随
-A1,early,adj. at or near the beginning of a period of time or course of events or before the usual or expected time; being or occurring at an early stage of development | adv. during an early stage; before the usual time or the time expected,adj. 早的；早期的　adv. 早；提前
-A1,expensive,adj. high in price or charging high prices,adj. 昂贵的
-A1,fairy,"n. a small being, human in form, playful and having magical powers; offensive term for a homosexual man",n. 小仙子；同性恋者
-A1,fast,"adj. acting or moving or capable of acting or moving quickly; (used of timepieces) indicating a time ahead of or later than the correct time | n. abstaining from food | adv. quickly or rapidly (often used as a combining form); firmly or closely | v. abstain from certain foods, as for religious or medical reasons; abstain from eating",adj. 快；偏快　n. 禁食　adv. 快；牢牢　v. 禁食；斋戒
-A1,five,adj. being one more than four | n. the cardinal number that is the sum of four and one; a team that plays basketball,adj. 五　n. 五；篮球队
-A1,grass,"n. narrow-leaved green herbage: grown as lawns; used as pasture for grazing animals; cut and dried as hay; a police informer who implicates many people | v. shoot down, of birds; cover with grass",n. 草；告密者　v. 射落；铺草
-A1,hair,n. a covering for the body (or parts of it) consisting of a dense growth of threadlike structures (as on the human head); helps to prevent heat loss; a very small distance or space,n. 毛发；毫厘
-A1,hall,n. an interior passage or corridor onto which rooms open; a large entrance or reception room or area,n. 走廊；门厅
-A1,happen,"v. come to pass; happen, occur, or be the case in the course of events or by chance",v. 发生；碰巧
-A1,hat,n. headdress that protects the head from bad weather; has shaped crown and usually a brim; an informal term for a person's role | v. put on or wear a hat; furnish with a hat,n. 帽子；角色　v. 戴帽；配帽
-A1,interview,"n. the questioning of a person (or a conversation in which information is elicited); often conducted by journalists; a conference (usually with someone important) | v. conduct an interview in television, newspaper, and radio reporting; discuss formally with (somebody) for the purpose of an evaluation",n. 面试；采访　v. 采访；面谈
-A1,interviewer,n. a person who conducts an interview,n. 采访者；面试官
-A1,key,"adj. serving as an essential component | n. metal device shaped in such a way that when it is inserted into the appropriate lock the lock's mechanism can be rotated; something crucial for explaining | v. identify as in botany or biology, for example; provide with a key",adj. 关键的　n. 钥匙；关键　v. 鉴定；配上钥匙
-A2,ankle,n. a gliding joint between the distal ends of the tibia and fibula and the proximal end of the talus,n. 踝关节
+A1,april,n. the month following March and preceding May,n. 四月
+A1,as,n. a very poisonous metallic element that has three allotropic forms; arsenic and arsenic compounds are used as herbicides and insecticides and in various alloys; found in arsenopyrite and orpiment and realgar | adv. to the same degree (often followed by ‘as’),n. 砷　adv. 同样地
+A1,ask,v. make a request or demand for something to somebody; direct or put; seek an answer to,v. 请求；询问
+A1,begin,"v. take the first step or steps in carrying out an action; have a beginning, in a temporal, spatial, or evaluative sense",v. 着手；开始
+A1,best,adj. (superlative of ‘good’) having the most positive qualities; (comparative and superlative of ‘well’) wiser or more advantageous and hence advisable | n. the supreme effort one can make; the person who is most outstanding or excellent; someone who tops all others | adv. in a most excellent way or manner; it would be sensible | v. get the better of,adj. 最好的；最明智的　n. 全力；最优秀者　adv. 最好地；不妨　v. 胜过
+A1,boy,n. a youthful male person; a friendly informal reference to a grown man,n. 男孩；小伙子
+A1,brain,n. that part of the central nervous system that includes all the higher nervous centers; enclosed within the skull; continuous with the spinal cord; mental ability | v. hit on the head; kill by smashing someone's skull,n. 大脑；智力　v. 击打头部；砸碎头骨
+A1,chicken,adj. easily frightened | n. the flesh of a chicken used for food; a domestic fowl bred for flesh or eggs; believed to have been developed from the red jungle fowl,adj. 胆小的　n. 鸡肉；鸡
+A1,child,n. a young person of either sex; a human offspring (son or daughter) of any age,n. 儿童；子女
+A1,coffee,n. a beverage consisting of an infusion of ground coffee beans; any of several small trees and shrubs native to the tropical Old World yielding coffee beans,n. 咖啡；咖啡树
+A1,cry,"n. a loud utterance; often in protest or opposition; a loud utterance of emotion (especially when inarticulate) | v. utter a sudden loud cry; shed tears because of sadness, rage, or pain",n. 喊叫；抗议声；哭声　v. 叫喊；哭泣；流泪
+A1,dear,adj. dearly loved; with or in a close or intimate relationship | n. a beloved person; used as terms of endearment; a sweet innocent mild-mannered person (especially a child) | adv. with affection; at a great cost,adj. 亲爱的；亲密的　n. 亲爱的；宝贝　adv. 深情地；高价地
+A1,different,adj. unlike in nature or quality or form or degree; distinctly separate from the first,adj. 不同的；另外的
+A1,dollar,n. the basic monetary unit in many countries; equal to 100 cents; a piece of paper money worth one dollar,n. 元；一元纸币
+A1,down,"adj. being or moving lower in position or less in some value; extending or moving from a higher to a lower place | n. soft fine feathers; (American football) a complete play to advance the football | adv. spatially or metaphorically from a higher to a lower level or position; away from a more central or a more northerly place | v. drink down entirely; eat up completely, as with great appetite",adj. 向下的；较低的　n. 绒毛；一次进攻　adv. 向下；远离中心　v. 喝光；吃光
+A1,drive,n. the act of applying force to propel something; a mechanism by which force or power is transmitted in a machine | v. operate or control a vehicle; travel or be transported in a vehicle,n. 推进；传动装置　v. 驾驶；乘车
+A1,event,n. something that happens at a given place and time; a special set of circumstances,n. 事件；场合
+A1,fight,n. a hostile meeting of opposing military forces in the course of a war; the act of fighting; any contest or struggle | v. be engaged in a fight; carry on a fight; fight against or resist strongly,n. 战斗；争斗　v. 战斗；抗争
+A1,grammar,n. the branch of linguistics that deals with syntax and morphology (and sometimes also deals with semantics),n. 语法
+A1,guest,n. a visitor to whom hospitality is extended; a customer of a hotel or restaurant etc.,n. 客人；旅客
+A1,habit,n. an established custom; (psychology) an automatic pattern of behavior in reaction to a specific situation; may be inherited or acquired through frequent repetition | v. put a habit on,n. 习惯；习性　v. 穿衣
+A1,horse,n. solid-hoofed herbivorous quadruped domesticated since prehistoric times; a padded gymnastic apparatus on legs | v. provide with a horse or horses,n. 马；跳马　v. 配备马匹
+A1,husband,n. a married man; a woman's partner in marriage | v. use cautiously and frugally,n. 丈夫　v. 节约
+A1,leaf,n. the main organ of photosynthesis and transpiration in higher plants; a sheet of any written or printed material (especially in a manuscript or book) | v. look through a book or other written material; turn over pages,n. 叶片；书页　v. 翻阅；翻页
+A1,learn,"v. gain knowledge or skills; get to know or become aware of, usually accidentally",v. 学习；偶然得知
+A1,list,n. a database containing an ordered array of items (names or topics); the property possessed by a line or surface that departs from the vertical | v. give or make a list of; name individually; give the names of; include in a list,n. 列表；倾斜度　v. 列出；列入
+A1,math,n. a science (or group of related sciences) dealing with the logic of quantity and shape and arrangement,n. 数学
+A1,monkey,"n. any of various long-tailed primates (excluding the prosimians); one who is playfully mischievous | v. play around with or alter or falsify, usually secretively or dishonestly; do random, unplanned work or activities or spend time idly",n. 猴子；淘气鬼　v. 暗中篡改；闲混胡闹
+A1,news,n. information about recent and important events; information reported in a newspaper or news magazine,n. 新闻；报刊消息
+A1,note,n. a brief written record; a short personal letter | v. make mention of; notice or perceive,n. 笔记；短笺　v. 提及；注意到
 A2,annoy,"v. cause annoyance in; disturb, especially by minor irritations",v. 惹恼；打扰
 A2,attractive,adj. pleasing to the eye or mind especially through beauty or charm; having power to arouse interest,adj. 迷人的；有吸引力的
-A2,beginning,adj. serving to begin | n. the event consisting of the start of something; the time at which something is supposed to begin,adj. 开端的　n. 开端；起点
+A2,awful,adj. exceptionally bad or displeasing; causing fear or dread or terror | adv. used as intensifiers,adj. 糟糕的；可怕的　adv. 非常；极其
 A2,bit,n. a small piece or quantity of something; a small fragment of something broken off from the whole,n. 小块；碎片
 A2,bite,"n. a wound resulting from biting by an animal or a person; a small amount of solid food; a mouthful | v. to grip, cut off, or tear with or as if with the teeth or jaws; cause a sharp or stinging pain or discomfort",n. 咬伤；一口　v. 咬；刺痛
 A2,blanket,adj. broad in scope or content | n. bedding that keeps a person warm in bed; anything that covers | v. cover as if with a blanket; form a blanket-like cover (over),adj. 广泛　n. 毯子；覆盖物　v. 覆盖；笼罩
 A2,bookshop,n. a shop where books are sold,n. 书店
-A2,cause,"n. events that provide the generative force that is the origin of something; a justification for something existing or happening | v. give rise to; cause to happen or occur, not always intentionally; cause to do; cause to act in a specified manner",n. 原因；理由　v. 导致；促使
+A2,chain,n. a series of things depending on each other as if linked together; (chemistry) a series of linked atoms (generally in an organic molecule) | v. connect or arrange into a chain by linking; fasten or secure with chains,n. 链；连锁　v. 连接；拴住
 A2,chimpanzee,n. intelligent somewhat arboreal ape of equatorial African forests,n. 黑猩猩
 A2,clear,adj. readily apparent to the mind; free from confusion or doubt | n. the state of being free of suspicion; a clear or unobstructed space or expanse of land or water | adv. entirely; in an easily perceptible manner | v. rid of obstructions; make a way or path by removing objects,adj. 清楚；明确　n. 清白；开阔地　adv. 完全；清晰地　v. 清除；开辟
+A2,clown,n. a rude or vulgar fool; a person who amuses others by ridiculous behavior | v. act as or like a clown,n. 小丑；粗人　v. 扮小丑；耍活宝
 A2,convenience,n. the state of being suitable or opportune; the quality of being useful and convenient,n. 适宜；便利
-A2,convenient,adj. suited to your comfort or purpose or needs; large and roomy (‘convenient’ is archaic in this sense),adj. 方便的；宽敞的
 A2,create,v. make or cause to be or to become; bring into existence,v. 创造；产生
 A2,description,n. a statement that represents something in words; the act of describing something,n. 描述；描写
 A2,earn,v. earn on some commercial or business transaction; earn as salary or wages; acquire or deserve by one's efforts or actions,v. 赚取；赢得
-A2,envy,n. a feeling of grudging admiration and desire to have something that is possessed by another; spite and resentment at seeing the success of another (personified as one of the deadly sins) | v. feel envious towards; admire enviously; be envious of; set one's heart on,n. 羡慕；嫉恨　v. 羡慕；嫉妒
 A2,escape,n. the act of escaping physically; an inclination to retreat from unpleasant realities through diversion or fantasy | v. run away from confinement; fail to experience,n. 逃跑；逃避　v. 逃脱；错过
 A2,euro,"n. the basic monetary unit of most members of the European Union (introduced in 1999); in 2002 twelve European nations (Germany, France, Belgium, Luxembourg, the Netherlands, Italy, Spain, Portugal, Ireland, Greece, Austria, Finland) adopted the euro as their basic unit of money and abandoned their traditional currencies",n. 欧元
 A2,except,v. object to; prevent from being included or considered or accepted,v. 反对；排除
 A2,expect,v. regard something as probable or likely; consider obligatory; request and expect,v. 预料；期待；要求
 A2,fact,n. a piece of information about circumstances that exist or events that have occurred; a statement or assertion of verified information about something that is the case or has happened,n. 事实
 A2,fare,n. an agenda of things to do; the sum charged for riding in a public conveyance | v. proceed or get along; eat well,n. 车费；日程　v. 进展；吃好
-A2,fix,"n. informal terms for a difficult situation; something craved, especially an intravenous injection of a narcotic drug | v. restore by replacing a part or putting together what is torn or broken; cause to be firmly attached",n. 困境；毒品注射　v. 修理；固定
-A2,fool,n. a person who lacks good judgment; a person who is gullible and easy to take advantage of | v. make a fool or dupe of; spend frivolously and unwisely,n. 傻瓜；易受骗者　v. 愚弄；挥霍
 A2,frank,"adj. characterized by directness in manner or speech; without subtlety or evasion; clearly manifest; evident | n. a member of the ancient Germanic peoples who spread from the Rhine into the Roman Empire in the 4th century; a smooth-textured sausage of minced beef or pork usually smoked; often served on a bread roll | v. stamp with a postmark to indicate date and time of mailing; exempt by means of an official pass or letter, as from customs or other checks",adj. 坦率的；明显的　n. 法兰克人；法兰克福香肠　v. 盖邮戳；特许豁免
 A2,gender,n. a grammatical category in inflected languages governing the agreement between nouns and pronouns and adjectives; in some languages it is quite arbitrary but in Indo-European languages it is usually based on sex or animateness; the properties that distinguish organisms on the basis of their reproductive roles,n. 语法性别；性别
-A2,harmony,n. compatibility in opinion and action; the structure of music with respect to the composition and progression of chords,n. 和睦；和声
-A2,instant,adj. occurring with no delay; in or of the present month | n. a very short time (as the time it takes the eye to blink or the heart to beat); a particular point in time,adj. 立即的；当月的　n. 瞬间；时点
+A2,ill,adj. affected by an impairment of normal physical or mental function; resulting in suffering or adversity | n. an often persistent bodily disorder or disease; a cause for complaining | adv. (‘ill’ is often used as a combining form) in a poor or improper or unsatisfactory manner; not well; unfavorably or with disapproval,adj. 生病的；不良的　n. 疾病；毛病　adv. 拙劣地；不利地
 A2,jelly,n. an edible jelly (sweet or pungent) made with gelatin and used as a dessert or salad base or a coating for foods; a preserve made of the jelled juice of fruit | v. make into jelly,n. 果冻；果汁果酱　v. 制成果冻
-B1,aboard,"adv. on a ship, train, plane or other vehicle; on first or second or third base",adv. 在交通工具上；在垒上
+A2,joy,n. the emotion of great happiness; something or someone that provides a source of happiness | v. feel happiness or joy; make glad or happy,n. 喜悦；乐事　v. 感到快乐；使高兴
+A2,major,adj. of greater importance or stature or rank; greater in scope or effect | n. a commissioned military officer in the United States Army or Air Force or Marines; below lieutenant colonel and above captain; a university student who is studying a particular field as the principal subject | v. have as one's principal field of study,adj. 更重要的；规模更大的　n. 少校；主修生　v. 主修
+A2,missing,adj. not able to be found; nonexistent,adj. 失踪的；不存在的
+A2,motorway,n. a broad highway designed for high-speed traffic,n. 高速公路
+A2,mystery,n. something that baffles understanding and cannot be explained; a story about a crime (usually murder) presented as a novel or play or movie,n. 谜团；悬疑故事
 B1,ad,n. a public promotion of some product or service | adv. in the Christian era; used before dates after the supposed year Christ was born,n. 广告　adv. 公元
 B1,alphabet,n. a character set that includes letters and is used to write a language; the elementary stages of any subject (usually plural),n. 字母表；入门
 B1,approve,v. give sanction to; judge to be right or commendable; think well of,v. 批准；赞成
 B1,army,n. the army of the United States of America; the agency that organizes and trains soldiers for land warfare; a permanent organization of the military land forces of a nation or state,n. 美国陆军；陆军部队
 B1,aside,n. a line spoken by an actor to the audience but not intended for others on the stage; a message that departs from the main subject | adv. on or to one side; out of the way (especially away from one's thoughts),n. 旁白；离题话　adv. 在旁边；到一边
-B1,astronomer,n. a physicist who studies astronomy,n. 天文学家
-B1,basement,n. the lowermost portion of a structure partly or wholly below ground level; often used for storage; the ground floor facade or interior in Renaissance architecture,n. 地下室；底层
 B1,beat,"adj. very tired | n. a regular route for a sentry or policeman; the rhythmic contraction and expansion of the arteries with each beat of the heart | v. come out better in a competition, race, or conflict; give a beating to; subject to a beating, either as a punishment or as an act of aggression",adj. 筋疲力尽　n. 巡逻路线；心跳　v. 击败；殴打
 B1,behalf,n. as the agent of or on someone's part (usually expressed as ‘on behalf of’ rather than ‘in behalf of’); for someone's benefit (usually expressed as ‘in behalf’ rather than ‘on behalf’ and usually with a possessive),n. 代表；利益
 B1,blog,"n. a shared on-line journal where people can post diary entries about their personal experiences and hobbies | v. read, write, or edit a shared on-line journal",n. 博客　v. 写博客
 B1,cancer,n. (astrology) a person who is born while the sun is in Cancer; any malignant growth or tumor caused by abnormal and uncontrolled cell division; it may spread to other parts of the body through the lymphatic system or the blood stream,n. 巨蟹座的人；癌症
 B1,checkout,n. the act of inspecting or verifying; the latest time for vacating a hotel room,n. 检查；退房时间
-B1,comedian,n. a professional performer who tells jokes and performs comical acts; an actor in a comedy,n. 喜剧演员；笑星
 B1,conscious,adj. intentionally conceived; knowing and perceiving; having awareness of surroundings and sensations and thoughts,adj. 有意的；有意识的
-B1,contrary,adj. very opposed in nature or character or purpose; of words or propositions so related that both cannot be true but both may be false | n. a relation of direct opposition; exact opposition,adj. 相反的；反对关系的　n. 对立关系；完全相反
-B1,convince,"v. make (someone) agree, understand, or realize the truth or validity of something",v. 使确信；说服
 B1,currently,adv. at this time or period; now,adv. 目前
 B1,damaged,adj. harmed or injured or spoiled; being unjustly brought into disrepute,adj. 受损的；名誉受损的
 B1,deposit,"n. the phenomenon of sediment or gravel accumulating; matter that has been deposited by some natural process | v. put, fix, force, or implant; put into a bank account",n. 沉积；沉积物　v. 放置；存入
 B1,derive,v. reason by deduction; establish by deduction; obtain,v. 推导；获得
 B1,despite,n. lack of respect accompanied by a feeling of intense dislike; contemptuous disregard,n. 蔑视；轻视
-B1,drag,"n. the phenomenon of resistance to motion through a fluid; something that slows or delays progress | v. pull, as against a resistance; draw slowly or heavily",n. 阻力；拖累　v. 拖拽；拖拉
 B1,eventually,adv. after an unspecified period of time or an especially long delay,adv. 最终
 B1,forgive,v. stop blaming or grant forgiveness; absolve from payment,v. 原谅；免除
 B1,global,adj. involving the entire earth; not limited or provincial in scope; having the shape of a sphere or ball,adj. 全球的；球形的
@@ -89,123 +82,130 @@ B1,habitat,n. the type of environment in which an organism or group normally liv
 B1,historic,adj. belonging to the past; of what is important or famous in the past; important in history,adj. 历史性的；历史悠久的
 B1,imitate,"v. reproduce someone's behavior or looks; appear like, as in behavior or appearance",v. 模仿；仿效
 B1,joint,adj. united or combined; affecting or involving two or more | n. (anatomy) the point of connection between two bones or elements of a skeleton (especially if it allows motion); a disreputable place of entertainment | v. fit as if by joints; provide with a joint,adj. 联合的；共同的　n. 关节；下等娱乐场所　v. 榫接；装上接头
+B1,limp,adj. without energy or will; lacking or having lost rigidity | n. the uneven manner of walking that results from an injured leg | v. walk impeded by some physical limitation or injury; proceed slowly or with difficulty,adj. 无精打采的；松软的　n. 跛行　v. 一瘸一拐地走；艰难缓慢前行
+B1,luxury,n. something that is an indulgence rather than a necessity; the quality possessed by something that is excessively expensive,n. 非必需享受；奢侈品
+B1,mechanic,adj. resembling the action of a machine | n. a craftsman skilled in operating machine tools; someone whose occupation is repairing and maintaining automobiles,adj. 机械般的　n. 机床技工；汽车修理工
+B1,mend,n. sewing that repairs a worn or torn hole (especially in a garment); the act of putting something in working order again | v. restore by replacing a part or putting together what is torn or broken; heal or recover,n. 缝补；修理　v. 修补；康复
+B1,modem,n. (from a combination of MOdulate and DEModulate) electronic equipment consisting of a device used to connect computers by a telephone line,n. 调制解调器
+B1,motherland,n. the country where you were born,n. 出生国
+B1,myth,n. a traditional story accepted as history; serves to explain the world view of a people,n. 神话
+B2,aboriginal,adj. characteristic of or relating to people inhabiting a region from the beginning; having existed from the beginning; in an earliest or original stage or state | n. an indigenous person who was born in a particular place,adj. 原住民的；原始的　n. 原住民
 B2,adopted,adj. acquired as your own by free choice,adj. 收养的；采用的
 B2,artificially,adv. not according to nature; not by natural means,adv. 人工地
 B2,assemble,v. create by putting components or members together; collect in one place,v. 组装；集合
-B2,audition,n. the ability to hear; the auditory faculty; a test of the suitability of a performer | v. perform in order to get a role,n. 听力；试演　v. 试演
-B2,beagle,n. a small short-legged smooth-coated breed of hound,n. 比格犬
-B2,cheeky,adj. offensively bold,adj. 无礼的
+B2,audit,n. an inspection of the accounting procedures and records by a trained accountant or CPA; a methodical examination or review of a condition or situation | v. examine carefully for accuracy with the intent of verification; attend academic courses without getting credit,n. 审计；审查　v. 审计；旁听
 B2,competence,n. the quality of being adequately or well qualified physically and intellectually,n. 能力；胜任
+B2,contract,n. a binding agreement between two or more persons that is enforceable by law; (contract bridge) the highest bid becomes the contract setting the number of tricks that the bidder must make | v. enter into a contractual arrangement; engage by written agreement,n. 合同；契约　v. 订约；签订
 B2,controversy,n. a contentious speech act; a dispute where there is strong disagreement,n. 争议
 B2,curl,"n. a round shape formed by a series of concentric circles (as formed by leaves or flower petals); lock of hair in the shape of a spiral or curl | v. form a curl, curve, or kink; shape one's body into a curl",n. 卷曲；卷发　v. 卷曲；蜷缩
-B2,cyclist,n. a person who rides a bicycle,n. 骑自行车的人
 B2,dawn,n. the first light of day; the earliest period | v. become clear or enter one's consciousness or emotions; appear or develop,n. 黎明；开端　v. 逐渐明白；出现
-B2,detach,"v. cause to become detached or separated; take off; separate (a small unit) from a larger, especially for a special assignment",v. 分开；派遣
-B2,discharge,n. the sudden giving off of energy; the act of venting | v. complete or carry out; pour forth or release,n. 释放；排放　v. 履行；释放
+B2,disqualify,v. make unfit or unsuitable; declare unfit,v. 使不合格；取消资格
 B2,distributor,n. someone who markets merchandise; a person with authority to allot or deal out or apportion,n. 经销商；分配者
 B2,diversion,n. an activity that diverts or amuses or stimulates; a turning aside (of your course or attention or concern),n. 消遣；转移
-B2,dorm,n. a college or university building containing living quarters for students,n. 宿舍
 B2,dose,n. a measured portion of medicine taken at any one time; the quantity of an active agent (substance or radiation) taken in or absorbed at any one time | v. treat with an agent; add (an agent) to; administer a drug to,n. 一剂；剂量　v. 给药；加药
 B2,employee,n. a worker who is hired to perform a job,n. 雇员；职工
 B2,ethnic,adj. denoting or deriving from or distinctive of the ways of living built up by a group of people; not acknowledging the God of Christianity and Judaism and Islam | n. a person who is a member of an ethnic group,adj. 民族的；异教的　n. 族裔成员
 B2,exotic,adj. being or from or characteristic of another place or part of the world; strikingly strange or unusual,adj. 异国的；奇异的
 B2,faculty,n. one of the inherent cognitive or perceptual powers of the mind; the body of teachers and administrators at a school,n. 官能；全体教员
-B2,fulfill,v. put in effect; meet the requirements or expectations of,v. 履行；满足
 B2,hook,n. a catch for locking a door; a sharp curve or crook; a shape resembling a hook | v. fasten with a hook; rip off; ask an unreasonable price,n. 门钩；弯钩　v. 钩住；宰客
 B2,impartial,adj. showing lack of favoritism; free from undue bias or preconceived opinions,adj. 公正；不偏不倚
 B2,improved,adj. made more desirable or valuable or profitable; especially made ready for use or marketing; become or made better in quality,adj. 改良的；变好的
 B2,intellectual,adj. of or associated with or requiring the use of the mind; appealing to or using the intellect | n. a person who uses the mind creatively,adj. 智力的；理性的　n. 知识分子
 B2,interpreter,n. someone who mediates between speakers of different languages; someone who uses art to represent something,n. 口译员；诠释者
 B2,juror,n. someone who serves (or waits to be called to serve) on a jury,n. 陪审员
-B2,kneel,n. supporting yourself on your knees | v. rest one's weight on one's knees,n. 跪姿　v. 跪下
 B2,laborer,n. someone who works with their hands; someone engaged in manual labor,n. 体力劳动者
+B2,lawn,n. a field of cultivated and mowed grass,n. 草坪
+B2,legend,n. a story about mythical or supernatural beings or events; brief description accompanying an illustration,n. 传说；插图说明
+B2,micrometer,n. a metric unit of length equal to one millionth of a meter; caliper for measuring small distances,n. 微米；千分尺
+B2,nomad,n. a member of a people who have no permanent home but move about according to the seasons,n. 季节迁徙者
+B2,nut,n. usually large hard-shelled seed; a small (usually square or hexagonal) metal block with internal screw thread to be fitted onto a bolt | v. gather nuts,n. 坚果；螺母　v. 采坚果
+C1,anticlimactic,adj. of or relating to a sudden change from an impressive to a ludicrous style; coming after the climax especially of a dramatic or narrative plot,adj. 反高潮的；高潮后的
 C1,antiquated,adj. so extremely old as seeming to belong to an earlier period,adj. 陈旧过时的
-C1,appalling,adj. causing consternation | n. an experience that appalls,adj. 令人震惊的　n. 可怕经历
 C1,apprentice,n. works for an expert to learn a trade | v. be or work as an apprentice,n. 学徒；徒弟　v. 当学徒
-C1,candidly,adv. (used as intensives reflecting the speaker's attitude) it is sincerely the case that,adv. 真诚地
+C1,bulk,n. the property resulting from being or relating to the greater in number of two parts; the main part; the property of something that is great in magnitude | v. stick out or up; cause to bulge or swell outwards,n. 大部分；体积　v. 凸起；使膨胀
 C1,clench,n. a small slip noose made with seizing; the act of grasping | v. hold in a tight grasp; squeeze together tightly,n. 紧握；活结套　v. 紧握；咬紧
 C1,climactic,adj. consisting of or causing a climax,adj. 高潮的
+C1,collaboration,n. act of working jointly; act of cooperating traitorously with an enemy that is occupying your country,n. 合作；通敌
 C1,complimentary,adj. conveying or resembling a compliment; costing nothing,adj. 赞美的；免费的
-C1,conditional,adj. qualified by reservations; imposing or depending on or containing a condition,adj. 有条件的；附条件的
+C1,con,"n. an argument opposed to a proposal; a person serving a sentence in a jail or prison | adv. in opposition to a proposition, opinion, etc. | v. deprive of by deceit; commit to memory; learn by heart",n. 反对论点；囚犯　adv. 反对地　v. 欺骗；熟记
+C1,conform,"v. be similar, be in line with; adapt or conform oneself to new or different conditions",v. 符合；顺应
 C1,conjure,"v. summon into action or bring into existence, often as if by magic; ask for or request earnestly",v. 召唤；恳求
-C1,craving,n. an intense desire for some particular thing,n. 渴望
+C1,contested,adj. disputed or made the object of contention or competition,adj. 有争议的
 C1,detrimentally,adv. in a detrimental manner,adv. 有害地
+C1,digitalize,"v. put into digital form, as for use in a computer; administer digitalis such that the patient benefits maximally without getting adverse effects",v. 数字化；洋地黄化
 C1,drawback,n. the quality of being a hindrance,n. 缺点；障碍
-C1,embark,v. go on board; set out on (an enterprise or subject of study),v. 登船；着手
-C1,engrossing,adj. capable of arousing and holding the attention,adj. 引人入胜
+C1,extravagance,n. the quality of exceeding the appropriate limits of decorum or probability or truth; the trait of spending extravagantly,n. 奢侈；挥霍；过度
+C1,exuberantly,adv. in an exuberant manner; in an ebullient manner,adv. 热情洋溢地
+C1,fanatic,adj. marked by excessive enthusiasm for and intense devotion to a cause or idea | n. a person motivated by irrational enthusiasm (as for a cause),adj. 狂热的　n. 狂热者
 C1,fatigue,n. temporary loss of strength and energy resulting from hard physical or mental work; used of materials (especially metals) in a weakened state caused by long stress | v. lose interest or become bored with something or somebody; exhaust or get tired through overuse or great strain or stress,n. 疲劳；材料疲劳　v. 厌倦；使疲惫
 C1,flick,n. a light sharp contact (usually with something flexible); a short stroke | v. flash intermittently; look through a book or other written material,n. 轻弹；轻打　v. 闪烁；翻阅
 C1,forfeit,"adj. surrendered as a penalty | n. something that is lost or surrendered as a penalty; a penalty for a fault or mistake that involves losing or giving up something | v. lose (something) or lose the right to (something) by some error, offense, or crime",adj. 罚没的　n. 没收物；罚金　v. 丧失
-C1,formality,n. a requirement of etiquette or custom; a manner that strictly observes all forms and ceremonies,n. 礼节；拘泥形式
-C1,glean,"v. gather, as of natural products",v. 采集
 C1,heighten,"v. become more extreme; make more extreme; raise in quantity, degree, or intensity",v. 加剧；增强；提高
-C1,heroine,n. the main good female character in a work of fiction; a woman possessing heroic qualities or a woman who has performed heroic deeds,n. 女英雄；女主角
 C1,impervious,adj. not admitting of passage or capable of being affected,adj. 不可渗透；无动于衷
-C1,impishly,adv. in an appealing but bold manner,adv. 顽皮地
-C1,incision,n. a depression scratched or carved into a surface; the cutting of or into body tissues or organs (especially by a surgeon as part of an operation),n. 切口；切开
+C1,implicate,"v. bring into intimate and incriminating connection; impose, involve, or imply as a necessary accompaniment or result",v. 牵连；涉及
+C1,ingenuity,n. the power of creative imagination; the property of being ingenious,n. 创造力；巧思
 C1,inherently,adv. in an inherent manner,adv. 固有地；本质上
-C1,insecurely,adv. in a tentative and self-conscious manner; in a manner involving risk,adv. 不自信地；危险地
-C1,integral,adj. existing as an essential constituent or characteristic; constituting the undiminished entirety; lacking nothing essential especially not damaged | n. the result of a mathematical integration; F(x) is the integral of f(x) if dF/dx = f(x),adj. 不可或缺的；完整的　n. 积分
-C1,intellect,n. knowledge and intellectual ability; the capacity for rational thought or inference or discrimination,n. 智力；才智
-C1,irately,adv. in an irate manner,adv. 暴怒地
 C1,itinerary,n. an established line of travel or access; a guidebook for travelers,n. 旅行路线；旅行指南
-C2,accountability,n. responsibility to someone or for some activity,n. 问责
-C2,agile,adj. moving quickly and lightly; mentally quick,adj. 敏捷的；机敏的
+C1,knowledgeable,adj. highly educated; having extensive information or understanding; alert and fully informed,adj. 有学识的；消息灵通的
+C1,maternalistic,adj. showing maternal instincts,adj. 具有母性本能的
+C1,mechanism,n. the atomic process that occurs during a chemical reaction; the technical aspects of doing something,n. 反应机理；运作方式
 C2,allude,v. make a more or less disguised reference to,v. 暗指
-C2,artifact,n. a man-made object taken as a whole,n. 人工制品；器物
-C2,austerity,n. the trait of great self-denial (especially refraining from worldly pleasures),n. 节制
-C2,centralized,adj. drawn toward a center or brought under the control of a central authority,adj. 集中的
+C2,anthropological,adj. of or concerned with the science of anthropology,adj. 人类学的
+C2,apostle,n. any important early teacher of Christianity or a Christian missionary to a people; (New Testament) one of the original 12 disciples chosen by Christ to preach his gospel,n. 使徒
+C2,blandishment,n. flattery intended to persuade; the act of urging by means of teasing or flattery,n. 奉承；哄劝
 C2,cinematography,n. the act of making a film,n. 电影摄影
-C2,cloister,"n. residence that is a place of religious seclusion (such as a monastery); a courtyard with covered walks (as in religious institutions) | v. surround with a cloister, as of a garden; surround with a cloister",n. 修道院；回廊庭院　v. 围以回廊
-C2,cocoon,"n. silky envelope spun by the larvae of many insects to protect pupas and by spiders to protect eggs | v. retreat as if into a cocoon, as from an unfriendly environment; wrap in or as if in a cocoon, as for protection",n. 茧　v. 隐居；包裹
-C2,combustion,n. a process in which a substance reacts with oxygen to give heat and light; a state of violent disturbance and excitement,n. 燃烧；骚动
+C2,commodity,"n. a raw material that is sold in large quantities, usually to other businesses for manufacturing or production purposes",n. 商品；大宗商品
 C2,connote,v. express or state indirectly; involve as a necessary condition of consequence; as in logic,v. 暗示；意味着
 C2,contraption,n. a device or control that is very useful for a particular job,n. 新奇装置；玩意儿
-C2,cosset,v. treat with excessive indulgence,v. 溺爱
+C2,corpus,n. capital as contrasted with the income derived from it; a collection of writings,n. 文集；本金
 C2,curate,n. a person authorized to conduct religious worship,n. 助理牧师
-C2,deficient,adj. inadequate in amount or degree; of a quantity not able to fulfill a need or requirement,adj. 不足的；缺乏的
-C2,denunciation,n. a public act of denouncing,n. 谴责；公开指责
 C2,disparage,v. express a negative opinion of,v. 贬低；轻视
 C2,distillation,n. the process of purifying a liquid by boiling it and condensing its vapors; a purified liquid produced by condensation from a vapor during distilling; the product of distilling,n. 蒸馏；馏出物
-C2,ethos,n. (anthropology) the distinctive spirit of a culture or an era,n. 文化精神
-C2,feign,v. make believe with the intent to deceive; make a pretence of,v. 假装；佯装
-C2,haphazard,adj. dependent upon or characterized by chance; marked by great carelessness | adv. without care; in a slapdash manner,adj. 偶然的；随意的　adv. 随意地；胡乱地
-C2,hinder,adj. located at or near the back of an animal | v. be a hindrance or obstacle to; hinder or prevent the progress or accomplishment of,adj. 后部的　v. 阻碍；妨碍
+C2,ephemeral,"adj. lasting a very short time | n. anything short-lived, as an insect that lives only for a day in its winged form",adj. 短暂的　n. 短命之物
+C2,equable,adj. not varying; not easily irritated,adj. 平稳的；温和的
+C2,herald,n. (formal) a person who announces important news; something that precedes and indicates the approach of something or someone | v. foreshadow or presage; praise vociferously,n. 传令官；预兆　v. 预示；欢呼
+C2,hysteria,n. state of violent mental agitation; excessive or uncontrollable fear,n. 癔症；过度恐惧
 C2,incise,v. make an incision into by carving or cutting,v. 切开；雕刻
-C2,indignant,adj. angered at something unjust or wrong,adj. 愤慨
+C2,individualism,n. the quality of being individual; a belief in the importance of the individual and the virtue of self-reliance and personal independence,n. 个人主义；个体性
 C2,indolent,"adj. disinclined to work or exertion; (of tumors, e.g.) slow to heal or develop and usually painless",adj. 懒惰的；惰性的
 C2,inexorability,n. mercilessness characterized by an unwillingness to relent or let up,n. 冷酷无情
-C2,instantaneous,adj. occurring with no delay,adj. 即时发生的
+C2,instantaneously,adv. without any delay,adv. 立即地
+C2,interlocking,adj. linked or locked closely together as by dovetailing | n. contact by fitting together; the act of interlocking or meshing,adj. 紧密咬合的　n. 相互嵌合；啮合
 C2,interrogatively,adv. in a questioning format; with curiosity,adv. 疑问地
 C2,intersperse,v. place at intervals in or among; introduce one's writing or speech with certain expressions,v. 点缀；穿插
-C2,interweave,v. interlace by or as if by weaving,v. 交织
-Unleveled,abampere,n. a unit of current equal to 10 amperes,n. 十安培
-Unleveled,acetylate,v. receive substitution of an acetyl group; introduce an acetyl group into (a chemical compound),v. 被乙酰化；引入乙酰基
-Unleveled,aerophilately,n. the collection and study of airmail stamps,n. 航空集邮
-Unleveled,anagnost,n. a cleric in the minor orders of the Eastern Orthodox Church who reads the lessons aloud in the liturgy (analogous to the lector in the Roman Catholic Church),n. 读经员
-Unleveled,attrited,adj. worn by rubbing or friction,adj. 磨损的
-Unleveled,awakened,adj. aroused or activated; (somewhat formal) having been waked up,adj. 被唤醒的；被激发的
-Unleveled,bigger,adj. large or big relative to something else,adj. 较大的
-Unleveled,brachycephalism,n. the quality of being brachycephalic,n. 短头型
-Unleveled,brine,n. water containing salts; a strong solution of salt and water used for pickling | v. soak in brine,n. 盐水；卤水　v. 盐渍
-Unleveled,bulbous,adj. shaped like a bulb; curving outward,adj. 球状的；外凸的
-Unleveled,catalpa,n. tree of the genus Catalpa with large leaves and white flowers followed by long slender pods,n. 梓树
-Unleveled,chamfer,n. two surfaces meeting at an angle different from 90 degrees | v. cut a bevel on; shape to a bevel; cut a furrow into a column,n. 斜面　v. 斜切；刻槽
-Unleveled,countryseat,n. an estate in the country,n. 乡村庄园
-Unleveled,drainboard,n. a board beside a kitchen sink and inclined to drain into the sink,n. 沥水板
-Unleveled,drooler,n. a person who dribbles,n. 流涎者
-Unleveled,earth-god,n. a god of fertility and vegetation,n. 地神
-Unleveled,epanalepsis,n. repetition after intervening words,n. 隔词重复
-Unleveled,faceless,adj. without a face or identity,adj. 无面孔的
-Unleveled,fitfulness,n. the quality of being spasmodic and irregular,n. 阵发性
-Unleveled,gamine,n. a homeless girl who roams the streets; a girl of impish appeal,n. 流浪女孩；俏皮女孩
-Unleveled,gardant,adj. looking forward,adj. 头朝前的
-Unleveled,geographer,n. an expert on geography,n. 地理学家
-Unleveled,ginkgo,n. deciduous dioecious Chinese tree having fan-shaped leaves and fleshy yellow seeds; exists almost exclusively in cultivation especially as an ornamental street tree,n. 银杏
-Unleveled,hardcore,adj. intensely loyal; extremely explicit,adj. 忠诚的；露骨的
-Unleveled,high-handedly,adv. in a domineering high-handed manner,adv. 专横地
-Unleveled,high-keyed,adj. (of persons) excitable,adj. 易激动的；紧张的
-Unleveled,imbricate,adj. used especially of leaves or bracts; overlapping or layered as scales or shingles | v. place so as to overlap; overlap,adj. 覆瓦状的　v. 重叠；交叠
-Unleveled,impregnate,"v. fill, as with a certain quality; infuse or fill completely",v. 浸透；使充满
-Unleveled,jellied,adj. congealed into jelly; solidified by cooling,adj. 凝成果冻的
-Unleveled,keypad,n. a keyboard that is a data input device for computers; arrangement of keys is modelled after the typewriter keyboard,n. 电脑键盘
+C2,lassitude,n. a state of comatose torpor (as found in sleeping sickness); a feeling of lack of interest or energy,n. 昏睡；倦怠乏力
+C2,locomotive,adj. of or relating to locomotion | n. a wheeled vehicle consisting of a self-propelled engine that is used to draw trains along railway tracks,adj. 运动的　n. 火车头
+C2,loiter,v. be about a place without any apparent purpose,v. 游荡
+C2,lyricist,n. a person who writes the words for songs,n. 歌词作者
+C2,magnanimous,adj. noble and generous in spirit; generous and understanding and tolerant,adj. 高尚宽宏的；慷慨宽容的
+C2,nonchalant,adj. marked by blithe unconcern,adj. 满不在乎的
+Unleveled,acarpelous,adj. having no carpels,adj. 无心皮的
+Unleveled,acephalism,n. absence of the head (as in the development of some monsters),n. 无头畸形
+Unleveled,aggregation,n. several things grouped together or considered as a whole; the act of gathering something together,n. 集合体；聚集
+Unleveled,amphiboly,"n. an ambiguous grammatical construction; e.g., ‘they are flying planes’ can mean either that someone is flying planes or that something is flying planes",n. 语法歧义
+Unleveled,anathema,n. a detested person; a formal ecclesiastical curse accompanied by excommunication,n. 可憎之人；教会诅咒
+Unleveled,bacteriophage,n. a virus that is parasitic (reproduces itself) in bacteria,n. 噬菌体
+Unleveled,bisexual,adj. sexually attracted to both sexes; having an ambiguous sexual identity | n. a person who is sexually attracted to both sexes,adj. 双性恋的；性别模糊的　n. 双性恋者
+Unleveled,brisken,v. become brisk,v. 变轻快
+Unleveled,capitate,adj. being abruptly enlarged and globose at the tip | n. the wrist bone with a rounded head shape that articulates with the 3rd metacarpus,adj. 头状的　n. 头状骨
+Unleveled,cautery,"n. an instrument or substance used to destroy tissue for medical reasons (e.g., removal of a wart) by burning it with a hot iron or an electric current or a caustic or by freezing it; the act of coagulating blood and destroying tissue with a hot iron or caustic agent or by freezing",n. 烧灼器；烧灼术
+Unleveled,contractile,adj. capable of contracting or being contracted,adj. 可收缩的
+Unleveled,cryptically,adv. in a cryptic manner,adv. 隐晦地；神秘地
+Unleveled,defervescent,adj. of or relating to the reduction of a fever,adj. 退热的
+Unleveled,deflagration,n. combustion that propagates through a gas or along the surface of an explosive at a rapid rate driven by the transfer of heat,n. 爆燃
+Unleveled,deoxycytidine,n. a nucleoside component of DNA; composed of cytosine and deoxyribose,n. 脱氧胞苷
+Unleveled,descant,n. a decorative musical accompaniment (often improvised) added above a basic melody | v. sing in descant; sing by changing register; sing by yodeling,n. 高音伴奏　v. 高音歌唱；假声歌唱
+Unleveled,disciform,adj. having a round or oval shape like a disc,adj. 圆盘状的；椭圆形的
+Unleveled,enjambment,n. the continuation of a syntactic unit from one line of verse into the next line without a pause,n. 跨行连续
+Unleveled,exorbitance,n. excessive excess,n. 过度
+Unleveled,ferrocerium,n. a pyrophoric alloy of iron with cerium; used for lighter flints,n. 铈铁合金
+Unleveled,frieze,n. an architectural ornament consisting of a horizontal sculptured band between the architrave and the cornice; a heavy woolen fabric with a long nap,n. 中楣；粗呢
+Unleveled,genovese,adj. of or relating to or characteristic of Genoa or its inhabitants,adj. 热那亚的
+Unleveled,honest-to-god,adj. (used informally especially for emphasis) real or genuine,adj. 真正的
+Unleveled,links,n. a golf course that is built on sandy ground near a shore,n. 海滨高尔夫球场
+Unleveled,mellowly,adv. in a mellow manner,adv. 温和地
+Unleveled,metempsychosis,n. after death the soul begins a new cycle of existence in another human body,n. 转世轮回
+Unleveled,midden,n. (archeology) a mound of domestic refuse containing shells and animal bones marking the site of a prehistoric settlement; a heap of dung or refuse,n. 贝壳骨屑堆；粪污堆
+Unleveled,monistat,n. an antifungal agent usually administered in the form of a nitrate (trade name Monistat),n. 抗真菌药
+Unleveled,nonsubmersible,adj. not submersible or submergible,adj. 不能潜水的
+Unleveled,notation,n. a technical system of symbols used to represent special things; a comment or instruction (usually added),n. 符号体系；注释指示

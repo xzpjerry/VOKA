@@ -52,6 +52,16 @@ class GeneratorTests(unittest.TestCase):
         self.assertEqual(generate.provenance(dict(model="gpt-6-luna", effort="max")), "gpt-6-luna (effort max)")
         self.assertEqual(generate.provenance(dict(model="deepseek/deepseek-flash")), "deepseek/deepseek-flash")
 
+    def test_progress_ignores_unrelated_cached_requests(self):
+        with tempfile.TemporaryDirectory() as cwd, patch.object(generate, "BATCHES", Path(cwd)), patch.object(generate, "RESEARCH", Path(cwd)), patch.object(generate, "PROMPT", "prompt", create=True):
+            generate.dump(Path(cwd) / "r0-stale.json", {
+                "request_sha256": "old-prompt", "round": 0, "model": "old-model",
+            })
+            progress = generate.write_progress([dict(lemma="test")], {}, ["test"], {}, 100)
+        self.assertEqual(progress["batchesCached"], 0)
+        self.assertEqual(progress["batchesRemaining"], 1)
+        self.assertEqual(progress["byConfiguration"], {})
+
 
 if __name__ == "__main__":
     unittest.main()
