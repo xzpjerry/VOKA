@@ -153,7 +153,8 @@ try {
     page.evaluate(() => {
       const root = document.getElementById("voka-drawer")!.shadowRoot!;
       return {
-        summary: root.querySelector("[role=status]")!.textContent,
+        summary: root.querySelector(".drawer-toggle [role=status]")!
+          .textContent,
         counts: [...root.querySelectorAll("[data-filter]")].map(
           (el) => el.textContent,
         ),
@@ -202,7 +203,17 @@ try {
   });
   assert(
     await page.evaluate(
-      () => window.scrollY < 900 && CSS.highlights.has("voka-flash"),
+      () =>
+        window.scrollY < 900 &&
+        !(
+          document
+            .getElementById("voka-drawer")!
+            .shadowRoot!.querySelector("#voka-card") as HTMLElement
+        ).hidden &&
+        document
+          .getElementById("voka-drawer")!
+          .shadowRoot!.querySelector("#voka-card h2")?.textContent ===
+          "achieve",
     ),
   );
   await new Promise((r) => setTimeout(r, 1000));
@@ -333,14 +344,15 @@ try {
     /未运行|not running/i.test(
       document
         .getElementById("voka-drawer")!
-        .shadowRoot!.querySelector("[role=status]")!.textContent!,
+        .shadowRoot!.querySelector(".drawer-toggle [role=status]")!
+        .textContent!,
     ),
   );
   const summary = await page.evaluate(
     () =>
       document
         .getElementById("voka-drawer")!
-        .shadowRoot!.querySelector("[role=status]")!.textContent,
+        .shadowRoot!.querySelector(".drawer-toggle [role=status]")!.textContent,
   );
   assert.match(
     summary!,

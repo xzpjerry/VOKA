@@ -1,11 +1,13 @@
 import { LEVELS, loadData } from "../data";
 import { normalizeKey } from "../key";
+import { cardContext } from "./contexts";
 import { updateGlossCss } from "./gloss";
 import { pageStates } from "./reading";
 import { previewImport, executeImport } from "./import";
 import { checkConnection, rpc, GatewayError } from "./gateway";
 import { settings } from "../shared";
 let importBusy = false;
+let contextQueue = Promise.resolve();
 async function notifyDisconnected() {
   for (const tab of await chrome.tabs.query({})) {
     if (tab.id)
@@ -72,6 +74,31 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       (data) => reply({ data }),
       (error) => reply({ error: String(error) }),
     );
+  } else if (
+    message?.type === "card-context" &&
+    sender.tab &&
+    /^https?:/.test(sender.url || "") &&
+    typeof message.key === "string" &&
+    /^en:[\p{L}\p{M}'-]+$/u.test(message.key) &&
+    ["read", "save", "pin"].includes(message.action)
+  ) {
+    contextQueue = contextQueue
+      .catch(() => {})
+      .then(async () => {
+        try {
+          const config = await settings();
+          if ((await checked(config)) !== "ok") throw new Error("unreachable");
+          const data = await cardContext(
+            (method, params = {}, write = false) =>
+              gatewayCall(config, method, params, { sideEffecting: write }),
+            { ...message, url: sender.url },
+            config,
+          );
+          reply({ data });
+        } catch (error) {
+          reply({ error: String(error) });
+        }
+      });
   } else if (
     message?.type === "page-states" &&
     Array.isArray(message.keys) &&

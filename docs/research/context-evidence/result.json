@@ -1,0 +1,49 @@
+{
+  "createdManual": false,
+  "manualKey": "en:banana",
+  "manualLevel": "A1",
+  "dataVersion": "en-2026.10",
+  "browser": "Chrome/156.0.8078.47",
+  "port": 8766,
+  "createdApple": false,
+  "noteId": "1793437493827",
+  "replacement": [
+    {
+      "checked": false,
+      "text": "They baked an apple into a delicious pie. 127.0.0.1 · Context /3 · 2026-10-31☆"
+    },
+    {
+      "checked": false,
+      "text": "She picked an apple from the tall tree. 127.0.0.1 · Context /2 · 2026-10-31☆"
+    },
+    {
+      "checked": true,
+      "text": "We shared a fresh apple after lunch, edited in Anki. 127.0.0.1 · Context /1 · 2026-10-31☆"
+    }
+  ],
+  "fields": {
+    "Key": "en:apple",
+    "Word": "apple",
+    "Variants": "",
+    "Reading": "/ˈæpəl/",
+    "GlossNative": "苹果",
+    "GlossTarget": "a round fruit",
+    "Context1": "…fruit read about fruit read about fruit read about fruit read about fruit read about fruit read about fruit read about fruit read about fruit <b>apple</b> in the garden in the garden in the garden in the garden in the garden in the garden in the garden in the garden in the garden in the garden in the…",
+    "Source1": "127.0.0.1 · Context /long · 2026-10-31",
+    "Context2": "Our neighbour brought an <b>apple</b> for the picnic.",
+    "Source2": "127.0.0.1 · Context /4 · 2026-10-31",
+    "Context3": "They baked an <b>apple</b> into a delicious pie.",
+    "Source3": "127.0.0.1 · Context /3 · 2026-10-31",
+    "ManualStatus": "",
+    "Audio": "",
+    "VokaMeta": "{\"pinnedContext\":null,\"contextOrder\":[\"85db9ced0a744d6350aedf26a2f65101512d66990ef0c8aa90ba79dd413715ec\",\"613918eafde15385c8c9cbf2edd57f1d7f03425518b606bc05387f8ffbdbb287\",\"66179b376d726c9c1f6b24652ff39d06b95cb2b63a6cc1b22495c658eda9fea8\"]}"
+  },
+  "checks": [
+    "four pages, max three contexts",
+    "Anki edit preserved across later saves, stale pin cleared",
+    "replacement chooses oldest unpinned by default",
+    "single click unhighlighted ignored; link and button preserved; single highlighted click opens",
+    "actual surface bold; short rejected; long window; footnotes removed; duplicate refused",
+    "below-target add to its own real-data level deck without whole-level import; no full URL by default"
+  ]
+}

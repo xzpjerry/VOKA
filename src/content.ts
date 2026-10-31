@@ -1,5 +1,7 @@
 import { createDrawer } from "./drawer";
 import { DynamicReading } from "./dynamic-reading";
+import { fullCard } from "./full-card";
+import { containsPoint, excluded, type Token } from "./reading";
 import { check, settings, t } from "./shared";
 import {
   gloss,
@@ -63,7 +65,69 @@ import {
   let config: ReadingSettings;
   let running = false,
     generation = 0;
+  const card = fullCard(
+    root,
+    () => config,
+    (key, fields) => {
+      if (!session) return;
+      session.states[key] = {
+        ...session.states[key],
+        fields,
+        cards: session.states[key]?.cards || [],
+      };
+      for (const token of session.tokens)
+        if (token.key === key) {
+          token.recognized = true;
+          token.entry.lemma = fields.Word || token.entry.lemma;
+        }
+      drawerUI.update(session.tokens, config);
+    },
+    (key) => session?.states[key],
+  );
+  const interactive = (event: MouseEvent) =>
+    event
+      .composedPath()
+      .some(
+        (n) =>
+          n instanceof Element &&
+          n.matches(
+            'a,button,input,select,textarea,[role="button"],[role="link"],#voka-drawer',
+          ),
+      );
+  function openAt(event: MouseEvent, all: boolean) {
+    if (!running || interactive(event)) return;
+    const candidates =
+      session?.tokensFor(
+        event.target instanceof Element ? event.target : null,
+      ) ?? [];
+    const token = candidates.find(
+      (t) =>
+        (all || t.style !== null) &&
+        t.range.startContainer.isConnected &&
+        !excluded(t.range.startContainer.parentElement) &&
+        Array.from(t.range.getClientRects()).some((r) =>
+          containsPoint(r, event.clientX, event.clientY),
+        ),
+    );
+    if (token) {
+      tooltip.hidden = true;
+      void card.open(token);
+    }
+  }
+  document.addEventListener("click", (event) => openAt(event, false));
+  document.addEventListener("dblclick", (event) => openAt(event, true));
+  document.addEventListener("voka-open-card", (event) => {
+    if (!running) return;
+    const token = (event as CustomEvent<{ token: Token }>).detail?.token;
+    if (!token) return;
+    event.preventDefault();
+    token.range.startContainer.parentElement?.scrollIntoView({
+      block: "center",
+    });
+    void card.open(token);
+  });
   function clear() {
+    card.close();
     running = false;
     session?.stop();
     session = undefined;

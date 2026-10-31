@@ -1,7 +1,9 @@
 import type { Settings, Status } from "./background/gateway";
 export const t = (key: string) => chrome.i18n.getMessage(key);
 import { levels, type ReadingSettings } from "./reading";
-export async function settings(): Promise<Settings & ReadingSettings> {
+export async function settings(): Promise<
+  Settings & ReadingSettings & { storeFullUrl: boolean }
+> {
   const value = await chrome.storage.local.get({
     port: 8765,
     apiKey: "",
@@ -10,6 +12,7 @@ export async function settings(): Promise<Settings & ReadingSettings> {
     targetLevel: "B1",
     showAdvanced: false,
     hoverScope: "highlighted",
+    storeFullUrl: false,
   });
   return {
     port:
@@ -19,6 +22,7 @@ export async function settings(): Promise<Settings & ReadingSettings> {
       value.port <= 65535
         ? value.port
         : 8765,
+    storeFullUrl: value.storeFullUrl === true,
     apiKey: typeof value.apiKey === "string" ? value.apiKey : "",
     nativeLanguage: value.nativeLanguage === "en" ? "en" : "zh",
     glossLanguage: value.glossLanguage === "target" ? "target" : "native",

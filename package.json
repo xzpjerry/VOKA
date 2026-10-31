@@ -12,7 +12,8 @@
     "check:dynamic": "tsx scripts/check-dynamic.ts",
     "data:build": "python3 tools/data/build.py",
     "check:data": "tsx scripts/check-data.ts",
-    "check:data:browser": "tsx scripts/check-data-browser.ts"
+    "check:data:browser": "tsx scripts/check-data-browser.ts",
+    "check:contexts": "tsx scripts/check-contexts.ts"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.24",
