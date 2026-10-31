@@ -18,6 +18,23 @@
         ><button data-i18n="saveCheck"></button>
       </form>
       <p role="status" id="status"></p>
+      <section>
+        <h2 data-i18n="importTitle"></h2>
+        <p data-i18n="importPromise"></p>
+        <p data-i18n="importDaily"></p>
+        <button id="preview" type="button" data-i18n="importPreview"></button>
+        <button
+          id="confirm"
+          type="button"
+          data-i18n="importConfirm"
+          disabled
+        ></button>
+        <pre
+          id="importStatus"
+          role="status"
+          style="white-space: pre-wrap"
+        ></pre>
+      </section>
     </main>
     <script type="module" src="/src/options.ts"></script>
   </body>

@@ -12,7 +12,7 @@ Load `dist/` with **Load unpacked** at `chrome://extensions` (Developer mode). O
 
 Visit an ordinary HTTP(S) page and click the VOKA toolbar icon. A collapsed drawer shows the connection summary. If unavailable, fix Anki/settings and click Retry. Protected Chrome pages cannot be injected. There is no polling or automatic retry. Rebuild and reload the extension after source changes; reload the web page to replace an already injected script.
 
-Only the background service worker makes Anki requests. API keys stay in `chrome.storage.local` and are sent as Bearer credentials to loopback. Checks use `api.describe` and require the spec section 6 methods to be advertised as available. Failure classes distinguish unreachable, incompatible API, forbidden origin (403), and authentication. Mutation transport failures have an unknown outcome and are never retried; this skeleton exposes no mutation message route.
+Only the background service worker makes Anki requests. API keys stay in `chrome.storage.local` and are sent as Bearer credentials to loopback. Checks use `api.describe` and require the spec section 6 methods to be advertised as available. Failure classes distinguish unreachable, incompatible API, forbidden origin (403), and authentication. Mutation transport failures have an unknown outcome and are never retried; the Options-only import route performs explicit user-confirmed writes.
 
 ## Isolated integration check
 
@@ -23,3 +23,17 @@ npm run check:anki
 ```
 
 This explicitly targets **127.0.0.1:8766**, verifies `ok`, reads decks and note types, and checks a temporarily allocated closed port classifies as `unreachable`. It never requests 8765 or writes Anki data. Unit tests mock fetch and do not require Anki. UI text uses Chrome i18n catalogs in `public/_locales/zh_CN` and `en`, with Chinese as the default locale.
+
+## Test B1 import
+
+After saving the isolated port **8766**, use **Preview import** in Options. The bundled synthetic pack contains 12 illustrative B1 lemmas and two A2 lemmas (skipped), with authored test glosses/readings and CC0/version metadata; it is not the production CEFR dataset. The preview reads Anki only and shows new, existing, conflicting and skipped counts, target deck/type status, and source/version. Confirm is enabled only when new notes remain.
+
+Confirmation provisions missing targets, verifies the exact 15-field order, validates notes, submits only valid notes with `atomic:false`, and reads back by Key. Existing notes/cards are never updated. Field mismatches stop the import instead of editing structure. Transport failures never trigger automatic write retries: the importer reads back and reports unresolved Keys. Run Preview again to inspect remaining notes after a failure.
+
+```sh
+npm run check:import                    # creates a uniquely named test type/deck and 12 notes
+npm run check:import -- --existing-type  # provisions type first, then checks importing with an existing type
+npm run check:import -- --default        # uses product targets; preserves existing fixture Keys
+```
+
+These integration checks only contact `127.0.0.1:8766` and retain their artifacts for inspection. They assert fields/tags/hashes/templates, a second preview with zero new notes (the UI's disabled-confirm condition), unchanged card data on repeat, and unchanged `col.scm`, existing scheduling and review history using a read-only copy of the isolated SQLite collection. They do not drive Anki reviews; T-05 is checked by read-only state/history comparison, not by reviewing newly imported cards.

@@ -37,5 +37,41 @@
   },
   "status_not_new_ankiconnect": {
     "message": "Upgrade to Anki ≥ 26.08 and new AnkiConnect; required methods must be available."
+  },
+  "importTitle": {
+    "message": "Test wordlist import · English B1"
+  },
+  "importPromise": {
+    "message": "Existing cards will not be modified, moved, or reset."
+  },
+  "importDaily": {
+    "message": "Anki introduces new cards according to your daily new card limit."
+  },
+  "importPreview": {
+    "message": "Preview import"
+  },
+  "importConfirm": {
+    "message": "Confirm import"
+  },
+  "importDeck": {
+    "message": "Target deck"
+  },
+  "importType": {
+    "message": "Note type"
+  },
+  "importExists": {
+    "message": "Existing"
+  },
+  "importNew": {
+    "message": "New"
+  },
+  "importConflict": {
+    "message": "Conflict"
+  },
+  "importSkipped": {
+    "message": "Skipped"
+  },
+  "importConfirmed": {
+    "message": "Confirmed by read-back"
   }
 }
