@@ -80,7 +80,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     /^https?:/.test(sender.url || "") &&
     typeof message.key === "string" &&
     /^en:[\p{L}\p{M}'-]+$/u.test(message.key) &&
-    ["read", "save", "pin"].includes(message.action)
+    ["read", "save", "pin", "manual"].includes(message.action)
   ) {
     contextQueue = contextQueue
       .catch(() => {})

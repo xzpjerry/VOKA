@@ -6,10 +6,12 @@ import {
 import { sentenceForRange } from "./page-context";
 import {
   gloss,
+  highlightRule,
   type Token,
   type ReadingSettings,
   type WordState,
 } from "./reading";
+import { manualAction } from "./manual";
 type View = {
   exists: boolean;
   fields: Record<string, string>;
@@ -130,6 +132,21 @@ export function fullCard(
     }
     const manual = element("div");
     manual.dataset.slot = "manual-status";
+    const action = manualAction(
+      fields.ManualStatus,
+      highlightRule(
+        token.entry.level || state?.level,
+        config(),
+        state,
+      ) !== null,
+    );
+    const manualButton = button(
+      action.label,
+      () => void mutate("manual", { manual: action.status }),
+    );
+    manualButton.id = "voka-manual-status";
+    manualButton.dataset.manual = action.status || "clear";
+    manual.append(manualButton);
     card.append(manual);
     let sentence: ReturnType<typeof sentenceForRange> | undefined,
       error = "";
@@ -223,7 +240,16 @@ export function fullCard(
       const next = await request(action, { ...extra, title: document.title });
       if (current !== epoch) return;
       view = next;
-      message = action === "pin" ? "置顶已更新" : "例句已保存";
+      message =
+        action === "manual"
+          ? view.fields.ManualStatus === "known"
+            ? "已标为认识"
+            : view.fields.ManualStatus === "unknown"
+              ? "已标为不认识"
+              : "已撤销标记"
+          : action === "pin"
+            ? "置顶已更新"
+            : "例句已保存";
       list = false;
       updated(active!.key, view.fields);
     } catch (e) {

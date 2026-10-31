@@ -1,0 +1,115 @@
+{
+  "browser": "Chrome/156.0.8078.47",
+  "port": 8766,
+  "target": {
+    "key": "en:benefit",
+    "before": {
+      "Key": "en:benefit",
+      "Word": "benefit",
+      "Variants": "",
+      "Reading": "/ˈbɛnəfɪt/",
+      "GlossNative": "益处",
+      "GlossTarget": "something that helps you",
+      "Context1": "",
+      "Source1": "",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"test-2026.10\",\"hashes\":{\"GlossNative\":\"dd7268a4df533d28acd6b618da62313d3e46bb018905fa48997bf95d86fce8d6\",\"GlossTarget\":\"967eee79a7eb4b88d912bf3f78cdcd485c05929e812d3e1089cbe1fa5d9a4b46\",\"Reading\":\"b4ef1b0529ef12ae8684530cb4ad212399c062ee87dc8686c737e3f04750401f\"}}"
+    },
+    "afterManualKnown": {
+      "Key": "en:benefit",
+      "Word": "benefit",
+      "Variants": "",
+      "Reading": "/ˈbɛnəfɪt/",
+      "GlossNative": "益处",
+      "GlossTarget": "something that helps you",
+      "Context1": "",
+      "Source1": "",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "known",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"test-2026.10\",\"hashes\":{\"GlossNative\":\"dd7268a4df533d28acd6b618da62313d3e46bb018905fa48997bf95d86fce8d6\",\"GlossTarget\":\"967eee79a7eb4b88d912bf3f78cdcd485c05929e812d3e1089cbe1fa5d9a4b46\",\"Reading\":\"b4ef1b0529ef12ae8684530cb4ad212399c062ee87dc8686c737e3f04750401f\"}}"
+    },
+    "changedFields": [
+      "ManualStatus"
+    ]
+  },
+  "below": {
+    "key": "en:banana",
+    "before": {
+      "Key": "en:banana",
+      "Word": "banana",
+      "Variants": "",
+      "Reading": "/bənˈænə/",
+      "GlossNative": "",
+      "GlossTarget": "n. any of several tropical and subtropical treelike herbs of the genus Musa having a terminal crown of large entire leaves and usually bearing hanging clusters of elongated fruits; elongated crescent-shaped yellow fruit with soft sweet flesh",
+      "Context1": "People enjoy the <b>banana</b> after lunch.",
+      "Source1": "127.0.0.1 · Context /manual · 2026-10-31",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"en-2026.10\",\"hashes\":{\"GlossNative\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"GlossTarget\":\"5756839b2e0b3ab534c23818021c89a109ae6fd2a66775bda58708c5cbb6e777\",\"Reading\":\"c52c01480c174df88335df8a7db62d2127813c4dd474ea403e7b4ca504630e7c\"},\"pinnedContext\":null,\"contextOrder\":[\"97675ccec7dcec1dd3eadc8a46edbfccec816b5077a91eeec3709d8d08187ee6\"]}"
+    },
+    "afterManualUnknown": {
+      "Key": "en:banana",
+      "Word": "banana",
+      "Variants": "",
+      "Reading": "/bənˈænə/",
+      "GlossNative": "",
+      "GlossTarget": "n. any of several tropical and subtropical treelike herbs of the genus Musa having a terminal crown of large entire leaves and usually bearing hanging clusters of elongated fruits; elongated crescent-shaped yellow fruit with soft sweet flesh",
+      "Context1": "People enjoy the <b>banana</b> after lunch.",
+      "Source1": "127.0.0.1 · Context /manual · 2026-10-31",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "unknown",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"en-2026.10\",\"hashes\":{\"GlossNative\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"GlossTarget\":\"5756839b2e0b3ab534c23818021c89a109ae6fd2a66775bda58708c5cbb6e777\",\"Reading\":\"c52c01480c174df88335df8a7db62d2127813c4dd474ea403e7b4ca504630e7c\"},\"pinnedContext\":null,\"contextOrder\":[\"97675ccec7dcec1dd3eadc8a46edbfccec816b5077a91eeec3709d8d08187ee6\"]}"
+    },
+    "changedFields": [
+      "ManualStatus"
+    ]
+  },
+  "absent": {
+    "key": "en:dog",
+    "existedBefore": false,
+    "createdNoteId": "1793442051410",
+    "fieldsAfterManualUnknown": {
+      "Key": "en:dog",
+      "Word": "dog",
+      "Variants": "",
+      "Reading": "/dˈɔɡ/",
+      "GlossNative": "",
+      "GlossTarget": "n. a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds; a dull unattractive unpleasant girl or woman · v. go after with the intent to catch",
+      "Context1": "",
+      "Source1": "",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "unknown",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"en-2026.10\",\"hashes\":{\"GlossNative\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"GlossTarget\":\"13da799f6a43c0bb96666b4a8a501e64b4a3f223ba33a8c4f278161c48f86344\",\"Reading\":\"12ac037f2a235c93b58e791675eda935cf638fe3fbeda3aa6a6963787f5b2c0e\"},\"pinnedContext\":null,\"contextOrder\":[]}"
+    }
+  },
+  "checks": [
+    "target word known removes its highlight and lowers the drawer target count",
+    "below-target word unknown becomes red regardless of level and raises the target count",
+    "undo restores the automatic rule for both words",
+    "known and unknown both survive a page reload",
+    "only ManualStatus differs in Anki for existing notes",
+    "unknown on a word without a note creates it in its level deck with ManualStatus=unknown",
+    "no manual learning option"
+  ]
+}
