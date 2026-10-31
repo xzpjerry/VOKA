@@ -1,0 +1,323 @@
+{
+  "words": [
+    {
+      "lemma": "racist",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "种族主义的",
+            "种族歧视的"
+          ]
+        },
+        {
+          "pos": "n",
+          "senses": [
+            "种族主义者"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "recession",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "经济衰退",
+            "凹处"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "repression",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "镇压",
+            "压抑"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "skyward",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "朝向天空的"
+          ]
+        },
+        {
+          "pos": "r",
+          "senses": [
+            "向天空"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "tanned",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "晒黑的",
+            "鞣制的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "thermometer",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "温度计"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "vacant",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "空的",
+            "空缺的",
+            "茫然的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "version",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "版本",
+            "说法"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "waistcoat",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "马甲"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "wondrous",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "奇妙的"
+          ]
+        },
+        {
+          "pos": "r",
+          "senses": [
+            "极好地"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "adjoin",
+      "glosses": [
+        {
+          "pos": "v",
+          "senses": [
+            "毗邻",
+            "紧挨"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "alleviate",
+      "glosses": [
+        {
+          "pos": "v",
+          "senses": [
+            "减轻",
+            "缓解"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "apprenticeship",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "学徒期"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "candid",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "坦率的",
+            "自然的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "conscientiously",
+      "glosses": [
+        {
+          "pos": "r",
+          "senses": [
+            "认真地"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "contractor",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "承包商",
+            "定约人"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "detrimentally",
+      "glosses": [
+        {
+          "pos": "r",
+          "senses": [
+            "有害地"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "discourse",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "论述",
+            "布道"
+          ]
+        },
+        {
+          "pos": "v",
+          "senses": [
+            "论述",
+            "交谈"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "divergent",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "分歧的",
+            "发散的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "effortless",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "不费力的",
+            "轻松的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "elevate",
+      "glosses": [
+        {
+          "pos": "v",
+          "senses": [
+            "提升",
+            "举起",
+            "提拔"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "elude",
+      "glosses": [
+        {
+          "pos": "v",
+          "senses": [
+            "逃避",
+            "令人费解"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "endorsement",
+      "glosses": [
+        {
+          "pos": "n",
+          "senses": [
+            "推荐语",
+            "附议"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "ethical",
+      "glosses": [
+        {
+          "pos": "a",
+          "senses": [
+            "伦理的",
+            "合乎道德的"
+          ]
+        }
+      ]
+    },
+    {
+      "lemma": "favorably",
+      "glosses": [
+        {
+          "pos": "r",
+          "senses": [
+            "赞许地"
+          ]
+        }
+      ]
+    }
+  ]
+}
