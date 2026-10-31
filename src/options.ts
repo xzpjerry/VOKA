@@ -10,6 +10,7 @@ const wizard = new URLSearchParams(location.search).has("wizard");
 let step = 0;
 let connected = false;
 let busy = false;
+let executing = false;
 let previewLevel: Level | undefined;
 let previewNew = 0;
 let lastRunInterrupted = false;
@@ -45,7 +46,7 @@ function layout() {
     "disabled",
     !connected || busy || !previewLevel || previewNew === 0,
   );
-  cancelButton.hidden = !busy;
+  cancelButton.hidden = !(busy && executing);
   cancelButton.disabled = false;
   const about = document.getElementById("about");
   if (about) {
@@ -234,7 +235,7 @@ async function showPreview() {
   const targetLine =
     `目标牌组：${p.target.deck} · ${p.deckExists ? "已存在" : "新建"}\n` +
     `笔记类型：${p.target.noteType} · ${p.typeExists ? "已存在" : "新建"}`;
-  const countLine = `${level} 词表 ${(p.rows?.length ?? 0).toLocaleString()} 词：新建 ${p.counts.new.toLocaleString()} / 已存在 ${p.counts.existing.toLocaleString()} / 冲突 ${p.counts.conflict.toLocaleString()} / 跳过 ${p.counts.skipped.toLocaleString()}`;
+  const countLine = `数据包 ${(p.total ?? p.rows?.length ?? 0).toLocaleString()} 词 · 本次 ${level} ${(p.selected ?? p.rows?.length ?? 0).toLocaleString()} 词：新建 ${p.counts.new.toLocaleString()} / 已存在 ${p.counts.existing.toLocaleString()} / 冲突 ${p.counts.conflict.toLocaleString()} / 跳过 ${p.counts.skipped.toLocaleString()}（其他等级）`;
   const conflictLine = conflicts.length
     ? `冲突 Key（同一 Key 有多条笔记，已列出并跳过）：\n${conflicts.join("\n")}`
     : "冲突 Key：无";
@@ -243,7 +244,7 @@ async function showPreview() {
   $("importCounts").textContent = countLine;
   $("importConflicts").textContent = conflictLine;
   $("importSource").textContent = sourceLine;
-  $("importStatus").textContent = `${targetLine}\n${countLine}\n${conflictLine}\n${sourceLine}`;
+  $("importStatus").textContent = "";
   previewLevel = level;
   previewNew = p.counts.new;
   confirmButton.textContent =
@@ -255,6 +256,7 @@ async function showPreview() {
 }
 async function runImport(execute: boolean) {
   busy = true;
+  executing = execute;
   layout();
   try {
     if (execute) {
@@ -278,6 +280,7 @@ async function runImport(execute: boolean) {
         created: number;
         remaining: number;
       };
+      executing = false;
       lastRunInterrupted = data.interrupted || data.cancelled;
       const state = data.cancelled
         ? "已取消"
@@ -287,7 +290,11 @@ async function runImport(execute: boolean) {
       $("importProgressText").textContent =
         `${state}：本次新建 ${data.confirmed.length.toLocaleString()} 条` +
         (data.remaining
-          ? `，剩余 ${data.remaining.toLocaleString()} 条。恢复连接后可点「继续导入」只补剩下的。`
+          ? data.interrupted
+            ? `，剩余 ${data.remaining.toLocaleString()} 条。恢复连接后可点「继续导入」只补剩下的。`
+            : data.cancelled
+              ? `，剩余 ${data.remaining.toLocaleString()} 条。可点「继续导入」只补剩下的。`
+              : `，剩余 ${data.remaining.toLocaleString()} 条。`
           : "。");
       const failureText = data.failures
         .map((f) => `${f.key}: ${f.reason}`)
@@ -317,6 +324,7 @@ async function runImport(execute: boolean) {
     $("importProgressText").textContent = String(error);
   } finally {
     busy = false;
+    executing = false;
     layout();
   }
 }

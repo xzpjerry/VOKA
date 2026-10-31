@@ -211,13 +211,19 @@ try {
       ),
     { timeout: 120000 },
   );
-  const previewText = await page.$eval(
-    "#importStatus",
-    (element) => element.textContent!,
-  );
+  const previewText = (
+    await Promise.all(
+      ["#importTarget", "#importCounts", "#importConflicts", "#importSource"].map(
+        (selector) => page.$eval(selector, (element) => element.textContent!),
+      ),
+    )
+  ).join("\n");
   assert.match(previewText, /目标牌组：VOKA::Level Import Acceptance A/);
   assert.match(previewText, /笔记类型：VOKA Level Import Acceptance A/);
-  assert.match(previewText, /新建 2,085 \/ 已存在 0 \/ 冲突 0 \/ 跳过 0/);
+  assert.match(
+    previewText,
+    /数据包 8,495 词 · 本次 B1 2,085 词：新建 2,085 \/ 已存在 0 \/ 冲突 0 \/ 跳过 6,410/,
+  );
   assert.match(await page.$eval("#importTarget", (e) => e.textContent!), /新建/);
   assert.match(
     await page.$eval("#importConflicts", (e) => e.textContent!),
@@ -504,7 +510,7 @@ try {
 
   evidence.ui = {
     preview:
-      "新建 2,085 / 已存在 0 / 冲突 0 / 跳过 0; deck and type 新建; promises and version visible",
+      "数据包 8,495 词 · 本次 B1 2,085 词：新建 2,085 / 已存在 0 / 冲突 0 / 跳过 6,410（其他等级）; deck and type 新建; promises and version visible",
     t03Ms: importElapsed,
     progressSamples: progressSamples.filter(
       (sample) =>
@@ -687,9 +693,19 @@ evidence.interruption = {
 
 // T-05-style read-only scheduling/revlog evidence around the whole run.
 evidence.finalCounts = {
-  A: (await snapshotTarget(targetATarget)).noteCount,
+  A: (
+    await snapshotTarget({
+      noteType: targetA.noteType,
+      deck: `${targetA.deckPrefix}::B1`,
+    })
+  ).noteCount,
   B: (await snapshotTarget(targetBTarget)).noteCount,
-  C: (await snapshotTarget(targetCTarget)).noteCount,
+  C: (
+    await snapshotTarget({
+      noteType: targetC.noteType,
+      deck: `${targetC.deckPrefix}::A1`,
+    })
+  ).noteCount,
 };
 const databaseAfter = sqliteSnapshot();
 assert.equal(databaseAfter.scm, databaseBefore.scm);

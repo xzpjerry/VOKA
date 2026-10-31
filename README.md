@@ -28,14 +28,16 @@ This explicitly targets **127.0.0.1:8766**, verifies `ok`, reads decks and note 
 
 ## English data and B1 import
 
-After saving the isolated port **8766**, use **Preview import** in Options. The production pack uses official CEFR-J 1.6 and the separate Octanove C1/C2 1.0 dataset, OEWN 2025 definitions, and CMUdict US IPA. B1 contains 2,085 unique canonical lemmas. Native glosses are empty pending #28–#30. Options lists all data attributions and complete notices. The preview reads Anki only and shows new, existing, conflicting and skipped counts, target deck/type status, and source/version. Confirm is enabled only when new notes remain.
+After saving the isolated port **8766**, use **Preview import** in Options. The production pack uses official CEFR-J 1.6 and the separate Octanove C1/C2 1.0 dataset, OEWN 2025 definitions, and CMUdict US IPA. B1 contains 2,085 unique canonical lemmas. Native glosses are empty pending #28–#30. Options lists all data attributions and complete notices. The preview reads Anki only and shows new, existing, conflicting and skipped counts, whether the target deck/type are new or existing, the exact conflicting Keys, and source/version. It states that existing cards are never changed, moved or reset, and that Anki introduces new cards at the daily new-card limit. Confirm is enabled only when new notes remain; switching the target level only changes the highlight target and offers a preview of the newly selected level.
 
-Confirmation provisions missing targets, verifies the exact 15-field order, validates notes, submits only valid notes with `atomic:false`, and reads back by Key. Existing notes/cards are never updated. Field mismatches stop the import instead of editing structure. Transport failures never trigger automatic write retries: the importer reads back and reports unresolved Keys. Run Preview again to inspect remaining notes after a failure.
+Confirmation provisions missing targets, verifies the exact 15-field order, then runs logical batches of 200 as `notes.validateMany` → submit only valid notes with `notes.createMany` (`atomic:false`) → read back by Key before the next batch. The 200-note logical batch is split into 100-note wire requests because AnkiConnect v1 caps batches at 100. Options shows a progress bar and a cancel button; cancelling stops after the current batch and keeps already written notes. After a dropped connection, **继续导入** previews the current state and fills only the remainder, so a second run creates zero. Existing notes/cards are never updated. Field mismatches stop the import instead of editing structure. Transport failures never trigger automatic write retries: the importer reads back and reports unresolved Keys. No scheduling, card-move or delete method is called.
 
 ```sh
-npm run check:import                    # creates a uniquely named test type/deck and 12 notes
+npm run check:import                     # creates a uniquely named test type/deck and 12 notes
 npm run check:import -- --existing-type  # provisions type first, then checks importing with an existing type
 npm run check:import -- --default        # uses product targets; preserves existing fixture Keys
+npm run check:level-import               # full 2,085-word B1 acceptance through the Options UI
+npm run cleanup:level-import             # removes only the test-owned decks, types and manual A2 note
 ```
 
 

@@ -75,6 +75,9 @@ it("preview is read only, reports conflicts, filters A2, and skips existing", as
   const call = gateway(true),
     p = await previewImport(call, undefined, testPack.entries);
   expect(p.counts).toEqual({ new: 10, existing: 1, conflict: 1, skipped: 2 });
+  expect(p.total).toBe(14);
+  expect(p.selected).toBe(12);
+  expect(p.conflicts).toEqual(["en:advice"]);
   expect(
     call.mock.calls.every(([method]) =>
       [

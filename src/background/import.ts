@@ -163,6 +163,8 @@ export async function previewImport(
   return {
     target,
     level,
+    total: entries.length,
+    selected: selected.length,
     typeExists,
     deckExists,
     source: pack.source,
