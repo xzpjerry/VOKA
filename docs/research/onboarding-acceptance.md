@@ -1,0 +1,11 @@
+# Onboarding and settings acceptance (#31)
+
+2026-10-31. Reproduce: `npm ci`, `npm run build && npm test`, then `npx tsx scripts/check-onboarding.ts` with the isolated Anki instance running on 8766.
+
+- Chrome for Testing 156.0.8078.47 opened `options.html?wizard=1` automatically on installation. The first page waits for port confirmation before its first request, so an isolated test can select 8766 without contacting the default 8765. Next is disabled until the connection passes; learning settings precede the selected-level import preview.
+- Real Anki 26.09.3, 127.0.0.1:8766: connection checks, A2 read-only import preview, settings persistence across reload (mother language, gloss language, target level), English mother language hiding gloss choices, complete source attributions. Counts computed from loaded and canonicalized production entries: A1 1050, A2 1200, B1 2085, B2 2383, C1 909, C2 868.
+- A closed local port shows the merged Anki/add-on/port hint including code 2055492159. Local mocks cover legacy AnkiConnect, Anki 25.09, HTTP 401 and HTTP 403. Each blocks later controls and shows the matching guidance, with later checks waiting. No periodic requests were observed.
+- T-02 proxy path: an HTTP 403 mock changes to proxying real 8766 only after receiving `access.requestPermission`; the page instructs switching to Anki and clicking Allow, provides the extension origin for webCorsOriginList, and requires an explicit recheck before enabling settings. No configuration changes were made to real Anki. This validates the extension's request and UI transitions, **not the real Anki authorization dialog**.
+- Build and all 80 unit tests passed, including a new test verifying non-B1 level preview, target deck and note tags. Existing gloss CSS tests remain passing. Screenshots and machine-readable results are in [onboarding-evidence](onboarding-evidence/).
+
+Not verified: real Allow dialog interaction, a real API-key-protected instance, real whole-level imports from the new UI, mobile behavior, or Chrome Web Store installation. Existing import machinery is reused; batching/cancel/resume improvements remain #32, site scope #33 and data updates #35. No request was sent to 8765, and no real note import, sync, scheduling mutation, move, structure edit or deletion was performed during browser acceptance.

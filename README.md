@@ -8,7 +8,9 @@ npm run build
 npm test
 ```
 
-Load `dist/` with **Load unpacked** at `chrome://extensions` (Developer mode). Open the extension's **Options**, set the AnkiConnect port and optional API key, and click **Save and check again**. The default port is 8765; for the disposable test instance, **set 8766 before clicking the toolbar action or running checks**. Opening Options checks the currently saved port. For isolated testing without ever contacting 8765: after loading, click the service worker **Inspect** link at `chrome://extensions`, run `await chrome.storage.local.set({port: 8766, apiKey: ""})` in its console, then open Options and use the toolbar.
+Load `dist/` with **Load unpacked** at `chrome://extensions` (Developer mode). Installation opens the three-step onboarding wizard: connect Anki, choose learning settings, then preview a level import or skip it. The initial wizard waits for you to confirm the port before making its first request. The default port is 8765; for the disposable test instance, **enter 8766 before clicking 重新检测**. Subsequent Options visits and wizard reloads check the saved port once, with no polling. Options keeps the same connection, learning, import and source-attribution sections on a single page.
+
+Run `npx tsx scripts/check-onboarding.ts` after building for Chrome for Testing acceptance against isolated Anki 8766 and local diagnostic mocks. It verifies install navigation, sequential guidance, the mocked permission request path, persisted learning settings and computed counts, and retains screenshots under `docs/research/onboarding-evidence/`. It does not modify the real instance's configuration or import notes.
 
 Visit an ordinary HTTP(S) page and click the VOKA toolbar icon. A collapsed drawer shows the connection summary. If unavailable, fix Anki/settings and click Retry. Protected Chrome pages cannot be injected. There is no polling or automatic retry. Rebuild and reload the extension after source changes; reload the web page to replace an already injected script.
 

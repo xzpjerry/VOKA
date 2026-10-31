@@ -1,55 +1,87 @@
 <!doctype html>
-<html>
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>VOKA</title>
+    <title>VOKA · 设置</title>
   </head>
   <body>
     <main>
-      <h1>VOKA</h1>
-      <form>
+      <header>
+        <p class="brand">VOKA / Read. Remember. Roar.</p>
+        <h1 id="title">设置</h1>
+        <p id="steps" hidden>① 连接 Anki　→　② 学习设置　→　③ 导入预览</p>
+      </header>
+      <section id="connection">
+        <h2>连接 Anki</h2>
+        <p id="status" role="status"></p>
+        <ol id="checks"></ol>
+        <form id="connectionForm">
+          <label
+            >端口<input
+              id="port"
+              type="number"
+              min="1"
+              max="65535"
+              required /></label
+          ><label
+            >API Key（如有）<input
+              id="apiKey"
+              type="password"
+              autocomplete="off" /></label
+          ><button id="retry">重新检测</button>
+        </form>
+        <button id="access" hidden>请求访问权限</button>
+        <p id="accessStatus" role="status"></p>
+        <button id="nextConnection" hidden disabled>下一步：学习设置</button>
+      </section>
+      <fieldset id="learning" disabled>
+        <h2>学习设置</h2>
         <label
-          ><span data-i18n="port"></span
-          ><input id="port" type="number" min="1" max="65535" required /></label
+          >学习语言<select disabled>
+            <option>English</option>
+          </select></label
         ><label
-          ><span data-i18n="apiKey"></span
-          ><input id="apiKey" type="password" autocomplete="off" /></label
-        ><button data-i18n="saveCheck"></button>
-      </form>
-      <p role="status" id="status"></p>
-      <section>
-        <label
-          ><span data-i18n="nativeLanguage"></span
-          ><select id="nativeLanguage">
+          >母语<select id="nativeLanguage">
             <option value="zh">中文</option>
             <option value="en">English</option>
           </select></label
+        ><label id="glossLanguageRow"
+          >释义语言<select id="glossLanguage">
+            <option value="native">母语释义</option>
+            <option value="target">单语释义</option>
+          </select></label
         >
-        <label id="glossLanguageRow"
-          ><span data-i18n="glossLanguage"></span
-          ><select id="glossLanguage">
-            <option value="native" data-i18n="glossNative"></option>
-            <option value="target" data-i18n="glossTarget"></option></select
-        ></label>
-      </section>
-      <section>
-        <h2 data-i18n="importTitle"></h2>
-        <p data-i18n="importPromise"></p>
-        <p data-i18n="importDaily"></p>
-        <button id="preview" type="button" data-i18n="importPreview"></button>
-        <button
-          id="confirm"
-          type="button"
-          data-i18n="importConfirm"
-          disabled
-        ></button>
-        <pre
-          id="importStatus"
-          role="status"
-          style="white-space: pre-wrap"
-        ></pre>
-      </section>
+        <h3>目标等级</h3>
+        <div id="levels" class="levels"></div>
+        <p id="saveStatus" role="status"></p>
+        <h3>站点范围</h3>
+        <p>
+          点工具栏图标才在当前页运行。更多站点范围与禁用名单设置即将提供。
+        </p>
+        <button id="backConnection" hidden>上一步</button
+        ><button id="nextLearning" hidden>下一步：导入预览</button>
+      </fieldset>
+      <fieldset id="imports" disabled>
+        <h2>等级导入</h2>
+        <p>不会修改、移动或重置任何已有卡片。</p>
+        <p>新卡由 Anki 按你的每日新卡上限逐步引入。</p>
+        <label>导入等级<select id="importLevel"></select></label
+        ><button id="preview">预览导入</button
+        ><button id="confirm" disabled>确认导入</button>
+        <pre id="importStatus" role="status"></pre>
+        <div id="wizardFinish" hidden>
+          <button id="backLearning">上一步</button
+          ><button id="skip">先不导入</button
+          ><span> 不导入的话，无法使用上下文复习</span
+          ><button id="finish" disabled>完成</button>
+        </div>
+      </fieldset>
+      <fieldset id="updates" disabled>
+        <h2>释义数据更新</h2>
+        <button disabled>检查释义数据更新</button>
+        <p>数据更新检查即将提供。</p>
+      </fieldset>
     </main>
     <script type="module" src="/src/options.ts"></script>
   </body>

@@ -1,0 +1,19 @@
+{
+  "install": "onInstalled opened full-page wizard; waits for first port confirmation",
+  "real": {
+    "anki": "26.09.3 at 8766",
+    "counts": [
+      "A1 · 1,050 词",
+      "A2 · 1,200 词",
+      "B1 · 2,085 词",
+      "B2 · 2,383 词",
+      "C1 · 909 词",
+      "C2 · 868 词"
+    ],
+    "preview": "A2 read-only",
+    "persistence": "nativeLanguage, glossLanguage, targetLevel",
+    "attribution": "Princeton and complete source details retained"
+  },
+  "mock": "closed port, legacy endpoint, old Anki, HTTP 401, HTTP 403 → access.requestPermission → explicit recheck → real 8766 success; no polling; no import writes",
+  "browser": "Chrome/156.0.8078.47"
+}
