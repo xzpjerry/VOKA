@@ -1,7 +1,7 @@
 import { createDrawer } from "./drawer";
 import { DynamicReading } from "./dynamic-reading";
 import { fullCard } from "./full-card";
-import { containsPoint, type Token } from "./reading";
+import { containsPoint, excluded, type Token } from "./reading";
 import { check, settings, t } from "./shared";
 import {
   gloss,
@@ -104,6 +104,7 @@ import {
       (t) =>
         (all || t.style !== null) &&
         t.range.startContainer.isConnected &&
+        !excluded(t.range.startContainer.parentElement) &&
         Array.from(t.range.getClientRects()).some((r) =>
           containsPoint(r, event.clientX, event.clientY),
         ),

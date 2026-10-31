@@ -46,47 +46,56 @@ it("reads fresh fields, merges only context changes, and reads back every update
   expect(call.mock.calls.at(-1)?.[0]).toBe("notes.getMany");
   expect(fields.Source1).not.toContain("/private");
 });
-it("manual A2 add creates just one note in its own deck with validate/create/readback", async () => {
-  let fields: Record<string, string> | undefined;
-  const call = vi.fn(async (method: string, params: any = {}) => {
-    if (method === "notes.search") return { ids: fields ? ["1"] : [] };
-    if (method === "notes.getMany")
-      return { items: [{ result: { id: "1", fields } }] };
-    if (method === "noteTypes.list")
-      return [{ name: "VOKA Vocabulary · English" }];
-    if (method === "noteTypes.get")
-      return { fields: CORE_FIELDS.map((name) => ({ name })) };
-    if (method === "decks.list") return [];
-    if (method === "decks.create") return {};
-    if (method === "notes.validateMany")
-      return { items: [{ result: { valid: true } }] };
-    if (method === "notes.createMany") {
-      fields = params.notes[0].fields;
-      return { items: [{ result: { id: "1" } }] };
-    }
-    throw new Error(method);
-  });
-  await cardContext(
-    call,
-    {
-      key: "en:apple",
-      action: "save",
-      ...sentenceAt("I ate an apple today.", 9, 5),
-      url: "https://example.com/",
-      title: "Page",
-    },
-    config,
-  );
-  const notes = call.mock.calls.find(([m]) => m === "notes.createMany")![1]
-    .notes;
-  expect(notes).toHaveLength(1);
-  expect(notes[0].deck.name).toBe("VOKA::English::A2");
-  expect(notes[0].tags).toContain("voka::level::A2");
-  expect(fields!.Context1).toContain("<b>apple</b>");
-  expect(
-    call.mock.calls.findIndex(([m]) => m === "notes.validateMany"),
-  ).toBeLessThan(call.mock.calls.findIndex(([m]) => m === "notes.createMany"));
-});
+it.each([
+  ["apple", "A2"],
+  ["vokacontextfixture", "Unleveled"],
+])(
+  "manual %s add creates just one note in %s with validate/create/readback",
+  async (lemma, deck) => {
+    let fields: Record<string, string> | undefined;
+    const call = vi.fn(async (method: string, params: any = {}) => {
+      if (method === "notes.search") return { ids: fields ? ["1"] : [] };
+      if (method === "notes.getMany")
+        return { items: [{ result: { id: "1", fields } }] };
+      if (method === "noteTypes.list")
+        return [{ name: "VOKA Vocabulary · English" }];
+      if (method === "noteTypes.get")
+        return { fields: CORE_FIELDS.map((name) => ({ name })) };
+      if (method === "decks.list") return [];
+      if (method === "decks.create") return {};
+      if (method === "notes.validateMany")
+        return { items: [{ result: { valid: true } }] };
+      if (method === "notes.createMany") {
+        fields = params.notes[0].fields;
+        return { items: [{ result: { id: "1" } }] };
+      }
+      throw new Error(method);
+    });
+    await cardContext(
+      call,
+      {
+        key: "en:" + lemma,
+        action: "save",
+        ...sentenceAt(`I found a ${lemma} today.`, 10, lemma.length),
+        url: "https://example.com/",
+        title: "Page",
+      },
+      config,
+    );
+    const notes = call.mock.calls.find(([m]) => m === "notes.createMany")![1]
+      .notes;
+    expect(notes).toHaveLength(1);
+    expect(notes[0].deck.name).toBe("VOKA::English::" + deck);
+    if (deck === "A2") expect(notes[0].tags).toContain("voka::level::A2");
+    else expect(notes[0].tags).toEqual(["voka"]);
+    expect(fields!.Context1).toContain(`<b>${lemma}</b>`);
+    expect(
+      call.mock.calls.findIndex(([m]) => m === "notes.validateMany"),
+    ).toBeLessThan(
+      call.mock.calls.findIndex(([m]) => m === "notes.createMany"),
+    );
+  },
+);
 it("never retries an update whose response was lost, and confirms it by readback", async () => {
   const fields: Record<string, string> = { Key: "en:apple" };
   const call = vi.fn(async (method: string, params: any = {}) => {

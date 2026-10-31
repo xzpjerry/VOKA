@@ -202,7 +202,17 @@ try {
   });
   assert(
     await page.evaluate(
-      () => window.scrollY < 900 && CSS.highlights.has("voka-flash"),
+      () =>
+        window.scrollY < 900 &&
+        !(
+          document
+            .getElementById("voka-drawer")!
+            .shadowRoot!.querySelector("#voka-card") as HTMLElement
+        ).hidden &&
+        document
+          .getElementById("voka-drawer")!
+          .shadowRoot!.querySelector("#voka-card h2")?.textContent ===
+          "achieve",
     ),
   );
   await new Promise((r) => setTimeout(r, 1000));
@@ -328,7 +338,10 @@ try {
           .getElementById("voka-drawer")!
           .shadowRoot!.querySelector("[role=tooltip]") as HTMLElement
       ).hidden,
-  );
+  ).catch(async error => {
+    console.error("Disconnect state", await page.evaluate(() => ({highlights:[...CSS.highlights.keys()], drawer:document.getElementById("voka-drawer")!.shadowRoot!.textContent})));
+    throw error;
+  });
   await page.waitForFunction(() =>
     /未运行|not running/i.test(
       document

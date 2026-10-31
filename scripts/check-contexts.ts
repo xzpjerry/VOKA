@@ -349,8 +349,15 @@ try {
   ).ids.length;
   await open("/travel");
   await click("word", 2);
-  await waitCard("travel");
   const createdTravel = travelBefore.length === 0;
+  if (createdTravel) await waitCard("travel");
+  else
+    await page.waitForFunction(
+      () =>
+        document
+          .getElementById("voka-drawer")!
+          .shadowRoot!.querySelector("#voka-card h2")?.textContent === "travel",
+    );
   if (createdTravel) {
     assert.match(await cardText(), /加入 Anki（含这句例句）/);
     await save();
