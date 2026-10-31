@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VOKA 引导原型</title>
+<!--
+  PROTOTYPE · 一次性代码，不进 main。
+  问题：「引导流程、等级导入预览与『不运行』提示」长什么样？
+  三种结构不同的引导方案，?variant=A|B|C 切换（底部浮条或键盘 ← →）。
+  底部浮条的「连接情况」下拉框模拟各种故障；「数据升级预览」按钮打开升级预览（三个方案共用）。
+  等级词数按「词条等级取最低、去掉多词短语」从 CEFR-J + Octanove 实算：A1 1049 / A2 1202 / B1 2088 / B2 2384 / C1 909 / C2 869。
+-->
+<style>
+:root{--bg:#f6f5f2;--ink:#1d1d1f;--muted:#6b6b70;--line:#e2e0da;--card:#fff;--accent:#2f6fde;--ok:#1f9d55;--bad:#d33;--warn:#c98a00}
+@media (prefers-color-scheme:dark){:root{--bg:#18181a;--ink:#ececee;--muted:#9a9aa0;--line:#34343a;--card:#222226;--accent:#7aa7ff;--ok:#4cc38a;--bad:#ff6b6b;--warn:#e0b040}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"PingFang SC",system-ui,sans-serif}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:0 0 8px}.muted{color:var(--muted)}.small{font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+.btn{font:14px system-ui,"PingFang SC";padding:7px 14px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sp{justify-content:space-between}
+select,input[type=text]{font:14px system-ui;padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.chk{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.chk:last-child{border:0}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}.dot.wait{background:var(--line)}
+.fix{margin-top:6px;padding:10px 12px;border-radius:8px;background:rgba(220,60,60,.07);border:1px solid rgba(220,60,60,.25);font-size:13px}
+.fix code{background:rgba(127,127,127,.15);padding:1px 4px;border-radius:4px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{border:1px solid var(--line);border-radius:8px;padding:10px}.stat b{font-size:22px;display:block}
+.levels{display:flex;gap:6px;flex-wrap:wrap}.lv{border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;text-align:center;min-width:72px}.lv.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.steps{display:flex;gap:6px;margin:14px 0}.steps span{flex:1;height:4px;border-radius:2px;background:var(--line)}.steps span.on{background:var(--accent)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:50}
+.modal{width:min(620px,94vw);max-height:86vh;overflow:auto}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px}.diff div{border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+/* reading-page mock for variant C */
+.page{max-width:680px;margin:0 auto;padding:32px 20px 220px;font:19px/1.75 Georgia,serif;color:var(--muted)}
+.drawer{position:fixed;left:50%;transform:translateX(-50%);bottom:56px;width:min(720px,94vw);background:var(--card);border:1px solid var(--line);border-radius:12px 12px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.12);z-index:20}
+.drawer .dh{padding:10px 16px;display:flex;justify-content:space-between;cursor:pointer}.drawer .db{padding:0 16px 14px;max-height:56vh;overflow:auto}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 120px}
+.proto-bar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:100;background:#111;color:#fff;border-radius:99px;padding:6px 10px;display:flex;gap:8px;align-items:center;font:13px system-ui,"PingFang SC";box-shadow:0 4px 18px rgba(0,0,0,.35);white-space:nowrap}
+.proto-bar button{background:#333;color:#fff;border:0;border-radius:99px;min-width:28px;height:28px;cursor:pointer;padding:0 8px}
+.proto-bar select{background:#222;color:#fff;border:1px solid #444;font-size:12px}
+.proto-state{position:fixed;left:12px;bottom:60px;z-index:100;width:260px;background:#111;color:#9f9;font:11px/1.4 ui-monospace,monospace;border-radius:8px;padding:8px;opacity:.9;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div class="proto-bar" id="bar"></div>
+<div class="proto-state" id="state"></div>
+<script>
+const LEVELS={A1:1049,A2:1202,B1:2088,B2:2384,C1:909,C2:869};
+const CONN={
+ ok:{label:"一切正常"},
+ refused:{label:"连不上（Anki 没开 / 没装 AnkiConnect / 端口不对）"},
+ old:{label:"Anki 或 AnkiConnect 版本过低"},
+ origin:{label:"来源未授权（改过 CORS 列表）"},
+ apikey:{label:"设了 API Key"},
+};
+const S={variant:(new URLSearchParams(location.search).get("variant")||"A").toUpperCase(), conn:"ok", step:0, native:"zh", gloss:"native", level:"B1",
+  sites:"activeTab", port:"8765", key:"", imported:false, importing:null, modal:null, drawer:true, log:[]};
+const log=m=>{S.log.unshift(m);S.log=S.log.slice(0,6)};
+// ---------- 连接诊断 ----------
+function checks(){
+  const c=S.conn, port=S.port;
+  const reach = c!=="refused", ver = reach && c!=="old", allowed = ver && c!=="origin", auth = allowed && (c!=="apikey" || S.key==="secret");
+  return [
+   {t:`连接本机 Anki（127.0.0.1:${port}）`, ok:reach, fix:`连不上。请依次确认：<br>① Anki 已经打开；<br>② 已安装 AnkiConnect（工具 → 插件 → 获取插件，代码 <code>2055492159</code>），装完重启 Anki；<br>③ 如果你改过 AnkiConnect 的端口，在这里填上：<input type="text" data-k="port" value="${port}" size="6">`},
+   {t:"Anki ≥ 26.08 与新版 AnkiConnect", ok:ver, fix:"检测到旧版 AnkiConnect。VOKA 只支持 Anki 26.08 及以上：请到 apps.ankiweb.net 升级 Anki，然后在「工具 → 插件」里更新 AnkiConnect。"},
+   {t:"允许 VOKA 访问", ok:allowed, fix:`AnkiConnect 拒绝了 VOKA 的请求（你改过它的来源列表）。点下面的按钮后，<b>切到 Anki 窗口</b>点「允许」：<div class="row" style="margin-top:6px"><button class="btn" data-a="perm">请求访问权限</button></div><span class="small muted">或在 AnkiConnect 配置的 webCorsOriginList 里加入 <code>chrome-extension://abcd…</code></span>`},
+   {t:"API Key", ok:auth, fix:`你的 AnkiConnect 设置了 API Key，请填入：<input type="text" data-k="key" value="${S.key}" placeholder="（原型里填 secret）">`},
+  ];
+}
+const healthy=()=>checks().every(c=>c.ok);
+function checkList(){ let blocked=false;
+  return checks().map(c=>{ const st=blocked?"wait":c.ok?"ok":"bad"; const html=`<div class="chk"><span class="dot ${st}"></span><div style="flex:1"><div>${c.t}${st==="wait"?' <span class="small muted">（等上一步）</span>':""}</div>${st==="bad"?`<div class="fix">${c.fix}</div>`:""}</div></div>`; if(!c.ok) blocked=true; return html; }).join("")
+  + `<div class="row" style="margin-top:10px"><button class="btn" data-a="recheck">重新检测</button><span class="small muted">不会在后台反复重试；点这里或刷新页面才会再测一次。</span></div>`; }
+// ---------- 学习设置 ----------
+function settings(){
+  return `<div class="grid">
+   <label>学习语言<br><select disabled><option>English</option></select> <span class="small muted">其他语言以后支持</span></label>
+   <label>你的母语<br><select data-k="native"><option value="zh" ${S.native==="zh"?"selected":""}>中文</option><option value="en" ${S.native==="en"?"selected":""}>English</option></select></label>
+  </div>
+  ${S.native==="en"?`<p class="small muted">母语和学习语言相同：释义只用英文单语释义。</p>`:`<p>词卡背面的释义用：<label><input type="radio" name="g" data-k="gloss" value="native" ${S.gloss==="native"?"checked":""}> 中文</label> <label><input type="radio" name="g" data-k="gloss" value="target" ${S.gloss==="target"?"checked":""}> 英文（单语）</label> <span class="small muted">随时可改，不影响复习进度</span></p>`}
+  <p style="margin-bottom:6px">目标等级（只高亮这一级的词）</p>
+  <div class="levels">${Object.entries(LEVELS).map(([l,n])=>`<div class="lv ${S.level===l?'on':''}" data-a="level" data-v="${l}"><b>${l}</b><div class="small muted">${n.toLocaleString()} 词</div></div>`).join("")}</div>
+  <p style="margin:14px 0 6px">在哪些网站上运行</p>
+  <label><input type="radio" name="s" data-k="sites" value="activeTab" ${S.sites==="activeTab"?"checked":""}> 我点工具栏图标时才在当前页运行（推荐，无需额外授权）</label><br>
+  <label><input type="radio" name="s" data-k="sites" value="perSite" ${S.sites==="perSite"?"checked":""}> 记住我启用过的网站，下次自动运行</label><br>
+  <label><input type="radio" name="s" data-k="sites" value="all" ${S.sites==="all"?"checked":""}> 所有网站 <span class="small muted">（Chrome 会提示「读取和更改所有网站数据」）</span></label>`; }
+// ---------- 等级导入预览 ----------
+function importPreview(){
+  const n=LEVELS[S.level], deck=`VOKA::English::${S.level}`;
+  if(S.importing){ const p=S.importing; return `<h2>正在导入 ${S.level}</h2><div class="bar"><i style="width:${Math.round(p.done/n*100)}%"></i></div>
+    <p class="small muted">${p.done.toLocaleString()} / ${n.toLocaleString()} · 每批 200 条，每批写完都会回读确认</p>
+    ${p.failed?`<div class="fix">第 ${Math.floor(p.done/200)+1} 批写入时 Anki 断开了。已写入的 ${p.done.toLocaleString()} 条都在，重试只会补上剩下的。<div class="row" style="margin-top:6px"><button class="btn primary" data-a="resume">继续导入</button></div></div>`:`<div class="row"><button class="btn" data-a="cancel">取消</button><button class="btn" data-a="fail">（原型：模拟中途断开）</button></div>`}`; }
+  if(S.imported) return `<h2>✓ ${S.level} 已导入</h2><p>新建 ${n.toLocaleString()} 张词卡，放在牌组 <b>${deck}</b>。Anki 会按你的每日新卡上限慢慢引入它们。</p><div class="row"><button class="btn" data-a="again">再导入一次（看看幂等）</button></div>`;
+  const again=S.importedOnce;
+  return `<h2>导入 ${S.level} 词汇到 Anki</h2>
+  <div class="grid"><div class="stat"><b>${again?0:n.toLocaleString()}</b>新建词卡</div><div class="stat"><b>${again?n.toLocaleString():0}</b>已存在，保持不动</div>
+  <div class="stat"><b>0</b>冲突（同一个 Key 有多条笔记）</div><div class="stat"><b>0</b>跳过</div></div>
+  <ul class="small">
+   <li>目标牌组：<b>${deck}</b>${again?"（已存在）":"（新建）"}；笔记类型：<b>VOKA Vocabulary · English</b>${again?"（已存在）":"（新建）"}</li>
+   <li><b>不会修改、移动或重置任何已有卡片</b>，也不会改动你的复习进度。</li>
+   <li>新卡由 Anki 按你的「每日新卡上限」逐步引入，不会一下子全塞进今天。</li>
+   <li class="muted">数据：CEFR-J Wordlist 1.6 + Octanove C1/C2 1.0 · 释义数据 en-2026.10</li></ul>
+  <div class="row"><button class="btn primary" data-a="import" ${again?"disabled":""}>${again?"没有需要新建的词卡":`确认，新建 ${n.toLocaleString()} 张词卡`}</button><button class="btn" data-a="skip">先不导入</button></div>`; }
+// ---------- 数据升级预览 ----------
+function upgradeModal(){ const sel=S.diffKeep;
+  return `<div class="modal-bg"><div class="card modal"><h2>释义数据有更新：en-2026.10 → en-2027.01</h2>
+  <p class="small muted">只会更新 VOKA 生成的释义和音标，不碰你的例句、复习进度和人工标记。确认之前不会写入 Anki。</p>
+  <div class="card"><div class="row sp"><b>你没改过的 1,812 条</b><label><input type="checkbox" checked> 全部更新</label></div>
+   <div class="small muted">例：achieve　v. 实现；达到 → <b>v. 实现；达到；取得（成功）</b></div></div>
+  <div class="card"><div class="row sp"><b>你改过的 23 条</b><span class="small"><a href="#" data-a="allnew">全部改用新版</a> · <a href="#" data-a="allmine">全部保留我的</a></span></div>
+   ${["abandon","resilient","colour"].map((w,i)=>`<div style="margin-top:10px"><div class="small"><b>${w}</b></div><div class="diff">
+     <div><div class="small muted">你的版本 ${sel[i]?"✓ 保留":""}</div>${["v. 抛弃（车、船）；放弃（计划）","adj. 韧性强的","n. 颜色（英式拼写）"][i]}</div>
+     <div><div class="small muted">新版本 ${sel[i]?"":"✓ 采用"}</div>${["v. 抛弃；放弃；中止","adj. 有弹性的；适应力强的","n. 颜色；色彩"][i]}</div></div>
+     <div class="small"><a href="#" data-a="toggle" data-i="${i}">${sel[i]?"改用新版":"还是保留我的"}</a></div></div>`).join("")}
+   <div class="small muted" style="margin-top:8px">…还有 20 条（默认都保留你的版本）</div></div>
+  <div class="row"><button class="btn primary" data-a="closeModal">确认更新 ${1812+sel.filter(x=>!x).length+0} 条</button><button class="btn" data-a="closeModal">以后再说</button></div></div></div>`; }
+// ---------- 三个方案 ----------
+const V={
+ A:{name:"分步向导（独立页面）", note:"安装后打开一个全屏页面，三步走：①连接检测 ②学习设置 ③导入预览。每步做完才能下一步。"},
+ B:{name:"单页清单（设置页即引导）", note:"一个长页面，所有区块同时可见，像一张待办清单；导入预览以弹窗出现。以后的设置页就是这一页。"},
+ C:{name:"就地引导（在阅读页的底部抽屉里）", note:"不另开页面：用户第一次在网页上点 VOKA 图标时，抽屉展开，在抽屉里完成连接、设置、导入。"},
+};
+function stepsA(){
+  const st=S.step, ok=healthy();
+  const body = st===0 ? `<h2>1 · 连接 Anki</h2>${checkList()}<div class="row" style="margin-top:12px"><button class="btn primary" data-a="next" ${ok?"":"disabled"}>下一步</button></div>`
+   : st===1 ? `<h2>2 · 学习设置</h2>${settings()}<div class="row" style="margin-top:14px"><button class="btn" data-a="prev">上一步</button><button class="btn primary" data-a="next">下一步：预览导入</button></div>`
+   : `${importPreview()}<div class="row" style="margin-top:12px"><button class="btn" data-a="prev">上一步</button></div>`;
+  return `<div class="wrap"><h1>欢迎使用 VOKA</h1><div class="muted">Read. Remember. Roar.</div><div class="steps">${[0,1,2].map(i=>`<span class="${i<=st?'on':''}"></span>`).join("")}</div><div class="card">${ok||st===0?body:notRunning()}</div></div>`; }
+function pageB(){ const ok=healthy();
+  return `<div class="wrap"><h1>VOKA 设置</h1><p class="muted">从上到下完成就好。以后改设置也回到这一页。</p>
+  <div class="card"><div class="row sp"><h2>连接 Anki</h2><span class="small" style="color:${ok?'var(--ok)':'var(--bad)'}">${ok?"● 已连接 · Anki 26.9.3":"● 未连接"}</span></div>${ok?'<div class="small muted">AnkiConnect（新版）· 127.0.0.1:'+S.port+'</div>':checkList()}</div>
+  <div class="card" style="${ok?'':'opacity:.45;pointer-events:none'}"><h2>学习设置</h2>${settings()}</div>
+  <div class="card" style="${ok?'':'opacity:.45;pointer-events:none'}"><div class="row sp"><h2>${S.level} 词汇</h2>${S.imported?'<span class="small" style="color:var(--ok)">✓ 已导入</span>':''}</div>
+   <p class="small muted">${S.imported?`${LEVELS[S.level].toLocaleString()} 张词卡在 VOKA::English::${S.level}`:"还没导入。导入前会先给你看预览。"}</p><button class="btn ${S.imported?'':'primary'}" data-a="openImport">${S.imported?"再次检查":"预览导入…"}</button></div>
+  <div class="card"><h2>数据</h2><button class="btn" data-a="upgrade">检查释义数据更新</button></div></div>`; }
+function pageC(){ const ok=healthy(); let inner;
+  if(!ok) inner=`<h2>先连上 Anki</h2>${checkList()}`;
+  else if(S.step<1) inner=`<h2>学习设置</h2>${settings()}<div class="row" style="margin-top:12px"><button class="btn primary" data-a="next">下一步：预览导入</button></div>`;
+  else inner=importPreview()+(S.imported||S.skipped?`<p class="small muted" style="margin-top:10px">完成！关掉抽屉就能开始读这篇文章。</p>`:"");
+  return `<div class="page"><p style="color:var(--ink);font-weight:600;font-family:system-ui">（这里是用户正在读的网页）</p>
+  ${"<p>Researchers have long tried to achieve a simple goal: keep streets cool without abandoning the comforts of modern life. Last summer I saw a team paint whole blocks white…</p>".repeat(4)}</div>
+  <div class="drawer"><div class="dh" data-a="drawer"><span><b>VOKA</b> <span class="small muted">${ok?(S.imported?"已就绪":"第一次使用 · 还差几步"):"未运行：请检查 Anki"}</span></span><span class="small muted">${S.drawer?"收起 ▾":"展开 ▴"}</span></div>${S.drawer?`<div class="db">${inner}</div>`:""}</div>`; }
+function notRunning(){ return `<h2>VOKA 没有运行</h2>${checkList()}`; }
+// ---------- render ----------
+function render(){
+  document.getElementById("app").innerHTML = S.variant==="A"?stepsA():S.variant==="B"?pageB():pageC();
+  document.getElementById("modal").innerHTML = S.modal==="import"?`<div class="modal-bg"><div class="card modal">${importPreview()}<div class="row" style="margin-top:10px"><button class="btn" data-a="closeModal">关闭</button></div></div></div>`:S.modal==="upgrade"?upgradeModal():"";
+  document.getElementById("bar").innerHTML=`<button data-p="-1">←</button><span><b>${S.variant}</b> · ${V[S.variant].name}</span><button data-p="1">→</button>
+   <select id="conn">${Object.entries(CONN).map(([k,v])=>`<option value="${k}" ${S.conn===k?"selected":""}>${v.label}</option>`).join("")}</select>
+   <button data-a="upgrade">数据升级预览</button><button data-a="reset">重来</button>`;
+  document.querySelectorAll("#bar [data-p]").forEach(b=>b.onclick=()=>cycle(+b.dataset.p));
+  document.getElementById("conn").onchange=e=>{S.conn=e.target.value;S.key="";log("连接情况 → "+e.target.value);render();};
+  document.getElementById("state").textContent=`PROTOTYPE 状态\n${V[S.variant].note}\n\n连接: ${S.conn} → ${healthy()?"可运行":"不运行"}\n端口: ${S.port}  母语: ${S.native}  释义: ${S.native==="en"?"target(固定)":S.gloss}\n目标等级: ${S.level}  站点: ${S.sites}\n步骤: ${S.step}  已导入: ${S.imported}\n\n${S.log.join("\n")}`;
+}
+function cycle(d){ const ks=Object.keys(V); S.variant=ks[(ks.indexOf(S.variant)+d+ks.length)%ks.length]; S.step=0; history.replaceState(null,"","?variant="+S.variant); render(); }
+addEventListener("keydown",e=>{ if(e.target.closest("input,select,textarea")) return; if(e.key==="ArrowLeft")cycle(-1); if(e.key==="ArrowRight")cycle(1); });
+let timer=null;
+document.addEventListener("click",e=>{ const t=e.target.closest("[data-a]"); if(!t) return; e.preventDefault(); const a=t.dataset.a;
+  if(a==="next")S.step++; if(a==="prev")S.step--; if(a==="level"){S.level=t.dataset.v;S.imported=false;S.importedOnce=false;log("目标等级 → "+S.level);}
+  if(a==="recheck")log("重新检测"); if(a==="perm"){log("已请求权限；用户在 Anki 里点了允许");S.conn="ok";}
+  if(a==="import"){S.importing={done:0};log(`开始导入 ${S.level}`);timer=setInterval(()=>{ if(!S.importing||S.importing.failed) return clearInterval(timer); S.importing.done=Math.min(LEVELS[S.level],S.importing.done+200);
+     if(S.importing.done>=LEVELS[S.level]){clearInterval(timer);S.importing=null;S.imported=true;S.importedOnce=true;log("导入完成，已回读确认");} render(); },250);}
+  if(a==="fail"&&S.importing){S.importing.failed=true;log(`第 ${Math.floor(S.importing.done/200)+1} 批中断`);}
+  if(a==="resume"){S.importing.failed=false;log("从断点继续");document.querySelector('[data-a="import"]');S.importing.done=S.importing.done; const keep=S.importing; S.importing=null; S.importing=keep; timer=setInterval(()=>{ if(!S.importing||S.importing.failed) return clearInterval(timer); S.importing.done=Math.min(LEVELS[S.level],S.importing.done+200); if(S.importing.done>=LEVELS[S.level]){clearInterval(timer);S.importing=null;S.imported=true;S.importedOnce=true;log("导入完成");} render(); },250);}
+  if(a==="cancel"){clearInterval(timer);log(`取消；已写入的 ${S.importing.done} 条保留`);S.importing=null;}
+  if(a==="again"){S.imported=false;log("再次预览：应全部是「已存在」");}
+  if(a==="skip"){S.skipped=true;S.modal=null;log("先不导入：只高亮，不建卡");}
+  if(a==="openImport")S.modal="import"; if(a==="upgrade"){S.modal="upgrade";S.diffKeep=[true,true,true];}
+  if(a==="toggle")S.diffKeep[+t.dataset.i]=!S.diffKeep[+t.dataset.i]; if(a==="allnew")S.diffKeep=[false,false,false]; if(a==="allmine")S.diffKeep=[true,true,true];
+  if(a==="closeModal")S.modal=null; if(a==="drawer")S.drawer=!S.drawer;
+  if(a==="reset"){Object.assign(S,{conn:"ok",step:0,imported:false,importedOnce:false,importing:null,modal:null,port:"8765",key:"",skipped:false,log:[]});}
+  render(); });
+document.addEventListener("change",e=>{ const k=e.target.dataset.k; if(!k) return; S[k]=e.target.value;
+  if(k==="key"&&S.key==="secret"){log("API Key 正确");} if(k==="port"){log("端口 → "+S.port+(S.port!=="8765"&&S.conn==="refused"?"（原型：假装这个端口通了）":"")); if(S.conn==="refused"&&S.port!=="8765")S.conn="ok";}
+  render(); });
+render();
+</script>
+</body>
+</html>
