@@ -1,0 +1,9 @@
+# Gloss language switch acceptance (#25)
+
+2026-10-31, isolated Anki 26.09.3 at **127.0.0.1:8766** only. Run `npx tsx scripts/check-gloss.ts`; raw results: [gloss-switch-raw.json](gloss-switch-raw.json). Browser paths can be overridden with `VOKA_PLAYWRIGHT` (Playwright module) and `VOKA_CHROME` (Chrome for Testing executable).
+
+T-26: the real `VOKA Vocabulary · English` type was read, a user CSS sentinel appended outside the markers, and the product `updateGlossCss` function exercised in target and native modes. Each readback equaled the original CSS with only marker contents replaced, including the exact user sentinel. Before/after snapshots copied collection.anki2 plus WAL into a fresh temporary directory (no stale SHM), then read SQLite. `col.scm` stayed **1793435872969** in both modes; all pre-existing notes, card scheduling and revlog remained identical. Finally the original CSS was restored. Runtime v1 requires `noteTypes.update({noteType, patch:{css}})`.
+
+T-27: two new retained test notes in a uniquely named `VOKA::Gloss Acceptance …` deck contain, respectively, no native gloss and no target gloss. Real `cards.render` output was loaded into **Chrome for Testing 147.0.7727.15**. In native mode, missing native gloss showed `target fallback` with computed display `block`; in target mode, missing target gloss showed `母语回退` with computed display `block`. Rendered CSS contained no `:has(`. Existing notes were never edited; no fields or templates were changed.
+
+Not verified: clicking the extension Options controls in a loaded browser profile, service-worker storage event delivery across restart, AnkiMobile/AnkiWeb/AnkiDroid, real sync, or later reading-popup integration. Offline settings are retained but a failed CSS write is logged rather than retried; change the setting again after reconnecting. The script retains its two fixture notes and deck for inspection; it performs no deletes or sync.

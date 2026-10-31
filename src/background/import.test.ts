@@ -103,34 +103,36 @@ it("refuses mismatched field structure", async () => {
 it("submits only valid notes once and resolves unknown writes by Key", async () => {
   const call = gateway(true);
   // First preview has no existing keys; subsequent read-back returns the committed note.
-  call.mockImplementation(async (method: string, params: any = {}): Promise<any> => {
-    if (method === "noteTypes.list")
-      return [{ name: "VOKA Vocabulary · English" }];
-    if (method === "decks.list") return [{ name: "VOKA::English::B1" }];
-    if (method === "noteTypes.get")
-      return { fields: CORE_FIELDS.map((name) => ({ name })) };
-    if (method === "notes.search")
-      return {
-        ids: call.mock.calls.some(([m]) => m === "notes.createMany")
-          ? ["4"]
-          : [],
-        nextCursor: null,
-      };
-    if (method === "notes.getMany")
-      return {
-        items: [{ result: { id: "4", fields: { Key: "en:achieve" } } }],
-      };
-    if (method === "notes.validateMany")
-      return {
-        items: params.notes.map((_: unknown, index: number) => ({
-          index,
-          result: { valid: index === 0 },
-        })),
-      };
-    if (method === "notes.createMany")
-      throw new GatewayError("unreachable", "unknown");
-    throw new Error(method);
-  });
+  call.mockImplementation(
+    async (method: string, params: any = {}): Promise<any> => {
+      if (method === "noteTypes.list")
+        return [{ name: "VOKA Vocabulary · English" }];
+      if (method === "decks.list") return [{ name: "VOKA::English::B1" }];
+      if (method === "noteTypes.get")
+        return { fields: CORE_FIELDS.map((name) => ({ name })) };
+      if (method === "notes.search")
+        return {
+          ids: call.mock.calls.some(([m]) => m === "notes.createMany")
+            ? ["4"]
+            : [],
+          nextCursor: null,
+        };
+      if (method === "notes.getMany")
+        return {
+          items: [{ result: { id: "4", fields: { Key: "en:achieve" } } }],
+        };
+      if (method === "notes.validateMany")
+        return {
+          items: params.notes.map((_: unknown, index: number) => ({
+            index,
+            result: { valid: index === 0 },
+          })),
+        };
+      if (method === "notes.createMany")
+        throw new GatewayError("unreachable", "unknown");
+      throw new Error(method);
+    },
+  );
   const result = await executeImport(call);
   expect(result.confirmed).toEqual(["en:achieve"]);
   expect(result.failures).toHaveLength(11);
@@ -142,33 +144,35 @@ it("submits only valid notes once and resolves unknown writes by Key", async () 
 it("reads paginated searches and compares exact Key values", async () => {
   let page = 0;
   const call = gateway(true);
-  call.mockImplementation(async (method: string, params: any = {}): Promise<any> => {
-    if (method === "noteTypes.list")
-      return [{ name: "VOKA Vocabulary · English" }];
-    if (method === "decks.list") return [];
-    if (method === "noteTypes.get")
-      return { fields: CORE_FIELDS.map((name) => ({ name })) };
-    if (method === "notes.search") {
-      page++;
-      if (page === 1) return { ids: ["1"], nextCursor: "page2" };
-      expect(params.cursor).toBe("page2");
-      return { ids: ["2"], nextCursor: null };
-    }
-    if (method === "notes.getMany")
-      return {
-        items: [
-          {
-            result: {
-              id: params.ids[0],
-              fields: {
-                Key: params.ids[0] === "1" ? "en:Achieve" : "en:achieve",
+  call.mockImplementation(
+    async (method: string, params: any = {}): Promise<any> => {
+      if (method === "noteTypes.list")
+        return [{ name: "VOKA Vocabulary · English" }];
+      if (method === "decks.list") return [];
+      if (method === "noteTypes.get")
+        return { fields: CORE_FIELDS.map((name) => ({ name })) };
+      if (method === "notes.search") {
+        page++;
+        if (page === 1) return { ids: ["1"], nextCursor: "page2" };
+        expect(params.cursor).toBe("page2");
+        return { ids: ["2"], nextCursor: null };
+      }
+      if (method === "notes.getMany")
+        return {
+          items: [
+            {
+              result: {
+                id: params.ids[0],
+                fields: {
+                  Key: params.ids[0] === "1" ? "en:Achieve" : "en:achieve",
+                },
               },
             },
-          },
-        ],
-      };
-    throw new Error(method);
-  });
+          ],
+        };
+      throw new Error(method);
+    },
+  );
   expect((await previewImport(call)).counts).toEqual({
     new: 11,
     existing: 1,
@@ -209,3 +213,34 @@ it("a repeated import does not write or validate existing notes", async () => {
   });
   expect(await executeImport(call)).toEqual({ confirmed: [], failures: [] });
 });
+it.each([
+  ["target", "zh"],
+  ["native", "en"],
+] as const)(
+  "provisions current mode %s for native language %s",
+  async (mode, nativeLanguage) => {
+    const base = gateway();
+    const call = vi.fn(
+      async (method: string, params: any = {}, write = false): Promise<any> => {
+        if (method === "noteTypes.create" || method === "decks.create")
+          return {};
+        return base(method, params);
+      },
+    );
+    await executeImport(call, undefined, mode, nativeLanguage);
+    const created = call.mock.calls.find(
+      ([method]) => method === "noteTypes.create",
+    )![1];
+    expect(created.css).toContain(".gloss-target{display:block}");
+    expect(created.css).not.toContain("\n.gloss-native{display:block}");
+    const notes = call.mock.calls.find(
+      ([method]) => method === "notes.validateMany",
+    )![1].notes;
+    if (nativeLanguage === "en") {
+      expect(notes.every((n: any) => n.fields.GlossNative === "")).toBe(true);
+      expect(JSON.parse(notes[0].fields.VokaMeta).hashes.GlossNative).toBe(
+        await contentHash(""),
+      );
+    }
+  },
+);
