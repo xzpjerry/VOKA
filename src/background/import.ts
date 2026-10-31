@@ -1,3 +1,4 @@
+import { replaceGlossCss, type GlossLanguage } from "./gloss";
 import { testPack } from "../data/test-pack";
 import { questionHtml, answerHtml, css } from "../data/template";
 export const CORE_FIELDS = [
@@ -139,7 +140,12 @@ export async function previewImport(
     },
   };
 }
-export async function executeImport(call: Call, target = DEFAULT_TARGET) {
+export async function executeImport(
+  call: Call,
+  target = DEFAULT_TARGET,
+  mode: GlossLanguage = "native",
+  nativeLanguage: "zh" | "en" = "zh",
+) {
   // Fresh read prevents a stale preview from overwriting anything.
   const preview = await previewImport(call, target);
   const failures: { key: string; reason: string }[] = [];
@@ -171,7 +177,7 @@ export async function executeImport(call: Call, target = DEFAULT_TARGET) {
         name: target.noteType,
         fields: CORE_FIELDS.map((name) => ({ name })),
         templates: [{ name: "词卡", questionHtml, answerHtml }],
-        css,
+        css: replaceGlossCss(css, nativeLanguage === "en" ? "target" : mode),
         sortField: "Word",
       },
       async () =>
@@ -196,9 +202,12 @@ export async function executeImport(call: Call, target = DEFAULT_TARGET) {
         Key: key,
         Word: entry.lemma,
         Reading: entry.Reading,
-        GlossNative: entry.GlossNative,
+        GlossNative: nativeLanguage === "en" ? "" : entry.GlossNative,
         GlossTarget: entry.GlossTarget,
-        VokaMeta: await vokaMeta(entry),
+        VokaMeta: await vokaMeta({
+          ...entry,
+          GlossNative: nativeLanguage === "en" ? "" : entry.GlossNative,
+        }),
       },
     })),
   );

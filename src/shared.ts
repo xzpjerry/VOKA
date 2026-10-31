@@ -1,8 +1,17 @@
 import type { Settings, Status } from "./background/gateway";
 export const t = (key: string) => chrome.i18n.getMessage(key);
-export async function settings(): Promise<Settings> {
-  const value = await chrome.storage.local.get({ port: 8765, apiKey: "" });
+export async function settings(): Promise<
+  Settings & { nativeLanguage: "zh" | "en"; glossLanguage: "native" | "target" }
+> {
+  const value = await chrome.storage.local.get({
+    port: 8765,
+    apiKey: "",
+    nativeLanguage: "zh",
+    glossLanguage: "native",
+  });
   return {
+    nativeLanguage: value.nativeLanguage === "en" ? "en" : "zh",
+    glossLanguage: value.glossLanguage === "target" ? "target" : "native",
     port:
       typeof value.port === "number" &&
       Number.isInteger(value.port) &&

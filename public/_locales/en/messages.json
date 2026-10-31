@@ -73,5 +73,17 @@
   },
   "importConfirmed": {
     "message": "Confirmed by read-back"
+  },
+  "nativeLanguage": {
+    "message": "Native language"
+  },
+  "glossLanguage": {
+    "message": "Gloss language"
+  },
+  "glossNative": {
+    "message": "Native gloss"
+  },
+  "glossTarget": {
+    "message": "Monolingual gloss"
   }
 }

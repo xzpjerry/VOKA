@@ -73,5 +73,17 @@
   },
   "importConfirmed": {
     "message": "回读确认"
+  },
+  "nativeLanguage": {
+    "message": "母语"
+  },
+  "glossLanguage": {
+    "message": "释义语言"
+  },
+  "glossNative": {
+    "message": "母语释义"
+  },
+  "glossTarget": {
+    "message": "单语释义"
   }
 }

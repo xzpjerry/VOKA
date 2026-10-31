@@ -1,0 +1,38 @@
+{
+  "port": 8766,
+  "modes": [
+    {
+      "mode": "target",
+      "scmBefore": 1793435872969,
+      "scmAfter": 1793435872969,
+      "outsideCssPreserved": true,
+      "notesAndSchedulingUnchanged": true
+    },
+    {
+      "mode": "native",
+      "scmBefore": 1793435872969,
+      "scmAfter": 1793435872969,
+      "outsideCssPreserved": true,
+      "notesAndSchedulingUnchanged": true
+    }
+  ],
+  "browser": "147.0.7727.15",
+  "fallbacks": [
+    {
+      "mode": "native",
+      "missing": "native",
+      "cardId": "1793436789079",
+      "text": "target fallback",
+      "display": "block",
+      "noHas": true
+    },
+    {
+      "mode": "target",
+      "missing": "target",
+      "cardId": "1793436789083",
+      "text": "母语回退",
+      "display": "block",
+      "noHas": true
+    }
+  ]
+}

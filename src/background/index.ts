@@ -1,3 +1,4 @@
+import { updateGlossCss } from "./gloss";
 import { previewImport, executeImport } from "./import";
 import { checkConnection, rpc } from "./gateway";
 import { settings } from "../shared";
@@ -25,7 +26,12 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
         rpc(config, method, params, { sideEffecting: write });
       return message.type === "preview-import"
         ? previewImport(call)
-        : executeImport(call);
+        : executeImport(
+            call,
+            undefined,
+            config.glossLanguage,
+            config.nativeLanguage,
+          );
     })()
       .then(
         (data) => reply({ data }),
@@ -47,4 +53,25 @@ chrome.action.onClicked.addListener(async (tab) => {
   } catch {
     /* Chrome internal pages and other protected tabs cannot be injected. */
   }
+});
+
+// Serialize changes so quick successive selections cannot finish out of order.
+let glossUpdate = Promise.resolve();
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !(changes.glossLanguage || changes.nativeLanguage))
+    return;
+  glossUpdate = glossUpdate
+    .catch(() => {})
+    .then(async () => {
+      const config = await settings();
+      if ((await checkConnection(config)) !== "ok") return;
+      await updateGlossCss(
+        (method, params = {}, write = false) =>
+          rpc(config, method, params, { sideEffecting: write }),
+        config.nativeLanguage === "en" ? "target" : config.glossLanguage,
+      );
+    })
+    .catch((error) =>
+      console.error("VOKA gloss CSS update failed; setting retained", error),
+    );
 });

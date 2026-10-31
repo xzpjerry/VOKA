@@ -1,7 +1,7 @@
 import { settings, check, t } from "./shared";
 const style = document.createElement("style");
 style.textContent =
-  "body{font:16px system-ui;color:#17212b;background:#f5f7fa}main{max-width:520px;margin:64px auto;padding:32px;background:white;border-radius:16px}label{display:grid;gap:8px;margin:20px 0}input,button{font:inherit;padding:10px}";
+  "body{font:16px system-ui;color:#17212b;background:#f5f7fa}main{max-width:520px;margin:64px auto;padding:32px;background:white;border-radius:16px}label{display:grid;gap:8px;margin:20px 0}input,button,select{font:inherit;padding:10px}[hidden]{display:none!important}";
 document.head.append(style);
 document.documentElement.lang = chrome.i18n.getUILanguage();
 document
@@ -78,4 +78,24 @@ for (const input of [port, apiKey])
   input.addEventListener("input", () => {
     confirmButton.disabled = true;
     importStatus.textContent = "";
+  });
+
+const nativeLanguage =
+  document.querySelector<HTMLSelectElement>("#nativeLanguage")!;
+const glossLanguage =
+  document.querySelector<HTMLSelectElement>("#glossLanguage")!;
+const glossRow = document.querySelector<HTMLElement>("#glossLanguageRow")!;
+nativeLanguage.value = initial.nativeLanguage;
+glossLanguage.value = initial.glossLanguage;
+const showGloss = () => {
+  glossRow.hidden = nativeLanguage.value === "en";
+};
+showGloss();
+for (const select of [nativeLanguage, glossLanguage])
+  select.addEventListener("change", async () => {
+    showGloss();
+    await chrome.storage.local.set({
+      nativeLanguage: nativeLanguage.value,
+      glossLanguage: glossLanguage.value,
+    });
   });
