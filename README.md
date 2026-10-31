@@ -37,3 +37,11 @@ npm run check:import -- --default        # uses product targets; preserves exist
 ```
 
 These integration checks only contact `127.0.0.1:8766` and retain their artifacts for inspection. They assert fields/tags/hashes/templates, a second preview with zero new notes (the UI's disabled-confirm condition), unchanged card data on repeat, and unchanged `col.scm`, existing scheduling and review history using a read-only copy of the isolated SQLite collection. They do not drive Anki reviews; T-05 is checked by read-only state/history comparison, not by reviewing newly imported cards.
+
+## Reading highlights
+
+Click the toolbar icon on an English page after connecting Anki. Reading uses the synthetic fixture pack, exact normalized matches, and a tiny inflection table (`achieved → achieve`, `abandoning → abandon`). Target words are yellow, learning blue, manual unknown red, and optional advanced words pale yellow. Manual known and mature review cards have no highlight. Hover shows the headword and a gloss from the Anki note, or the fixture if no note exists. Excluded input/editable/code/navigation/hidden regions are never processed. Dynamic subtrees are rescanned after a short debounce; no word wrapper spans are inserted.
+
+Shared preferences are flat `chrome.storage.local` keys: `nativeLanguage` (`zh` default), `glossLanguage` (`native`), `targetLevel` (`B1`), `showAdvanced` (`false`), and `hoverScope` (`highlighted`). The reading script refreshes after preference/connection changes and a repeated toolbar click. Failed gateway work clears highlights and tooltip; Retry can restore them, with no background polling.
+
+Run `npx puppeteer browsers install chrome`, then `npm run check:highlight` for the real 8766 browser acceptance check. This check uses the existing import flow and temporarily changes/restores two fixture notes' ManualStatus fields. See [acceptance evidence and limitations](docs/research/highlight-acceptance.md).

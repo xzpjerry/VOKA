@@ -29,8 +29,8 @@ export type Call = (
   params?: Record<string, unknown>,
   write?: boolean,
 ) => Promise<any>;
-export const normalizeKey = (lemma: string) =>
-  "en:" + lemma.toLowerCase().normalize("NFC").replace(/[‘’]/g, "'");
+export { normalizeKey } from "../key";
+import { normalizeKey } from "../key";
 export async function contentHash(content: string): Promise<string> {
   const digest = await crypto.subtle.digest(
     "SHA-256",

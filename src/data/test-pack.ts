@@ -106,3 +106,22 @@ export const testPack = {
     },
   ],
 };
+
+/** Deliberately tiny fixture only; production lemmatization is a later ticket. */
+export const testInflections: Record<string, string[]> = {
+  achieved: ["achieve"],
+  achieving: ["achieve"],
+  improved: ["improve"],
+  abandoning: ["abandon"],
+};
+
+/** Extra reading-only fixture: not part of the B1 import pack. */
+export const testReadingEntries = [
+  {
+    lemma: "abandon",
+    level: "B2",
+    GlossNative: "放弃",
+    GlossTarget: "to leave something behind",
+    Reading: "",
+  },
+];

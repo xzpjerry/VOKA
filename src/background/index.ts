@@ -1,14 +1,57 @@
 import { updateGlossCss } from "./gloss";
+import { pageStates } from "./reading";
 import { previewImport, executeImport } from "./import";
-import { checkConnection, rpc } from "./gateway";
+import { checkConnection, rpc, GatewayError } from "./gateway";
 import { settings } from "../shared";
 let importBusy = false;
+async function notifyDisconnected() {
+  for (const tab of await chrome.tabs.query({})) {
+    if (tab.id)
+      void chrome.tabs
+        .sendMessage(tab.id, { type: "connection-lost" })
+        .catch(() => {});
+  }
+}
+const gatewayCall: typeof rpc = async (...args) => {
+  try {
+    return await rpc(...args);
+  } catch (error) {
+    if (error instanceof GatewayError && error.status === "unreachable")
+      void notifyDisconnected();
+    throw error;
+  }
+};
+async function checked(config: Parameters<typeof checkConnection>[0]) {
+  const status = await checkConnection(config);
+  if (status !== "ok") void notifyDisconnected();
+  return status;
+}
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== chrome.runtime.id) return;
   if (message?.type === "check-connection") {
     settings()
-      .then(checkConnection)
+      .then(checked)
       .then(reply, () => reply("unreachable"));
+  } else if (
+    message?.type === "page-states" &&
+    Array.isArray(message.keys) &&
+    message.keys.length <= 10000 &&
+    message.keys.every(
+      (k: unknown) => typeof k === "string" && /^en:[\p{L}\p{M}'-]+$/u.test(k),
+    )
+  ) {
+    (async () => {
+      const config = await settings();
+      const status = await checked(config);
+      if (status !== "ok") throw new Error(status);
+      return pageStates(
+        (method, params = {}) => gatewayCall(config, method, params),
+        message.keys,
+      );
+    })().then(
+      (data) => reply({ data }),
+      () => reply({ error: "unreachable" }),
+    );
   } else if (
     ["preview-import", "execute-import"].includes(message?.type) &&
     sender.url === chrome.runtime.getURL("options.html")
@@ -20,10 +63,10 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     importBusy = true;
     (async () => {
       const config = await settings();
-      const status = await checkConnection(config);
+      const status = await checked(config);
       if (status !== "ok") throw new Error(status);
       const call = (method: string, params = {}, write = false) =>
-        rpc(config, method, params, { sideEffecting: write });
+        gatewayCall(config, method, params, { sideEffecting: write });
       return message.type === "preview-import"
         ? previewImport(call)
         : executeImport(
@@ -64,10 +107,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
     .catch(() => {})
     .then(async () => {
       const config = await settings();
-      if ((await checkConnection(config)) !== "ok") return;
+      if ((await checked(config)) !== "ok") return;
       await updateGlossCss(
         (method, params = {}, write = false) =>
-          rpc(config, method, params, { sideEffecting: write }),
+          gatewayCall(config, method, params, { sideEffecting: write }),
         config.nativeLanguage === "en" ? "target" : config.glossLanguage,
       );
     })
