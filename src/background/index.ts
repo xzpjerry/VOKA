@@ -10,6 +10,7 @@ import { settings } from "../shared";
 import { httpHost, isSiteScope, type SiteScope } from "../site-scope";
 import {
   rememberSite,
+  recoverColdToolbar,
   scheduleSiteSync,
   shouldAutoRun,
 } from "./sites";
@@ -18,10 +19,12 @@ import {
 // requiring a storage read in the click handler.
 let toolbarSiteScope: SiteScope = "activeTab";
 let scopeRevision = 0;
+let toolbarScopeReady = false;
 void chrome.storage.local.get({ siteScope: "activeTab" }).then((value) => {
   // An intervening storage event is newer than this startup snapshot.
   if (scopeRevision === 0)
     toolbarSiteScope = isSiteScope(value.siteScope) ? value.siteScope : "activeTab";
+  toolbarScopeReady = true;
 }).catch((error) => console.error("VOKA site-scope cache failed", error));
 let importBusy = false;
 let importController: AbortController | undefined;
@@ -218,6 +221,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
 chrome.action.onClicked.addListener(async (tab) => {
   if (!tab.id) return;
   const host = httpHost(tab.url);
+  const cacheReady = toolbarScopeReady;
   // Start the optional permission request before awaiting injection. A denied
   // site can still be remembered; its deny-list entry only prevents auto-run.
   const remembering = toolbarSiteScope === "remembered" && host
@@ -232,6 +236,11 @@ chrome.action.onClicked.addListener(async (tab) => {
     /* Chrome internal pages and other protected tabs cannot be injected. */
   }
   await remembering;
+  if (host) {
+    await recoverColdToolbar(cacheReady, host, () => chrome.tabs.create({
+      url: chrome.runtime.getURL(`remember.html?host=${encodeURIComponent(host)}`),
+    }));
+  }
 });
 
 // Serialize changes so quick successive selections cannot finish out of order.
@@ -240,6 +249,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return;
   if (changes.siteScope) {
     ++scopeRevision;
+    toolbarScopeReady = true;
     toolbarSiteScope = isSiteScope(changes.siteScope.newValue)
       ? changes.siteScope.newValue : "activeTab";
   }

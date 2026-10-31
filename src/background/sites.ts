@@ -80,12 +80,30 @@ export async function rememberSite(host: string): Promise<boolean> {
     return false;
   }
   if (!granted) return false;
+  await recordRememberedSite(host);
+  return true;
+}
+
+async function recordRememberedSite(host: string): Promise<void> {
   const config = await settings();
   await chrome.storage.local.set({
     rememberedSites: [...new Set([...config.rememberedSites, host])],
   });
   await scheduleSiteSync();
-  return true;
+}
+
+/** Recover a toolbar gesture that arrived before the scope cache was ready. */
+export async function recoverColdToolbar(
+  cacheReady: boolean,
+  host: string,
+  offer: () => Promise<unknown>,
+): Promise<void> {
+  if (cacheReady || (await settings()).siteScope !== "remembered") return;
+  if (await chrome.permissions.contains({ origins: [sitePattern(host)] })) {
+    await recordRememberedSite(host);
+    return;
+  }
+  await offer();
 }
 
 /** Guard used by content-auto.js before it starts reading a page. */
