@@ -1,0 +1,41 @@
+{
+  "description": {
+    "message": "基于 Anki 的沉浸式语言阅读工具"
+  },
+  "retry": {
+    "message": "重试"
+  },
+  "checking": {
+    "message": "正在检测 Anki…"
+  },
+  "connected": {
+    "message": "Anki 已连接"
+  },
+  "notRunning": {
+    "message": "VOKA 未运行：请检查 Anki"
+  },
+  "port": {
+    "message": "AnkiConnect 端口"
+  },
+  "apiKey": {
+    "message": "API Key（可选）"
+  },
+  "saveCheck": {
+    "message": "保存并重新检测"
+  },
+  "status_ok": {
+    "message": "Anki 已连接"
+  },
+  "status_unreachable": {
+    "message": "无法连接：请检查 Anki、新版 AnkiConnect 和端口。"
+  },
+  "status_forbidden": {
+    "message": "来源未授权：请在 AnkiConnect 的 webCorsOriginList 中允许此扩展来源。"
+  },
+  "status_auth": {
+    "message": "API Key 缺失或错误：请检查 AnkiConnect 配置。"
+  },
+  "status_not_new_ankiconnect": {
+    "message": "请升级到 Anki ≥ 26.08 与新版 AnkiConnect，并确认所需方法可用。"
+  }
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VOKA</title>
+  </head>
+  <body>
+    <main>
+      <h1>VOKA</h1>
+      <form>
+        <label
+          ><span data-i18n="port"></span
+          ><input id="port" type="number" min="1" max="65535" required /></label
+        ><label
+          ><span data-i18n="apiKey"></span
+          ><input id="apiKey" type="password" autocomplete="off" /></label
+        ><button data-i18n="saveCheck"></button>
+      </form>
+      <p role="status" id="status"></p>
+    </main>
+    <script type="module" src="/src/options.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "description": {
+    "message": "Immersive language reading with Anki"
+  },
+  "retry": {
+    "message": "Retry"
+  },
+  "checking": {
+    "message": "Checking Anki…"
+  },
+  "connected": {
+    "message": "Anki connected"
+  },
+  "notRunning": {
+    "message": "VOKA is not running: please check Anki"
+  },
+  "port": {
+    "message": "AnkiConnect port"
+  },
+  "apiKey": {
+    "message": "API key (optional)"
+  },
+  "saveCheck": {
+    "message": "Save and check again"
+  },
+  "status_ok": {
+    "message": "Anki connected"
+  },
+  "status_unreachable": {
+    "message": "Cannot connect: check Anki, new AnkiConnect, and the port."
+  },
+  "status_forbidden": {
+    "message": "Origin forbidden: allow this extension origin in AnkiConnect webCorsOriginList."
+  },
+  "status_auth": {
+    "message": "API key missing or incorrect: check AnkiConnect settings."
+  },
+  "status_not_new_ankiconnect": {
+    "message": "Upgrade to Anki ≥ 26.08 and new AnkiConnect; required methods must be available."
+  }
+}
