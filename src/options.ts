@@ -320,3 +320,9 @@ async function showAttributions() {
   }
 }
 void showAttributions();
+
+const storeFullUrl = document.querySelector<HTMLInputElement>("#storeFullUrl")!;
+storeFullUrl.checked = initial.storeFullUrl;
+storeFullUrl.addEventListener("change", () =>
+  chrome.storage.local.set({ storeFullUrl: storeFullUrl.checked }),
+);
