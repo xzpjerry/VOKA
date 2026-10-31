@@ -95,10 +95,10 @@ Options 页（首次安装向导 + 设置页）
 | 查找与读取 | `notes.search`、`notes.getMany`、`cards.search`、`cards.getMany` | 批量调用；不逐个 token 请求 |
 | 更新字段 | `notes.update` | 只合并要改的字段；写后回读 |
 | 标签 | `tags.add`、`tags.remove` | |
-| 异步操作结果 | `operations.get` | 结果不确定时（超时、断连）回查，**禁止盲目重发** |
+| 异步操作结果 | `operations.get` | 仅对返回 `operationId` 的方法凭句柄回查；本表的笔记、标签与笔记类型写入直接返回完成结果，不返回操作句柄。超时、断连时按 Key / ID 回读核对，**禁止盲目重发** |
 | 同步（仅测试用） | `collection.sync` | 扩展本身不主动触发同步 |
 
-**必须在 v1 上重新验证**：之前的实测有一部分走的是 v6 兼容层，实现时要在测试实例上用 v1 重新确认——判重规则（区分大小写、先去 HTML、默认按整个收藏查同一笔记类型）、`notes.createMany` 逐条失败时的返回结构、哪些操作会改动 `col.scm`（触发全量同步）。
+**v1 复核已完成**（Anki 26.09.3，隔离实例，见[原始响应与复核报告](../research/anki-v1-review.md)）：首字段判重区分大小写、先去 HTML，默认按整个收藏查同一笔记类型；`duplicates.scope: "deck"` 必须指定 `deck`，`acrossNoteTypes: true` 可跨笔记类型判重，非法 scope 返回 `invalidParams`。`notes.validateMany` 返回 `items[{index,result:{valid,issues,duplicateNoteIds}}]`；`notes.createMany` 在 `atomic:false` 时返回逐条 `result` 或 `error`，成功项保留；`atomic:true` 遇重复返回顶层 `validationFailed`，整批不写入。新建笔记类型、更新 CSS / 名称、更新笔记字段、添加标签均不改变 `col.scm`；结构编辑添加字段会改变它。
 
 **禁止调用**：任何会重置排程或改动结构的方法（如 `scheduling.reset`、`scheduling.setDueDate`、`cards.move`、`noteTypes.editStructure`），除非将来有专门的规格。
 
