@@ -64,3 +64,9 @@ npm run check:data  # production B1 preview only; fixed 8766, no writes
 The pipeline verifies every download against `tools/data/sources.json` SHA-256 pins, caches upstream bytes in ignored `.cache/data/`, and prints per-level counts and raw/gzip sizes. See [pipeline details](tools/data/README.md) and [acceptance evidence](docs/research/data-pipeline-acceptance.md).
 
 `npm run check:dynamic` verifies React append/replace/remove and scroll behavior; see [dynamic-page measurements](docs/research/dynamic-pages-acceptance.md).
+
+## Site scope
+
+Settings and wizard step 2 offer manual toolbar activation (default), remembered websites, and all HTTP(S) websites. Remembered mode requests website access on a toolbar click and registers a persistent automatic script after approval. All-sites mode explains Chrome's warning and requires an explicit grant button. Revoking access stops future automatic runs. An editable default deny list covers common mail, chat, and password-vault sites; it suppresses automatic runs while allowing manual toolbar activation.
+
+Run `npm run check:scope` after building for Chrome for Testing checks against isolated Anki 8766. See [site-scope acceptance and native-permission UI limits](docs/research/site-scope-acceptance.md).

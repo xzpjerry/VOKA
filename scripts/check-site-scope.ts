@@ -45,7 +45,7 @@ try {
     args: ["--no-first-run"],
     protocolTimeout: 30000,
   });
-  console.log("step: launched");
+
   const worker = await (
     await browser.waitForTarget((target) => target.type() === "service_worker")
   ).worker();
@@ -57,7 +57,7 @@ try {
   evidence.extensionId = id;
 
   // Default install: only the declared loopback host, no optional site grant.
-  console.log("step: worker");
+
   const defaults = await worker.evaluate(async () => ({
     permissions: await chrome.permissions.getAll(),
     manifest: chrome.runtime.getManifest(),
@@ -83,7 +83,7 @@ try {
   await worker.evaluate(() =>
     chrome.storage.local.set({ port: 8766, apiKey: "" }),
   );
-  console.log("step: defaults");
+
   const wizardTarget = await browser.waitForTarget(
     (target) => target.url() === `${optionsUrl}?wizard=1`,
   );
@@ -92,7 +92,7 @@ try {
   await wizard.waitForFunction(
     () => document.querySelector("#status")?.textContent === "已连接",
   );
-  console.log("step: wizard loaded");
+
   await wizard.click("#nextConnection");
   await wizard.waitForSelector("#siteScopes");
   assert.equal(
@@ -120,7 +120,7 @@ try {
   };
 
   // Settings page: editable deny list and remembered-site controls.
-  console.log("step: wizard scope");
+
   const settings = await browser.newPage();
   await settings.goto(optionsUrl);
   await settings.waitForFunction(
@@ -181,13 +181,13 @@ try {
 
   // Pre-authorize exact origins through the extensions backend, then make the
   // real chrome.permissions.request call from a trusted click.
-  console.log("step: settings");
+
   const extensions = await browser.newPage();
-  console.log("step: extensions page");
+
   await extensions.goto(extensionsUrl);
-  console.log("step: extensions navigated", await extensions.title());
+
   await sleep(800);
-  console.log("step: extensions sleep");
+
   await extensions.evaluate(
     async (extensionId: string) =>
       chrome.developerPrivate.updateExtensionConfiguration({
@@ -198,16 +198,16 @@ try {
   );
 
   async function grant(pattern: string): Promise<boolean> {
-    console.log("grant: addHostPermission", pattern);
+
     await extensions.evaluate(
       async ({ extensionId, pattern }: { extensionId: string; pattern: string }) =>
         chrome.developerPrivate.addHostPermission(extensionId, pattern),
       { extensionId: id, pattern },
     );
-    console.log("grant: addHostPermission done", pattern);
+
     const page = await browser!.newPage();
     await page.goto(optionsUrl);
-    console.log("grant: page ready", pattern);
+
     await page.evaluate((origin: string) => {
       const button = document.createElement("button");
       button.id = "grant-test";
@@ -229,28 +229,27 @@ try {
     await page.bringToFront();
     const button = await page.$("#grant-test");
     assert(button);
-    console.log("grant: button found", pattern);
+
     const box = await button.boundingBox();
     assert(box);
-    console.log("grant: box", pattern);
+
     await page.mouse.click(box.x + 5, box.y + 5);
-    console.log("grant: clicked", pattern);
+
     await page.waitForFunction(
       () =>
         (window as unknown as { __grantResult?: string }).__grantResult !==
         "pending",
       { timeout: 5000 },
     );
-    console.log("grant: settled", pattern);
+
     const result = await page.evaluate(
       () => (window as unknown as { __grantResult?: string }).__grantResult,
     );
     await page.close();
-    console.log("grant: result", pattern, result);
+
     return result === "true";
   }
 
-  console.log("step: extensions");
   assert.equal(await grant("*://allow.localhost/*"), true);
   assert.equal(await grant("*://deny.localhost/*"), true);
   const grantedOrigins = await worker.evaluate(
@@ -393,28 +392,28 @@ try {
   };
 
   // All-sites mode: one grant enables auto-run on any site, deny list still wins.
-  console.log("all: before grant");
+
   assert.equal(await grant("*://*/*"), true);
-  console.log("all: granted");
+
   assert.equal(
     await worker.evaluate(() =>
       chrome.permissions.contains({ origins: ["*://*/*"] }),
     ),
     true,
   );
-  console.log("all: contains");
+
   await settings.bringToFront();
-  console.log("all: front");
+
   await settings.click('input[name="siteScope"][value="all"]');
-  console.log("all: clicked");
+
   await settings.waitForFunction(async () => {
     const value = await chrome.storage.local.get("siteScope");
     return value.siteScope === "all";
   });
-  console.log("all: stored");
+
   await settings.waitForSelector("#allPanel:not([hidden])");
   await settings.waitForSelector("#revokeAll:not([hidden])");
-  console.log("all: panels");
+
   assert.equal(
     await settings.$eval("#grantAll", (button: HTMLButtonElement) => button.hidden),
     true,
@@ -430,13 +429,13 @@ try {
     await sleep(100);
   }
   assert.deepEqual(scripts[0]?.matches, ["*://*/*"]);
-  console.log("all: registration verified");
+
   const anySite = await open("new.localhost");
   assert.equal(await hasDrawer(anySite), true);
   const deniedInAllMode = await open("deny.localhost");
   assert.equal(await hasDrawer(deniedInAllMode, 3000), false);
   evidence.t31.allSites = {
-    grant: "all_urls",
+    grant: "*://*/* (all HTTP(S) sites)",
     registeredMatches: scripts[0].matches,
     autoRunOnUnrememberedSite: true,
     denyListSuppressesAutoRun: true,
@@ -445,7 +444,6 @@ try {
     autoRun: false,
   };
 
-  console.log("all: auto-run verified");
   // Revoking all sites through the settings page removes the registration.
   await settings.bringToFront();
   await settings.click("#revokeAll");
