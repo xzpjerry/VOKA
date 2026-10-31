@@ -46,9 +46,10 @@ assert.equal(
   "",
   "missing OEWN word must not invent a native gloss",
 );
-const entries = data.pack.entries
-  .filter((entry: Entry) => entry.level === "B1" && entry.GlossNative)
-  .slice(0, 12);
+const eligible = data.pack.entries.filter(
+  (entry: Entry) => entry.level === "B1" && entry.GlossNative,
+);
+const entries = [...eligible.slice(0, 6), ...eligible.slice(-6)];
 assert.equal(entries.length, 12);
 for (const entry of entries)
   assert.match(entry.GlossNative, /[\u4e00-\u9fff]/);
