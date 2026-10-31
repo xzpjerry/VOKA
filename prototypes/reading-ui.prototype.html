@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VOKA 阅读界面原型</title>
+<!--
+  PROTOTYPE · 一次性代码，不进 main。
+  问题：「悬停弹窗与侧栏的交互形态」——阅读网页时弹窗与侧栏长什么样、怎么操作？
+  三种结构不同的方案，通过 ?variant=A|B|C 切换（底部浮条或键盘 ← →）。
+  所有数据都是假的，状态只存在内存里；右下角面板显示当前状态与操作日志。
+-->
+<style>
+:root{--bg:#fbfaf7;--ink:#1d1d1f;--muted:#6b6b70;--line:#e4e2dc;--panel:#ffffff;--accent:#2f6fde;
+--hl-target:rgba(255,196,0,.45);--hl-learning:rgba(64,170,255,.30);--hl-adv:rgba(255,196,0,.18);--hl-unknown:rgba(255,80,80,.30)}
+@media (prefers-color-scheme:dark){:root{--bg:#18181a;--ink:#ececee;--muted:#9a9aa0;--line:#333338;--panel:#222226;--accent:#7aa7ff;
+--hl-target:rgba(255,196,0,.35);--hl-learning:rgba(64,170,255,.30);--hl-adv:rgba(255,196,0,.14);--hl-unknown:rgba(255,80,80,.30)}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 -apple-system,"PingFang SC",system-ui,sans-serif}
+.site{max-width:680px;margin:0 auto;padding:32px 20px 140px}
+.site header{font:600 13px/1 system-ui;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:24px}
+.site h1{font:700 32px/1.25 Georgia,serif;margin:0 0 8px}.site .byline{color:var(--muted);font-size:14px;margin-bottom:24px}
+.site p{font:19px/1.75 Georgia,serif;margin:0 0 18px}
+.w{border-radius:3px;cursor:default}.w.target{background:var(--hl-target)}.w.learning{background:var(--hl-learning)}
+.w.adv{background:transparent}.show-adv .w.adv{background:var(--hl-adv)}.w.unknown{background:var(--hl-unknown)}
+.w.active{outline:2px solid var(--accent);outline-offset:1px}
+.off .w{background:transparent!important}
+/* layouts */
+body.with-panel .site{margin-right:360px}@media(max-width:1000px){body.with-panel .site{margin-right:auto}}
+.panel{position:fixed;top:0;right:0;width:340px;height:100vh;background:var(--panel);border-left:1px solid var(--line);font:14px/1.5 system-ui,"PingFang SC";display:flex;flex-direction:column;z-index:20}
+.panel h3{margin:0;font-size:15px}.ph{padding:14px 16px;border-bottom:1px solid var(--line)}
+.pb{padding:12px 16px;overflow:auto;flex:1}.muted{color:var(--muted)}.small{font-size:12px}
+.chip{display:inline-block;padding:1px 8px;border-radius:99px;border:1px solid var(--line);font-size:12px;margin-right:4px;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn{font:13px system-ui,"PingFang SC";padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn:hover{border-color:var(--accent)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.wl{list-style:none;margin:8px 0 0;padding:0}.wl li{display:flex;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--line);cursor:pointer}.wl li:hover{background:rgba(127,127,127,.08)}
+.due{margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:8px}
+.pop{position:absolute;z-index:30;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);font:14px/1.5 system-ui,"PingFang SC";padding:12px 14px;width:320px}
+.pop .hw{font:600 20px/1.2 Georgia,serif}.pop .ipa{color:var(--muted);font-size:13px}
+.gl{margin:8px 0}.gl .alt{color:var(--muted);font-size:13px;margin-top:4px}
+.cands{margin:6px 0;font-size:12px}.cands b{color:var(--accent);cursor:pointer;font-weight:500;margin-right:6px}
+.tip{position:absolute;z-index:30;background:var(--ink);color:var(--bg);font:13px/1.4 system-ui,"PingFang SC";padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none}
+.drawer{position:fixed;left:50%;transform:translateX(-50%);bottom:56px;width:min(720px,94vw);background:var(--panel);border:1px solid var(--line);border-radius:12px 12px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.12);font:14px/1.5 system-ui,"PingFang SC";z-index:20}
+.drawer .dh{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;cursor:pointer}
+.drawer .db{padding:0 14px 12px;max-height:38vh;overflow:auto;display:none}.drawer.open .db{display:block}
+.insp{border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px}
+.norun{padding:16px;border:1px dashed #d55;border-radius:8px;color:#c33;background:rgba(255,80,80,.06)}
+/* prototype chrome */
+.proto-bar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:100;background:#111;color:#fff;border-radius:99px;padding:6px 8px;display:flex;gap:8px;align-items:center;font:13px system-ui,"PingFang SC";box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.proto-bar button{background:#333;color:#fff;border:0;border-radius:99px;width:28px;height:28px;cursor:pointer}
+.proto-bar label{display:flex;gap:4px;align-items:center;color:#bbb}
+.proto-state{position:fixed;left:12px;bottom:12px;z-index:100;width:280px;max-height:40vh;overflow:auto;background:#111;color:#9f9;font:11px/1.4 ui-monospace,monospace;border-radius:8px;padding:8px;opacity:.9;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="site" id="site">
+  <header>The Daily Ledger · Science</header>
+  <h1>Why Some Cities Stay Cool</h1>
+  <div class="byline">By A. Writer · 6 min read</div>
+  <div id="article"></div>
+</div>
+<div id="ui"></div>
+<div class="proto-bar" id="bar"></div>
+<div class="proto-state" id="state"></div>
+<script>
+// ---------- 假数据 ----------
+const ART = [
+ "Researchers have long tried to achieve a simple goal: keep streets cool without abandoning the comforts of modern life. Last summer I saw a team paint whole blocks white, and the colour alone dropped surface heat by several degrees.",
+ "The finding was partly serendipity. A resilient coating meant for roofs was left on a sidewalk, and the readings the team found there surprised everyone. Now planners call the effect doomscrolling-proof shade, a joke that stuck.",
+ "Critics say painted streets cannot achieve much on their own, and that cities must not abandon trees. Both sides agree the data is still thin."
+];
+// 词形 -> 候选 lemma（按词条等级升序；等级相同时词形本身是 lemma 的优先）
+const FORMS = {achieve:["achieve"],abandoning:["abandon"],abandon:["abandon"],saw:["see","saw"],colour:["color"],serendipity:["serendipity"],resilient:["resilient"],found:["find","found"],"doomscrolling-proof":[],readings:["reading"],coating:["coating"],planners:["planner"]};
+const DICT = {
+ achieve:{ipa:"v. /əˈtʃiːv/",level:"B1",native:"v. 实现；达到；取得（成功）",target:"v. to succeed in doing something good, usually by working hard",anki:"new"},
+ abandon:{ipa:"v. /əˈbændən/",level:"B1",native:"v. 抛弃；放弃",target:"v. to leave somebody or something with no intention of returning",anki:"learning"},
+ see:{ipa:"v. /siː/",level:"A1",native:"v. 看见；明白",target:"v. to become aware of something by using your eyes",anki:"none"},
+ saw:{ipa:"n. /sɔː/",level:"B2",native:"n. 锯子  v. 锯",target:"n. a tool with a long blade with sharp points for cutting",anki:"none"},
+ color:{ipa:"n. /ˈkʌlɚ/",level:"A1",native:"n. 颜色；色彩",target:"n. the appearance that things have from the way they reflect light",anki:"none",variant:"colour"},
+ serendipity:{ipa:"n. /ˌsɛɹənˈdɪpɪti/",level:"C2",native:"n. 意外发现珍奇事物的运气",target:"n. the fact of finding interesting or valuable things by chance",anki:"none"},
+ resilient:{ipa:"adj. /rɪˈzɪliənt/",level:"B2",native:"adj. 有弹性的；适应力强的",target:"adj. able to recover quickly after something unpleasant",anki:"none"},
+ find:{ipa:"v. /faɪnd/",level:"A1",native:"v. 找到；发现",target:"v. to discover somebody or something unexpectedly",anki:"none"},
+ found:{ipa:"v. /faʊnd/",level:"B2",native:"v. 创立；建立",target:"v. to start an organization or institution",anki:"none"},
+ reading:{ipa:"n. /ˈriːdɪŋ/",level:"A1",native:"n. 阅读；读数",target:"n. the amount shown on an instrument",anki:"none"},
+ coating:{ipa:"n. /ˈkoʊtɪŋ/",level:"C1",native:"n. 涂层",target:"n. a thin layer of a substance covering a surface",anki:"none"},
+ planner:{ipa:"n. /ˈplænɚ/",level:"B2",native:"n. 规划者",target:"n. a person whose job is to plan the growth of a town",anki:"none"},
+};
+const TARGET="B1", ORDER=["A1","A2","B1","B2","C1","C2"];
+// ---------- 内存状态 ----------
+const S = { variant:(new URLSearchParams(location.search).get("variant")||"A").toUpperCase(), glossLang:"native", showAdv:false,
+  running:true, manual:{}, choice:{}, inAnki:{achieve:true,abandon:true}, contexts:{achieve:1,abandon:2}, active:null, filter:"target", log:[] };
+const log = m => { S.log.unshift(new Date().toLocaleTimeString()+" "+m); S.log=S.log.slice(0,8); renderState(); };
+const keyOf = form => { const c=FORMS[form.toLowerCase()]; if(!c||!c.length) return null; return S.choice[form.toLowerCase()]||c[0]; };
+function cls(form){ if(!S.running) return ""; const k=keyOf(form); if(!k) return ""; const d=DICT[k], m=S.manual[k];
+  if(m==="known") return ""; if(m==="unknown") return "unknown"; if(m==="learning"||d.anki==="learning") return "learning";
+  const lv=ORDER.indexOf(d.level), t=ORDER.indexOf(TARGET); return lv===t?"target":lv>t?"adv":""; }
+const statusText = k => { const m=S.manual[k]; if(m) return "人工："+{known:"已掌握",unknown:"不认识",learning:"学习中"}[m];
+  if(!S.inAnki[k]) return "未加入 Anki"; return {new:"Anki 新卡",learning:"Anki 学习中",none:"Anki 新卡"}[DICT[k].anki]; };
+// ---------- 文章 ----------
+function renderArticle(){
+  document.getElementById("article").innerHTML = ART.map(p=>"<p>"+p.replace(/[A-Za-z][A-Za-z'-]*/g, w=>{
+    const k=keyOf(w); const known=w.toLowerCase() in FORMS;
+    return known?`<span class="w ${cls(w)}${S.active===w.toLowerCase()?' active':''}" data-f="${w.toLowerCase()}">${w}</span>`:`<span class="w" data-f="${w.toLowerCase()}">${w}</span>`;
+  })+"</p>").join("");
+  document.body.classList.toggle("show-adv", S.showAdv); document.body.classList.toggle("off", !S.running);
+}
+// ---------- 共用片段 ----------
+function glossBlock(k){ const d=DICT[k]; const main=S.glossLang==="native"?d.native:d.target, alt=S.glossLang==="native"?d.target:d.native;
+  return `<div class="gl">${main}<div class="alt"><a href="#" data-act="alt">展开${S.glossLang==="native"?"单语":"母语"}释义</a><span class="altx" hidden> · ${alt}</span></div></div>`; }
+function candBlock(form){ const c=FORMS[form]||[]; if(c.length<2) return ""; const k=keyOf(form);
+  return `<div class="cands muted">「${form}」也可能是：${c.filter(x=>x!==k).map(x=>`<b data-act="cand" data-k="${x}">${x}</b>`).join("")}</div>`; }
+function actions(k){ const inA=S.inAnki[k];
+  return `<div class="row" style="margin-top:8px">${inA?`<button class="btn primary" data-act="ctx">保存这句为例句（${S.contexts[k]||0}/3）</button>`:`<button class="btn primary" data-act="add">加入 Anki（含这句例句）</button>`}
+  <select class="btn" data-act="manual"><option value="">标记…</option><option value="unknown">不认识</option><option value="learning">学习中</option><option value="known">已掌握</option><option value="auto">恢复自动</option></select></div>`; }
+function richCard(form){ const k=keyOf(form); if(!k) return `<div class="hw">${form}</div><div class="gl muted">词典没有这个词。<br><span class="small">（P0 不联网查询）</span></div>`;
+  const d=DICT[k]; return `<div class="row" style="justify-content:space-between"><div><span class="hw">${k}</span> <span class="ipa">${d.ipa}</span></div><span class="chip">${d.level}</span></div>
+  ${d.variant?`<div class="small muted">异体拼写：${d.variant}</div>`:""}${candBlock(form)}<div class="small muted">${statusText(k)}</div>${glossBlock(k)}${actions(k)}`; }
+function panelBody(){
+  if(!S.running) return `<div class="norun"><b>VOKA 没有运行</b><br>请确认 Anki 已打开，且版本 ≥ 26.08、已安装新版 AnkiConnect。<div class="row" style="margin-top:10px"><button class="btn" data-act="retry">重试</button></div></div>`;
+  const forms=[...new Set(ART.join(" ").match(/[A-Za-z][A-Za-z'-]*/g).map(w=>w.toLowerCase()).filter(w=>w in FORMS))];
+  const items=forms.map(f=>({f,k:keyOf(f),c:cls(f)})).filter(x=> S.filter==="all"?true: S.filter==="missing"?!x.k: S.filter==="learning"?x.c==="learning":x.c==="target"||x.c==="unknown");
+  const cnt=n=>forms.filter(f=>{const c=cls(f),k=keyOf(f);return n==="all"||(n==="missing"?!k:n==="learning"?c==="learning":c==="target"||c==="unknown")}).length;
+  return `<div class="due"><b>本页可复习 1 张今日到期卡</b><div class="small muted">abandon · 上下文复习属于 P1，此处只占位</div></div>
+  <div class="row">${[["target","目标词"],["learning","学习中"],["missing","词典没有"],["all","全部"]].map(([v,t])=>`<span class="chip ${S.filter===v?'on':''}" data-act="filter" data-v="${v}">${t} ${cnt(v)}</span>`).join("")}</div>
+  <ul class="wl">${items.map(x=>`<li data-act="pick" data-f="${x.f}"><span>${x.k||x.f}${x.k&&x.k!==x.f?` <span class="small muted">← ${x.f}</span>`:""}</span><span class="small muted">${x.k?DICT[x.k].level:"—"}</span></li>`).join("")||'<li class="muted">（无）</li>'}</ul>`; }
+function panelHeader(){ return `<div class="ph"><div class="row" style="justify-content:space-between"><h3>VOKA</h3><span class="small ${S.running?'muted':''}" style="${S.running?'':'color:#c33'}">${S.running?"● Anki 已连接":"● 未运行"}</span></div>
+  <div class="small muted">English · 目标 ${TARGET} · 释义：<a href="#" data-act="lang">${S.glossLang==="native"?"中文":"英文"}</a> · <label><input type="checkbox" data-act="adv" ${S.showAdv?"checked":""}> 进阶词弱高亮</label></div></div>`; }
+// ---------- 三种方案 ----------
+const V = {
+ A:{name:"悬停卡片 + 右侧栏", note:"悬停任何已识别的词即弹出完整卡片；侧栏固定在右侧，放列表与状态。", panel:true},
+ B:{name:"悬停一行提示，点击才展开 + 底部抽屉", note:"悬停只显示一行释义（不打扰）；点击才出现完整卡片；词汇列表收在底部可折叠抽屉里，页面保持全宽。", panel:false},
+ C:{name:"不弹窗，侧栏检查器", note:"页面上不出现任何浮层；悬停只描边，点击后所有细节在右侧栏顶部的检查器里显示。", panel:true},
+};
+let pop=null, tip=null, hideT=null;
+function closePop(){ pop?.remove(); pop=null; }
+function openPop(el){ closePop(); S.active=el.dataset.f; const r=el.getBoundingClientRect();
+  pop=document.createElement("div"); pop.className="pop"; pop.innerHTML=richCard(el.dataset.f);
+  pop.style.left=Math.max(8,Math.min(r.left+scrollX, innerWidth-340))+"px"; pop.style.top=(r.bottom+scrollY+6)+"px";
+  pop.onmouseenter=()=>clearTimeout(hideT); pop.onmouseleave=()=>{ if(S.variant==="A") hideT=setTimeout(()=>{closePop();S.active=null;renderArticle();renderState();},250); };
+  document.body.appendChild(pop); renderArticle(); renderState(); }
+function renderUI(){
+  const ui=document.getElementById("ui"); const v=V[S.variant]; document.body.classList.toggle("with-panel", v.panel); closePop(); tip?.remove();
+  if(S.variant==="A") ui.innerHTML=`<aside class="panel">${panelHeader()}<div class="pb">${panelBody()}</div></aside>`;
+  if(S.variant==="B") ui.innerHTML=`<div class="drawer ${S.drawer?'open':''}"><div class="dh" data-act="drawer"><span><b>VOKA</b> <span class="small muted">${S.running?`本页 ${[...new Set(ART.join(" ").match(/[A-Za-z][A-Za-z'-]*/g).filter(w=>cls(w)==="target"))].length} 个目标词 · 1 张今日到期`:"未运行"}</span></span><span class="small muted">${S.drawer?"收起 ▾":"展开 ▴"}</span></div><div class="db">${panelHeader()}${panelBody()}</div></div>`;
+  if(S.variant==="C") ui.innerHTML=`<aside class="panel">${panelHeader()}<div class="pb">${S.running?`<div class="insp">${S.active?richCard(S.active):'<span class="muted">点击文章里的词，详情显示在这里。</span>'}</div>`:""}${panelBody()}</div></aside>`;
+  renderArticle(); renderBar(); renderState(); }
+function renderBar(){ const ks=Object.keys(V);
+  document.getElementById("bar").innerHTML=`<button data-p="-1">←</button><span><b>${S.variant}</b> · ${V[S.variant].name}</span><button data-p="1">→</button>
+  <label><input type="checkbox" id="run" ${S.running?"checked":""}>Anki 在线</label>`;
+  document.querySelectorAll("#bar [data-p]").forEach(b=>b.onclick=()=>cycle(+b.dataset.p)); document.getElementById("run").onchange=e=>{S.running=e.target.checked;log(S.running?"Anki 重新连上":"Anki 断开 → 扩展停止运行");renderUI();}; }
+function renderState(){ const k=S.active&&keyOf(S.active);
+  document.getElementById("state").textContent=`PROTOTYPE 状态\n方案 ${S.variant}：${V[S.variant].note}\n\n运行中: ${S.running}  释义: ${S.glossLang}  进阶弱高亮: ${S.showAdv}\n当前词形: ${S.active||"-"} → Key: ${k?"en:"+k:"-"}\n人工状态: ${JSON.stringify(S.manual)}\n候选改选: ${JSON.stringify(S.choice)}\n已在 Anki: ${Object.keys(S.inAnki).join(", ")}\n例句数: ${JSON.stringify(S.contexts)}\n\n日志:\n${S.log.join("\n")}`; }
+function cycle(d){ const ks=Object.keys(V); S.variant=ks[(ks.indexOf(S.variant)+d+ks.length)%ks.length]; S.active=null; history.replaceState(null,"","?variant="+S.variant); log("切换到方案 "+S.variant); renderUI(); }
+addEventListener("keydown",e=>{ if(e.target.closest("input,textarea,select,[contenteditable]")) return; if(e.key==="ArrowLeft")cycle(-1); if(e.key==="ArrowRight")cycle(1); });
+// ---------- 交互 ----------
+document.addEventListener("mouseover",e=>{ const el=e.target.closest(".w"); if(!el||!S.running) return;
+  if(S.variant==="A"){ if(!(el.dataset.f in FORMS)) return; clearTimeout(hideT); openPop(el); }
+  if(S.variant==="B"){ if(!(el.dataset.f in FORMS)||pop) return; const k=keyOf(el.dataset.f); tip?.remove(); tip=document.createElement("div"); tip.className="tip";
+    tip.textContent=k?`${k} · ${(S.glossLang==="native"?DICT[k].native:DICT[k].target).slice(0,28)}  （点击查看）`:"词典没有"; const r=el.getBoundingClientRect(); tip.style.left=(r.left+scrollX)+"px"; tip.style.top=(r.top+scrollY-30)+"px"; document.body.appendChild(tip); }
+  if(S.variant==="C"){ el.style.outline="1px dashed var(--accent)"; }
+});
+document.addEventListener("mouseout",e=>{ const el=e.target.closest(".w"); if(!el) return; if(S.variant==="A") hideT=setTimeout(()=>{ if(pop&&!pop.matches(":hover")){closePop();S.active=null;renderArticle();renderState();}},250);
+  if(S.variant==="B"){tip?.remove();tip=null;} if(S.variant==="C") el.style.outline=""; });
+document.addEventListener("click",e=>{ const t=e.target.closest("[data-act]"); const w=e.target.closest(".w");
+  if(t){ e.preventDefault(); const a=t.dataset.act, k=S.active&&keyOf(S.active);
+    if(a==="alt"){ t.nextElementSibling.hidden=!t.nextElementSibling.hidden; return; }
+    if(a==="lang"){ S.glossLang=S.glossLang==="native"?"target":"native"; log("释义语言 → "+S.glossLang); }
+    if(a==="cand"){ S.choice[S.active]=t.dataset.k; log(`「${S.active}」改选为 en:${t.dataset.k}`); }
+    if(a==="add"){ S.inAnki[k]=true; S.contexts[k]=1; log(`加入 Anki：en:${k}（含当前句子）`); }
+    if(a==="ctx"){ S.contexts[k]=Math.min(3,(S.contexts[k]||0)+1); log(`保存例句到 en:${k}（${S.contexts[k]}/3${S.contexts[k]===3?"，再存会替换最旧且未置顶的一条":""}）`); }
+    if(a==="filter"){ S.filter=t.dataset.v; }
+    if(a==="pick"){ S.active=t.dataset.f; log("从列表选中 "+t.dataset.f); if(S.variant!=="C"){ renderUI(); const el=document.querySelector(`.w[data-f="${t.dataset.f}"]`); el?.scrollIntoView({block:"center"}); if(el) setTimeout(()=>openPop(el),50); return; } }
+    if(a==="drawer"){ S.drawer=!S.drawer; }
+    if(a==="retry"){ log("点了重试（原型里请用底部开关模拟恢复）"); }
+    const keepPop = S.variant!=="C" && pop && a!=="filter" && a!=="drawer" && a!=="lang";
+    if(keepPop){ const el=document.querySelector(`.w[data-f="${S.active}"]`); renderUI(); if(el) openPop(document.querySelector(`.w[data-f="${S.active}"]`)); } else renderUI();
+    return; }
+  if(w && S.running && (w.dataset.f in FORMS || S.variant!=="A")){ if(S.variant==="B"){ tip?.remove(); openPop(w); } if(S.variant==="C"){ S.active=w.dataset.f; renderUI(); } return; }
+  if(!e.target.closest(".pop") && S.variant==="B"){ closePop(); S.active=null; renderArticle(); renderState(); }
+});
+document.addEventListener("change",e=>{ const t=e.target; if(t.dataset.act==="adv"){ S.showAdv=t.checked; log("进阶词弱高亮 "+(S.showAdv?"开":"关")); renderUI(); }
+  if(t.dataset.act==="manual"&&t.value){ const k=keyOf(S.active); if(t.value==="auto") delete S.manual[k]; else S.manual[k]=t.value; log(`人工状态 en:${k} → ${t.value}`); const f=S.active; renderUI(); if(S.variant!=="C"){ const el=document.querySelector(`.w[data-f="${f}"]`); if(el) openPop(el);} } });
+renderUI();
+</script>
+</body>
+</html>
