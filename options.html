@@ -58,6 +58,7 @@
         >
         <h3>目标等级</h3>
         <div id="levels" class="levels"></div>
+        <p id="levelHint" role="status"></p>
         <p id="saveStatus" role="status"></p>
         <h3>站点范围</h3>
         <p>点工具栏图标才在当前页运行。更多站点范围与禁用名单设置即将提供。</p>
@@ -68,9 +69,19 @@
         <h2>等级导入</h2>
         <p>不会修改、移动或重置任何已有卡片。</p>
         <p>新卡由 Anki 按你的每日新卡上限逐步引入。</p>
+        <p id="importSkipNote">
+          先不导入也可以，之后随时可以在这里导入；不导入的话，无法使用上下文复习。
+        </p>
         <label>导入等级<select id="importLevel"></select></label
         ><button id="preview">预览导入</button
-        ><button id="confirm" disabled>确认导入</button>
+        ><button id="confirm" disabled>确认导入</button
+        ><button id="cancelImport" hidden>取消导入</button>
+        <div id="importTarget" class="import-meta"></div>
+        <div id="importCounts" class="import-meta"></div>
+        <div id="importConflicts" class="import-meta"></div>
+        <div id="importSource" class="import-meta"></div>
+        <progress id="importProgress" max="100" value="0" hidden></progress>
+        <p id="importProgressText" role="status"></p>
         <pre id="importStatus" role="status"></pre>
         <div id="wizardFinish" hidden>
           <button id="backLearning">上一步</button

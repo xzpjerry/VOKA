@@ -157,18 +157,25 @@ export async function previewImport(
     seen.add(key);
     return { key, entry, state };
   });
+  const conflicts = rows
+    .filter((r) => r.state === "conflict")
+    .map((r) => r.key);
   return {
     target,
+    level,
+    total: entries.length,
+    selected: selected.length,
     typeExists,
     deckExists,
     source: pack.source,
     license: pack.license,
     version: pack.version,
     rows,
+    conflicts,
     counts: {
       new: rows.filter((r) => r.state === "new").length,
       existing: rows.filter((r) => r.state === "existing").length,
-      conflict: rows.filter((r) => r.state === "conflict").length,
+      conflict: conflicts.length,
       skipped:
         entries.length -
         selected.length +
@@ -176,13 +183,65 @@ export async function previewImport(
     },
   };
 }
+export type ImportPhase =
+  | "preparing"
+  | "validating"
+  | "writing"
+  | "reading"
+  | "batch-done"
+  | "cancelled"
+  | "interrupted"
+  | "done";
+export type ImportProgress = {
+  phase: ImportPhase;
+  batch: number;
+  batches: number;
+  processed: number;
+  total: number;
+  created: number;
+  failed: number;
+  cancelled: boolean;
+  interrupted: boolean;
+  remaining: number;
+};
+export type ImportFailure = { key: string; reason: string };
+export type ImportResult = {
+  confirmed: string[];
+  failures: ImportFailure[];
+  conflicts: string[];
+  cancelled: boolean;
+  interrupted: boolean;
+  total: number;
+  processed: number;
+  created: number;
+  remaining: number;
+};
+export type ImportOptions = {
+  onProgress?: (progress: ImportProgress) => void;
+  signal?: AbortSignal;
+  /** Logical batch size. v1 transport caps every request at maxBatchItems=100. */
+  batchSize?: number;
+};
+/** Product target, or the test-only override read from chrome.storage.local. */
+export function importTarget(
+  level: string,
+  override?: { noteType: string; deckPrefix: string },
+): Target {
+  return override
+    ? { noteType: override.noteType, deck: `${override.deckPrefix}::${level}` }
+    : {
+        noteType: DEFAULT_TARGET.noteType,
+        deck: `VOKA::English::${level}`,
+      };
+}
 export async function executeImport(
   call: Call,
   target = DEFAULT_TARGET,
   mode: GlossLanguage = "native",
   nativeLanguage: "zh" | "en" = "zh",
   entries?: Entry[],
-) {
+  options: ImportOptions = {},
+): Promise<ImportResult> {
   // The v1 runtime advertises maxBatchItems=100. Keep each request bounded.
   const transport = call;
   call = async (method, params = {}, write = false) => {
@@ -209,11 +268,87 @@ export async function executeImport(
     }
     return { items };
   };
+  const failures: ImportFailure[] = [];
+  const confirmed: string[] = [];
+  const batchSize = Math.max(1, Math.floor(options.batchSize ?? 200));
+  let total = 0;
+  let batches = 0;
+  let processed = 0;
+  let cancelled = false;
+  let interrupted = false;
+  const progress = (
+    phase: ImportPhase,
+    batch = 0,
+  ): ImportProgress => ({
+    phase,
+    batch,
+    batches,
+    processed,
+    total,
+    created: confirmed.length,
+    failed: failures.length,
+    cancelled,
+    interrupted,
+    remaining: Math.max(0, total - confirmed.length),
+  });
+  const report = (phase: ImportPhase, batch = 0) => {
+    try {
+      options.onProgress?.(progress(phase, batch));
+    } catch {
+      /* A progress consumer must never break an import. */
+    }
+  };
+  report("preparing");
+  const aborted = () => options.signal?.aborted === true;
+  if (aborted()) {
+    cancelled = true;
+    report("cancelled");
+    return {
+      confirmed,
+      failures,
+      conflicts: [] as string[],
+      cancelled,
+      interrupted,
+      total,
+      processed,
+      created: 0,
+      remaining: 0,
+    };
+  }
   // Fresh read prevents a stale preview from overwriting anything.
   const preview = await previewImport(call, target, entries);
-  const failures: { key: string; reason: string }[] = [];
   const candidates = preview.rows.filter((r) => r.state === "new");
-  if (!candidates.length) return { confirmed: [] as string[], failures };
+  total = candidates.length;
+  batches = Math.ceil(total / batchSize);
+  if (!total) {
+    report("done");
+    return {
+      confirmed,
+      failures,
+      conflicts: preview.conflicts,
+      cancelled,
+      interrupted,
+      total,
+      processed,
+      created: 0,
+      remaining: 0,
+    };
+  }
+  if (aborted()) {
+    cancelled = true;
+    report("cancelled");
+    return {
+      confirmed,
+      failures,
+      conflicts: preview.conflicts,
+      cancelled,
+      interrupted,
+      total,
+      processed,
+      created: 0,
+      remaining: total,
+    };
+  }
   async function provision(
     method: string,
     params: Record<string, unknown>,
@@ -257,105 +392,160 @@ export async function executeImport(
         (d: { name: string }) => d.name === target.deck,
       ),
     );
-  const notes = await Promise.all(
-    candidates.map(async ({ key, entry }) => ({
-      noteType: { name: target.noteType },
-      deck: { name: target.deck },
-      tags: ["voka", `voka::level::${entry.level}`],
-      fields: {
-        ...Object.fromEntries(CORE_FIELDS.map((f) => [f, ""])),
-        Key: key,
-        Word: escapeHtml(entry.lemma),
-        Variants: escapeHtml(entry.Variants ?? ""),
-        Reading: escapeHtml(entry.Reading),
-        GlossNative:
-          nativeLanguage === "en" ? "" : escapeHtml(entry.GlossNative),
-        GlossTarget: escapeHtml(entry.GlossTarget),
-        VokaMeta: await vokaMeta({
-          ...entry,
+  for (let start = 0; start < total; start += batchSize) {
+    if (aborted()) {
+      cancelled = true;
+      break;
+    }
+    const batch = start / batchSize + 1;
+    const batchRows = candidates.slice(start, start + batchSize);
+    report("validating", batch);
+    const notes = await Promise.all(
+      batchRows.map(async ({ key, entry }) => ({
+        noteType: { name: target.noteType },
+        deck: { name: target.deck },
+        tags: ["voka", `voka::level::${entry.level}`],
+        fields: {
+          ...Object.fromEntries(CORE_FIELDS.map((f) => [f, ""])),
+          Key: key,
+          Word: escapeHtml(entry.lemma),
+          Variants: escapeHtml(entry.Variants ?? ""),
           Reading: escapeHtml(entry.Reading),
           GlossNative:
             nativeLanguage === "en" ? "" : escapeHtml(entry.GlossNative),
           GlossTarget: escapeHtml(entry.GlossTarget),
-        }),
-      },
-    })),
-  );
-  const validation = await call("notes.validateMany", { notes });
-  const valid: number[] = [];
-  candidates.forEach((row, index) => {
-    const item = validation.items.find(
-      (i: { index: number }) => i.index === index,
+          VokaMeta: await vokaMeta({
+            ...entry,
+            Reading: escapeHtml(entry.Reading),
+            GlossNative:
+              nativeLanguage === "en" ? "" : escapeHtml(entry.GlossNative),
+            GlossTarget: escapeHtml(entry.GlossTarget),
+          }),
+        },
+      })),
     );
-    if (item?.result?.valid === true) valid.push(index);
-    else
-      failures.push({
-        key: row.key,
-        reason: JSON.stringify(
-          item?.error ?? item?.result?.issues ?? "Missing validation result",
-        ),
-      });
-  });
-  let uncertain = false;
-  if (valid.length) {
+    let validation: { items: any[] };
     try {
-      const result = await call(
-        "notes.createMany",
-        { notes: valid.map((i) => notes[i]), atomic: false },
-        true,
+      validation = await call("notes.validateMany", { notes });
+    } catch (error) {
+      // Pre-validation is read-only, so these Keys are definitely not written.
+      failures.push(
+        ...batchRows.map((row) => ({
+          key: row.key,
+          reason: `预检连接中断，未写入：${String(error)}`,
+        })),
       );
-      valid.forEach((i, index) => {
-        const item = result.items.find(
-          (r: { index: number }) => r.index === index,
+      processed += batchRows.length;
+      interrupted = true;
+      break;
+    }
+    const valid: number[] = [];
+    batchRows.forEach((row, index) => {
+      const item = validation.items.find(
+        (i: { index: number }) => i.index === index,
+      );
+      if (item?.result?.valid === true) valid.push(index);
+      else
+        failures.push({
+          key: row.key,
+          reason: JSON.stringify(
+            item?.error ?? item?.result?.issues ?? "Missing validation result",
+          ),
+        });
+    });
+    const validRows = valid.map((index) => batchRows[index]);
+    const batchFailures = new Map<string, string>();
+    let createError: unknown;
+    if (valid.length) {
+      report("writing", batch);
+      try {
+        const result = await call(
+          "notes.createMany",
+          { notes: valid.map((i) => notes[i]), atomic: false },
+          true,
         );
-        if (item?.error || !item?.result)
-          failures.push({
-            key: candidates[i].key,
-            reason: JSON.stringify(item?.error ?? "Missing create result"),
-          });
-      });
-    } catch (error) {
-      uncertain = true; // Never resend: even an interrupted response may have committed.
-      failures.push(
-        ...valid.map((i) => ({
-          key: candidates[i].key,
-          reason: `写入请求未确认，正在按 Key 回读：${String(error)}`,
-        })),
-      );
-    }
-  }
-  const confirmed: string[] = [];
-  if (valid.length) {
-    try {
-      const matches = await lookup(
-        call,
-        target,
-        valid.map((i) => candidates[i].key),
-      );
-      for (const i of valid) {
-        const key = candidates[i].key,
-          count = matches.get(key)?.length ?? 0;
-        if (count === 1) {
-          confirmed.push(key);
-          if (uncertain) {
-            const failure = failures.findIndex((f) => f.key === key);
-            if (failure >= 0) failures.splice(failure, 1);
-          }
-        } else
-          failures.push({
-            key,
-            reason:
-              count > 1 ? "回读发现 Key 冲突" : "回读未找到笔记；未重发写入",
-          });
+        valid.forEach((i, index) => {
+          const item = result.items.find(
+            (r: { index: number }) => r.index === index,
+          );
+          if (item?.error || !item?.result)
+            batchFailures.set(
+              batchRows[i].key,
+              JSON.stringify(item?.error ?? "Missing create result"),
+            );
+        });
+      } catch (error) {
+        // Never resend: even an interrupted response may have committed.
+        createError = error;
+        for (const row of validRows)
+          batchFailures.set(
+            row.key,
+            `写入请求未确认，正在按 Key 回读：${String(error)}`,
+          );
       }
-    } catch (error) {
-      failures.push(
-        ...valid.map((i) => ({
-          key: candidates[i].key,
-          reason: `回读失败，结果不确定；未重发：${String(error)}`,
-        })),
-      );
+    }
+    if (valid.length) {
+      report("reading", batch);
+      let matches: Map<string, string[]>;
+      try {
+        matches = await lookup(
+          call,
+          target,
+          validRows.map((row) => row.key),
+        );
+      } catch (error) {
+        failures.push(
+          ...validRows.map((row) => ({
+            key: row.key,
+            reason: `回读失败，结果不确定；未重发：${String(error)}`,
+          })),
+        );
+        processed += batchRows.length;
+        interrupted = true;
+        break;
+      }
+      for (const row of validRows) {
+        const count = matches.get(row.key)?.length ?? 0;
+        if (count === 1) {
+          confirmed.push(row.key);
+          batchFailures.delete(row.key);
+        } else
+          batchFailures.set(
+            row.key,
+            count > 1
+              ? "回读发现 Key 冲突"
+              : batchFailures.get(row.key)
+                ? `写入未确认，回读也未找到笔记：${batchFailures.get(row.key)}`
+                : "回读未找到笔记；未重发写入",
+          );
+      }
+    }
+    failures.push(
+      ...validRows
+        .filter((row) => batchFailures.has(row.key))
+        .map((row) => ({ key: row.key, reason: batchFailures.get(row.key)! })),
+    );
+    processed += batchRows.length;
+    report("batch-done", batch);
+    if (createError) {
+      interrupted = true;
+      break;
+    }
+    if (aborted()) {
+      cancelled = true;
+      break;
     }
   }
-  return { confirmed, failures };
+  report(cancelled ? "cancelled" : interrupted ? "interrupted" : "done");
+  return {
+    confirmed,
+    failures,
+    conflicts: preview.conflicts,
+    cancelled,
+    interrupted,
+    total,
+    processed,
+    created: confirmed.length,
+    remaining: Math.max(0, total - confirmed.length),
+  };
 }

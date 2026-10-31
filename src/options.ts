@@ -2,7 +2,7 @@ import { settings, check, t } from "./shared";
 import { LEVELS, loadData, type Level } from "./data";
 import type { Status } from "./background/gateway";
 const style = document.createElement("style");
-style.textContent = `body{font:16px/1.6 system-ui;color:#24342e;background:#f4f6f2;margin:0}main{max-width:840px;margin:48px auto;padding:0 24px 64px}.brand{color:#56745e;letter-spacing:.08em}h1{font-size:36px}section,fieldset{min-width:0;border:1px solid #dce4db;border-radius:16px;padding:24px;background:white;margin:20px 0}fieldset:disabled{opacity:.45}h2{margin-top:0}label{display:inline-flex;flex-direction:column;gap:6px;margin:8px 16px 12px 0}input,select,button{font:inherit;padding:9px 12px;border:1px solid #c5d1c6;border-radius:8px}button{cursor:pointer;background:#edf3e9;margin:4px}button:disabled{cursor:default;opacity:.5}.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.levels label{border:1px solid #dce4db;padding:12px;margin:0}.levels label:has(:checked){border-color:#386344;background:#f0f6ec}ol{padding-left:24px}li{padding:8px}li[data-state=bad]{color:#8c352c}li[data-state=wait]{color:#7d847f}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}details{margin:12px 0}[hidden]{display:none!important}@media(max-width:600px){.levels{grid-template-columns:repeat(2,1fr)}}`;
+style.textContent = `body{font:16px/1.6 system-ui;color:#24342e;background:#f4f6f2;margin:0}main{max-width:840px;margin:48px auto;padding:0 24px 64px}.brand{color:#56745e;letter-spacing:.08em}h1{font-size:36px}section,fieldset{min-width:0;border:1px solid #dce4db;border-radius:16px;padding:24px;background:white;margin:20px 0}fieldset:disabled{opacity:.45}h2{margin-top:0}label{display:inline-flex;flex-direction:column;gap:6px;margin:8px 16px 12px 0}input,select,button{font:inherit;padding:9px 12px;border:1px solid #c5d1c6;border-radius:8px}button{cursor:pointer;background:#edf3e9;margin:4px}button:disabled{cursor:default;opacity:.5}.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.levels label{border:1px solid #dce4db;padding:12px;margin:0}.levels label:has(:checked){border-color:#386344;background:#f0f6ec}ol{padding-left:24px}li{padding:8px}li[data-state=bad]{color:#8c352c}li[data-state=wait]{color:#7d847f}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}details{margin:12px 0}progress{width:100%;height:14px}.import-meta{white-space:pre-line;margin:8px 0}[hidden]{display:none!important}@media(max-width:600px){.levels{grid-template-columns:repeat(2,1fr)}}`;
 document.head.append(style);
 const $ = <T extends HTMLElement>(id: string) =>
   document.getElementById(id) as T;
@@ -10,7 +10,10 @@ const wizard = new URLSearchParams(location.search).has("wizard");
 let step = 0;
 let connected = false;
 let busy = false;
+let executing = false;
 let previewLevel: Level | undefined;
+let previewNew = 0;
+let lastRunInterrupted = false;
 const initial = await settings();
 const port = $<HTMLInputElement>("port");
 const apiKey = $<HTMLInputElement>("apiKey");
@@ -18,6 +21,8 @@ const nativeLanguage = $<HTMLSelectElement>("nativeLanguage");
 const glossLanguage = $<HTMLSelectElement>("glossLanguage");
 const importLevel = $<HTMLSelectElement>("importLevel");
 const confirmButton = $<HTMLButtonElement>("confirm");
+const cancelButton = $<HTMLButtonElement>("cancelImport");
+const progress = $<HTMLProgressElement>("importProgress");
 port.value = String(initial.port);
 apiKey.value = initial.apiKey;
 nativeLanguage.value = initial.nativeLanguage;
@@ -32,8 +37,17 @@ function layout() {
     ["imports", 2],
   ] as const) {
     $(id).hidden = wizard && step !== n;
-    $<HTMLFieldSetElement>(id).disabled = !connected || busy;
+    $<HTMLFieldSetElement>(id).disabled = !connected;
   }
+  $<HTMLFieldSetElement>("learning").disabled = !connected || busy;
+  $("preview").toggleAttribute("disabled", !connected || busy);
+  $("importLevel").toggleAttribute("disabled", !connected || busy);
+  confirmButton.toggleAttribute(
+    "disabled",
+    !connected || busy || !previewLevel || previewNew === 0,
+  );
+  cancelButton.hidden = !(busy && executing);
+  cancelButton.disabled = false;
   const about = document.getElementById("about");
   if (about) {
     about.inert = !connected;
@@ -52,7 +66,20 @@ function layout() {
 }
 function invalidate() {
   previewLevel = undefined;
-  confirmButton.disabled = true;
+  previewNew = 0;
+  lastRunInterrupted = false;
+  confirmButton.textContent = "确认导入";
+  confirmButton.toggleAttribute("disabled", true);
+  for (const id of [
+    "importTarget",
+    "importCounts",
+    "importConflicts",
+    "importSource",
+    "importProgressText",
+  ])
+    $(id).textContent = "";
+  progress.hidden = true;
+  progress.value = 0;
   $("importStatus").textContent = "";
 }
 function diagnostics(status: Status) {
@@ -178,6 +205,7 @@ try {
       targetLevel = level;
       importLevel.value = level;
       invalidate();
+      $("levelHint").textContent = `目标等级已切换为 ${level}：只改变高亮目标，不会删除、移动或重置旧卡。如果 ${level} 还没导入，可以在下面的「等级导入」里预览并导入。`;
       void saveLearning();
     });
     label.append(
@@ -192,47 +220,151 @@ try {
 }
 async function showPreview() {
   const level = importLevel.value as Level;
+  $("importStatus").textContent = "正在读取 Anki…";
   const result = await chrome.runtime.sendMessage({
     type: "preview-import",
     level,
   });
   if (result.error) throw new Error(result.error);
   const p = result.data;
-  $("importStatus").textContent =
-    `目标牌组：${p.target.deck} · ${p.deckExists ? "已存在" : "新建"}\n笔记类型：${p.target.noteType} · ${p.typeExists ? "已存在" : "新建"}\n新建 ${p.counts.new} / 已存在 ${p.counts.existing} / 冲突 ${p.counts.conflict} / 跳过 ${p.counts.skipped}\n${p.rows
+  const conflicts: string[] =
+    p.conflicts ??
+    p.rows
       .filter((r: { state: string }) => r.state === "conflict")
-      .map((r: { key: string }) => r.key)
-      .join("\n")}\n${p.source}\n${p.license} · ${p.version}`;
+      .map((r: { key: string }) => r.key);
+  const targetLine =
+    `目标牌组：${p.target.deck} · ${p.deckExists ? "已存在" : "新建"}\n` +
+    `笔记类型：${p.target.noteType} · ${p.typeExists ? "已存在" : "新建"}`;
+  const countLine = `数据包 ${(p.total ?? p.rows?.length ?? 0).toLocaleString()} 词 · 本次 ${level} ${(p.selected ?? p.rows?.length ?? 0).toLocaleString()} 词：新建 ${p.counts.new.toLocaleString()} / 已存在 ${p.counts.existing.toLocaleString()} / 冲突 ${p.counts.conflict.toLocaleString()} / 跳过 ${p.counts.skipped.toLocaleString()}（其他等级）`;
+  const conflictLine = conflicts.length
+    ? `冲突 Key（同一 Key 有多条笔记，已列出并跳过）：\n${conflicts.join("\n")}`
+    : "冲突 Key：无";
+  const sourceLine = `${p.source}\n${p.license} · ${p.version}`;
+  $("importTarget").textContent = targetLine;
+  $("importCounts").textContent = countLine;
+  $("importConflicts").textContent = conflictLine;
+  $("importSource").textContent = sourceLine;
+  $("importStatus").textContent = "";
   previewLevel = level;
+  previewNew = p.counts.new;
+  confirmButton.textContent =
+    p.counts.new === 0 ? "没有需要新建的笔记" : "确认导入";
   confirmButton.disabled = p.counts.new === 0;
   $<HTMLButtonElement>("finish").disabled = p.counts.new !== 0;
+  layout();
+  return p as { counts: { new: number } };
 }
 async function runImport(execute: boolean) {
   busy = true;
+  executing = execute;
   layout();
   try {
     if (execute) {
       if (previewLevel !== importLevel.value)
         throw new Error("请先预览当前等级");
+      progress.hidden = false;
+      progress.value = 0;
+      $("importProgressText").textContent = "准备导入…";
       const result = await chrome.runtime.sendMessage({
         type: "execute-import",
         level: previewLevel,
       });
       if (result.error) throw new Error(result.error);
-      await showPreview();
+      const data = result.data as {
+        confirmed: string[];
+        failures: { key: string; reason: string }[];
+        conflicts: string[];
+        cancelled: boolean;
+        interrupted: boolean;
+        total: number;
+        created: number;
+        remaining: number;
+      };
+      executing = false;
+      lastRunInterrupted = data.interrupted || data.cancelled;
+      const state = data.cancelled
+        ? "已取消"
+        : data.interrupted
+          ? "连接中断"
+          : "已完成";
+      $("importProgressText").textContent =
+        `${state}：本次新建 ${data.confirmed.length.toLocaleString()} 条` +
+        (data.remaining
+          ? data.interrupted
+            ? `，剩余 ${data.remaining.toLocaleString()} 条。恢复连接后可点「继续导入」只补剩下的。`
+            : data.cancelled
+              ? `，剩余 ${data.remaining.toLocaleString()} 条。可点「继续导入」只补剩下的。`
+              : `，剩余 ${data.remaining.toLocaleString()} 条。`
+          : "。");
+      const failureText = data.failures
+        .map((f) => `${f.key}: ${f.reason}`)
+        .join("\n");
+      let preview: { counts: { new: number } } | undefined;
+      try {
+        preview = await showPreview();
+      } catch (error) {
+        $("importProgressText").textContent +=
+          `\n刷新预览失败：${String(error)}`;
+      }
       $("importStatus").textContent +=
-        `\n已确认：${result.data.confirmed.length}\n${result.data.failures.map((f: { key: string; reason: string }) => `${f.key}: ${f.reason}`).join("\n")}`;
-    } else await showPreview();
+        `\n${state}：本次回读确认 ${data.confirmed.length.toLocaleString()} 条` +
+        (failureText ? `\n未完成：\n${failureText}` : "");
+      if (lastRunInterrupted && (preview?.counts.new ?? data.remaining) > 0) {
+        const remaining = preview?.counts.new ?? data.remaining;
+        confirmButton.textContent = `继续导入（剩余 ${remaining.toLocaleString()} 条）`;
+        confirmButton.disabled = false;
+      }
+    } else {
+      await showPreview();
+      lastRunInterrupted = false;
+    }
   } catch (error) {
-    invalidate();
+    if (!lastRunInterrupted) invalidate();
     $("importStatus").textContent = String(error);
+    $("importProgressText").textContent = String(error);
   } finally {
     busy = false;
+    executing = false;
     layout();
   }
 }
 $("preview").addEventListener("click", () => void runImport(false));
 confirmButton.addEventListener("click", () => void runImport(true));
+cancelButton.addEventListener("click", async () => {
+  cancelButton.disabled = true;
+  $("importProgressText").textContent =
+    "正在取消：当前批次完成后停止，已经写入的笔记会保留。";
+  await chrome.runtime.sendMessage({ type: "cancel-import" });
+});
+chrome.runtime.onMessage.addListener((message) => {
+  if (!busy || message?.type !== "import-progress") return;
+  const p = message.data as {
+    phase: string;
+    batch: number;
+    batches: number;
+    processed: number;
+    total: number;
+    created: number;
+    failed: number;
+  };
+  if (typeof p?.total !== "number") return;
+  progress.hidden = false;
+  progress.max = Math.max(1, p.total);
+  progress.value = p.processed;
+  const phase = {
+    preparing: "准备",
+    validating: "预检",
+    writing: "写入",
+    reading: "回读",
+    "batch-done": "完成一批",
+    cancelled: "已取消",
+    interrupted: "连接中断",
+    done: "完成",
+  }[p.phase];
+  $("importProgressText").textContent =
+    `${phase ?? p.phase}：第 ${p.batch}/${p.batches} 批 · 已处理 ${p.processed.toLocaleString()}/${p.total.toLocaleString()} · 新建 ${p.created.toLocaleString()}` +
+    (p.failed ? ` · 失败 ${p.failed.toLocaleString()}` : "");
+});
 $("nextConnection").addEventListener("click", () => {
   if (connected) {
     step = 1;
