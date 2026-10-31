@@ -148,6 +148,96 @@ try {
         .shadowRoot!.querySelector("[role=tooltip]") as HTMLElement;
       return { hidden: el.hidden, text: el.textContent };
     });
+  const drawer = () =>
+    page.evaluate(() => {
+      const root = document.getElementById("voka-drawer")!.shadowRoot!;
+      return {
+        summary: root.querySelector("[role=status]")!.textContent,
+        counts: [...root.querySelectorAll("[data-filter]")].map(
+          (el) => el.textContent,
+        ),
+        words: [...root.querySelectorAll(".drawer-list button")].map((el) =>
+          el.getAttribute("data-key"),
+        ),
+      };
+    });
+  assert.equal(
+    await page.$eval(
+      "#voka-drawer",
+      (el) =>
+        (el.shadowRoot!.querySelector(".drawer-body") as HTMLElement).hidden,
+    ),
+    true,
+  );
+  const initialDrawer = await drawer();
+  assert.deepEqual(
+    (await drawer()).counts.map((text) => Number(text!.match(/\d+$/)![0])),
+    [4, 0, 2, 9],
+  );
+  assert.deepEqual((await drawer()).words, [
+    "en:achieve",
+    "en:afford",
+    "en:improve",
+    "en:encourage",
+  ]);
+  await page.evaluate(() =>
+    (
+      document
+        .getElementById("voka-drawer")!
+        .shadowRoot!.querySelector(".drawer-toggle") as HTMLElement
+    ).click(),
+  );
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector('[data-filter="missing"]') as HTMLElement).click();
+  });
+  assert.deepEqual((await drawer()).words, ["en:reading", "en:fixture"]);
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector('[data-filter="target"]') as HTMLElement).click();
+    document.body.style.paddingBottom = "1500px";
+    window.scrollTo(0, 900);
+    (root.querySelector('[data-key="en:achieve"]') as HTMLElement).click();
+  });
+  assert(
+    await page.evaluate(
+      () => window.scrollY < 900 && CSS.highlights.has("voka-flash"),
+    ),
+  );
+  await new Promise((r) => setTimeout(r, 1000));
+  await mkdir("docs/research/drawer-evidence", { recursive: true });
+  await page.screenshot({ path: "docs/research/drawer-evidence/expanded.png" });
+  await page.evaluate(() =>
+    (
+      document
+        .getElementById("voka-drawer")!
+        .shadowRoot!.querySelector(".drawer-toggle") as HTMLElement
+    ).click(),
+  );
+  await call(
+    "notes.update",
+    { id: original[1].id, patch: { fields: { ManualStatus: "known" } } },
+    true,
+  );
+  await inject();
+  await page.waitForFunction(() =>
+    document
+      .getElementById("voka-drawer")!
+      .shadowRoot!.querySelector('[data-filter="target"]')!
+      .textContent!.endsWith(" 3"),
+  );
+  await call(
+    "notes.update",
+    { id: original[1].id, patch: { fields: { ManualStatus: "unknown" } } },
+    true,
+  );
+  await inject();
+  await page.waitForFunction(() =>
+    document
+      .getElementById("voka-drawer")!
+      .shadowRoot!.querySelector('[data-filter="target"]')!
+      .textContent!.endsWith(" 4"),
+  );
   await hover("achieve");
   assert.equal((await tip()).hidden, false);
   assert.match((await tip()).text!, /achieve/);
@@ -159,15 +249,29 @@ try {
   assert.equal((await tip()).hidden, true);
   await hover("apple");
   assert.equal((await tip()).hidden, true);
-  await worker.evaluate(() =>
-    chrome.storage.local.set({
-      hoverScope: "all",
-      showAdvanced: true,
-    }),
-  );
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    const advanced = root.querySelector(
+      '[name="showAdvanced"]',
+    ) as HTMLInputElement;
+    advanced.checked = true;
+    advanced.dispatchEvent(new Event("change"));
+    const hover = root.querySelector(
+      '[name="hoverScope"]',
+    ) as HTMLSelectElement;
+    hover.value = "all";
+    hover.dispatchEvent(new Event("change"));
+  });
   await page.waitForFunction(() => CSS.highlights.get("voka-weak")?.size === 1);
   await hover("apple");
   assert.equal((await tip()).hidden, false);
+  assert.deepEqual(
+    await worker.evaluate(async () => {
+      const s = await chrome.storage.local.get(["showAdvanced", "hoverScope"]);
+      return [s.showAdvanced, s.hoverScope];
+    }),
+    [true, "all"],
+  );
   await worker.evaluate(() =>
     chrome.storage.local.set({ targetLevel: "B2", showAdvanced: false }),
   );
@@ -229,7 +333,13 @@ try {
         .getElementById("voka-drawer")!
         .shadowRoot!.querySelector("[role=status]")!.textContent,
   );
-  assert.match(summary!, /未运行|not running/i);
+  assert.match(
+    summary!,
+    /^(VOKA 未运行：请检查 Anki|VOKA is not running: please check Anki)$/,
+  );
+  await page.screenshot({
+    path: "docs/research/drawer-evidence/disconnected.png",
+  });
   await page.screenshot({
     path: "docs/research/highlight-evidence/disconnected.png",
   });
@@ -242,6 +352,7 @@ try {
       {
         browser: await browser.version(),
         initialHighlights: first,
+        drawer: initialDrawer,
         summary,
         checks:
           "exclusions; unchanged text/HTML/layout; imported B1 + not-in-Anki B2 target; manual known/unknown; hover scope; advanced inflection; dynamic text + exclusion; disconnect clears all; reconnect; single host",

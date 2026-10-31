@@ -1,3 +1,4 @@
+import { createDrawer } from "./drawer";
 import { check, settings, t } from "./shared";
 import {
   extract,
@@ -28,6 +29,23 @@ import {
   summary.setAttribute("role", "status");
   const retry = document.createElement("button");
   retry.textContent = t("retry");
+  const drawerUI = createDrawer(root, summary, retry, (token) => {
+    token.range.startContainer.parentElement?.scrollIntoView({
+      block: "center",
+      behavior: "instant",
+    });
+    // A card implementation claims this event by calling preventDefault().
+    const unclaimed = document.dispatchEvent(
+      new CustomEvent("voka-open-card", {
+        detail: { token },
+        cancelable: true,
+      }),
+    );
+    if (unclaimed && registry && HighlightCtor) {
+      registry.set("voka-flash", new HighlightCtor(token.range));
+      setTimeout(() => registry.delete("voka-flash"), 900);
+    }
+  });
   const tooltip = document.createElement("div");
   tooltip.setAttribute("role", "tooltip");
   tooltip.hidden = true;
@@ -36,7 +54,7 @@ import {
   root.append(tooltip);
   const pageStyle = document.createElement("style");
   pageStyle.textContent =
-    "::highlight(voka-target){background:#ffe89a;color:inherit}::highlight(voka-learning){background:#c9e4ff;color:inherit}::highlight(voka-unknown){background:#ffc9c9;color:inherit}::highlight(voka-weak){background:#fff4cf;color:inherit}";
+    "::highlight(voka-flash){background:#ffad45;color:inherit}::highlight(voka-target){background:#ffe89a;color:inherit}::highlight(voka-learning){background:#c9e4ff;color:inherit}::highlight(voka-unknown){background:#ffc9c9;color:inherit}::highlight(voka-weak){background:#fff4cf;color:inherit}";
   host.append(pageStyle);
   type Registry = Map<string, unknown>;
   const registry = (CSS as unknown as { highlights: Registry }).highlights;
@@ -54,6 +72,8 @@ import {
     running = false;
     tokens = [];
     states = {};
+    registry?.delete("voka-flash");
+    drawerUI.update([], config, "unreachable");
     tooltip.hidden = true;
     for (const name of styles) registry?.delete("voka-" + name);
   }
@@ -91,6 +111,7 @@ import {
       }
     running = true;
     paint();
+    drawerUI.update(tokens, config);
   }
   document.addEventListener("mousemove", (event) => {
     const token = running
@@ -192,7 +213,7 @@ import {
     const epoch = ++generation;
     clear();
     retry.disabled = true;
-    summary.textContent = t("checking");
+    drawerUI.update([], config, "checking");
     let status;
     try {
       status = await check();
@@ -211,13 +232,13 @@ import {
       }
     }
     if (epoch !== generation) return;
-    summary.textContent = t(status === "ok" ? "connected" : "notRunning");
+    drawerUI.update(tokens, config, status);
     retry.hidden = status === "ok";
     retry.disabled = false;
   }
   document.addEventListener("voka-refresh", () => void refresh());
   retry.addEventListener("click", refresh);
-  drawer.append(summary, retry);
+  drawer.append(drawerUI.header, drawerUI.body);
   root.append(style, drawer);
   document.documentElement.append(host);
   void refresh();

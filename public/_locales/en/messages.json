@@ -85,5 +85,50 @@
   },
   "glossTarget": {
     "message": "Monolingual gloss"
+  },
+  "drawerExpand": {
+    "message": "Expand ▴"
+  },
+  "drawerCollapse": {
+    "message": "Collapse ▾"
+  },
+  "drawerSummary": {
+    "message": "{count} target words on this page"
+  },
+  "drawerAdvanced": {
+    "message": "Highlight advanced words"
+  },
+  "drawerHighlighted": {
+    "message": "Highlighted words only"
+  },
+  "drawerAllRecognized": {
+    "message": "All recognized words"
+  },
+  "hoverScope": {
+    "message": "Hover tooltip scope"
+  },
+  "drawerFilters": {
+    "message": "Word filters"
+  },
+  "drawerEmpty": {
+    "message": "No words"
+  },
+  "drawerFilter_target": {
+    "message": "Target"
+  },
+  "drawerFilter_learning": {
+    "message": "Learning"
+  },
+  "drawerFilter_missing": {
+    "message": "Not in dictionary"
+  },
+  "drawerFilter_all": {
+    "message": "All"
+  },
+  "drawerLearning": {
+    "message": "Learning language"
+  },
+  "drawerLevel": {
+    "message": "Target level"
   }
 }

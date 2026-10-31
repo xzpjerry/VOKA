@@ -85,5 +85,50 @@
   },
   "glossTarget": {
     "message": "单语释义"
+  },
+  "drawerExpand": {
+    "message": "展开 ▴"
+  },
+  "drawerCollapse": {
+    "message": "收起 ▾"
+  },
+  "drawerSummary": {
+    "message": "本页 {count} 个目标词"
+  },
+  "drawerAdvanced": {
+    "message": "进阶词弱高亮"
+  },
+  "drawerHighlighted": {
+    "message": "只有高亮的词"
+  },
+  "drawerAllRecognized": {
+    "message": "所有识别出的词"
+  },
+  "hoverScope": {
+    "message": "悬停提示的范围"
+  },
+  "drawerFilters": {
+    "message": "词汇筛选"
+  },
+  "drawerEmpty": {
+    "message": "暂无词汇"
+  },
+  "drawerFilter_target": {
+    "message": "目标词"
+  },
+  "drawerFilter_learning": {
+    "message": "学习中"
+  },
+  "drawerFilter_missing": {
+    "message": "词典没有"
+  },
+  "drawerFilter_all": {
+    "message": "全部"
+  },
+  "drawerLearning": {
+    "message": "学习语言"
+  },
+  "drawerLevel": {
+    "message": "目标等级"
   }
 }
