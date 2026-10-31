@@ -7,6 +7,12 @@ import { pageStates } from "./reading";
 import { previewImport, executeImport, importTarget } from "./import";
 import { checkConnection, rpc, GatewayError } from "./gateway";
 import { settings } from "../shared";
+import { httpHost } from "../site-scope";
+import {
+  rememberSite,
+  scheduleSiteSync,
+  shouldAutoRun,
+} from "./sites";
 let importBusy = false;
 let importController: AbortController | undefined;
 let contextQueue = Promise.resolve();
@@ -50,6 +56,23 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     settings()
       .then(checked)
       .then(reply, () => reply("unreachable"));
+  } else if (
+    message?.type === "should-auto-run" &&
+    sender.tab &&
+    /^https?:/i.test(sender.url || "")
+  ) {
+    shouldAutoRun(sender.url).then(
+      (run) => reply({ run }),
+      () => reply({ run: false }),
+    );
+  } else if (
+    message?.type === "sync-site-scope" &&
+    sender.url?.split("?")[0] === chrome.runtime.getURL("options.html")
+  ) {
+    scheduleSiteSync().then(
+      () => reply({ ok: true }),
+      (error) => reply({ error: String(error) }),
+    );
   } else if (
     message?.type === "recognize-words" &&
     Array.isArray(message.words) &&
@@ -184,6 +207,13 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
 });
 chrome.action.onClicked.addListener(async (tab) => {
   if (!tab.id) return;
+  const config = await settings();
+  const host = httpHost(tab.url);
+  // Start the optional permission request before awaiting injection. A denied
+  // site can still be remembered; its deny-list entry only prevents auto-run.
+  const remembering = config.siteScope === "remembered" && host
+    ? rememberSite(host)
+    : Promise.resolve(false);
   try {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -192,13 +222,20 @@ chrome.action.onClicked.addListener(async (tab) => {
   } catch {
     /* Chrome internal pages and other protected tabs cannot be injected. */
   }
+  await remembering;
 });
 
 // Serialize changes so quick successive selections cannot finish out of order.
 let glossUpdate = Promise.resolve();
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== "local" || !(changes.glossLanguage || changes.nativeLanguage))
-    return;
+  if (area !== "local") return;
+  if (
+    changes.siteScope ||
+    changes.denyList ||
+    changes.rememberedSites
+  )
+    void scheduleSiteSync();
+  if (!(changes.glossLanguage || changes.nativeLanguage)) return;
   glossUpdate = glossUpdate
     .catch(() => {})
     .then(async () => {
@@ -215,7 +252,13 @@ chrome.storage.onChanged.addListener((changes, area) => {
     );
 });
 
+chrome.permissions.onAdded.addListener(() => void scheduleSiteSync());
+chrome.permissions.onRemoved.addListener(() => void scheduleSiteSync());
+chrome.runtime.onStartup.addListener(() => void scheduleSiteSync());
+void scheduleSiteSync();
+
 chrome.runtime.onInstalled.addListener(({ reason }) => {
+  void scheduleSiteSync();
   if (reason === "install")
     void chrome.tabs.create({
       url: chrome.runtime.getURL("options.html?wizard=1"),

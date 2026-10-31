@@ -61,7 +61,42 @@
         <p id="levelHint" role="status"></p>
         <p id="saveStatus" role="status"></p>
         <h3>站点范围</h3>
-        <p>点工具栏图标才在当前页运行。更多站点范围与禁用名单设置即将提供。</p>
+        <div id="siteScopes" class="scopes">
+          <label
+            ><input
+              type="radio"
+              name="siteScope"
+              value="activeTab"
+            />点工具栏图标才在当前页运行（默认，没有安装站点权限提示）</label
+          >
+          <label
+            ><input
+              type="radio"
+              name="siteScope"
+              value="remembered"
+            />记住启用过的网站：点过 VOKA 图标的网站以后自动运行</label
+          >
+          <label
+            ><input type="radio" name="siteScope" value="all" />所有网站：打开任何网页都自动运行</label
+          >
+        </div>
+        <div id="rememberedPanel" hidden>
+          <p>
+            点工具栏图标时，VOKA 会在用户手势中向 Chrome
+            申请当前网站的访问权限；授权后，打开该网站会自动运行。撤销某个网站的授权后，该网站不再自动运行。
+          </p>
+          <div id="rememberedSites"></div>
+        </div>
+        <div id="allPanel" hidden>
+          <p>
+            Chrome 会显示「读取和更改您在所有网站上的所有数据」的权限提示。授权后，VOKA
+            会在你打开任意网页时自动运行；撤销授权后停止自动运行。
+          </p>
+          <button id="grantAll" type="button">允许在所有网站运行</button>
+          <button id="revokeAll" type="button" hidden>撤销所有网站授权</button>
+          <p id="allStatus" role="status"></p>
+        </div>
+        <p id="siteScopeStatus" role="status"></p>
         <button id="backConnection" hidden>上一步</button
         ><button id="nextLearning" hidden>下一步：导入预览</button>
       </fieldset>
@@ -94,6 +129,24 @@
         <h2>释义数据更新</h2>
         <button disabled>检查释义数据更新</button>
         <p>数据更新检查即将提供。</p>
+      </fieldset>
+      <fieldset id="denylist" disabled>
+        <h2>站点禁用名单</h2>
+        <p>
+          名单只在「记住启用过的网站」和「所有网站」模式下阻止自动运行；在名单里的网站上手动点
+          VOKA 图标仍然可以运行。每行一个域名，子域名一并生效。
+        </p>
+        <textarea
+          id="denyListInput"
+          rows="12"
+          spellcheck="false"
+          autocapitalize="off"
+        ></textarea>
+        <div>
+          <button id="saveDenyList" type="button">保存名单</button
+          ><button id="resetDenyList" type="button">恢复默认名单</button>
+        </div>
+        <p id="denyListStatus" role="status"></p>
       </fieldset>
     </main>
     <script type="module" src="/src/options.ts"></script>
