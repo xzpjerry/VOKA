@@ -1,12 +1,9 @@
 import { createDrawer } from "./drawer";
+import { DynamicReading } from "./dynamic-reading";
 import { check, settings, t } from "./shared";
 import {
-  extract,
   gloss,
-  highlightRule,
   hitTest,
-  type Token,
-  type WordState,
   type ReadingSettings,
   type HighlightStyle,
 } from "./reading";
@@ -62,66 +59,35 @@ import {
     globalThis as unknown as { Highlight: new (...ranges: Range[]) => unknown }
   ).Highlight;
   const styles: HighlightStyle[] = ["target", "learning", "unknown", "weak"];
-  let tokens: Token[] = [],
-    states: Record<string, WordState> = {};
+  let session: DynamicReading | undefined;
   let config: ReadingSettings;
   let running = false,
-    generation = 0,
-    timer: ReturnType<typeof setTimeout>;
+    generation = 0;
   function clear() {
     running = false;
-    tokens = [];
-    states = {};
+    session?.stop();
+    session = undefined;
     registry?.delete("voka-flash");
     drawerUI.update([], config, "unreachable");
     tooltip.hidden = true;
     for (const name of styles) registry?.delete("voka-" + name);
   }
-  function paint() {
-    for (const token of tokens)
-      token.style = highlightRule(
-        token.entry.level || states[token.key]?.level,
-        config,
-        states[token.key],
-      );
-    for (const name of styles) {
-      const highlight = new HighlightCtor();
-      for (const token of tokens)
-        if (token.style === name)
-          (highlight as { add(range: Range): void }).add(token.range);
-      registry.set("voka-" + name, highlight);
-    }
-  }
-  async function load(next: Token[], epoch: number) {
-    const keys = [...new Set(next.map((t) => t.key))];
-    const response = keys.length
-      ? await chrome.runtime.sendMessage({ type: "page-states", keys })
-      : { data: {} };
-    if (epoch !== generation) return;
-    if (response.error) throw new Error(response.error);
-    states = response.data;
-    tokens = next;
-    for (const token of tokens)
-      if (states[token.key]) {
-        token.recognized = true;
-        token.entry = {
-          ...token.entry,
-          lemma: states[token.key].fields.Word || token.entry.lemma,
-        };
-      }
-    running = true;
-    paint();
-    drawerUI.update(tokens, config);
-  }
   document.addEventListener("mousemove", (event) => {
     const token = running
-      ? hitTest(tokens, event.clientX, event.clientY, config.hoverScope)
+      ? hitTest(
+          session?.tokensFor(
+            event.target instanceof Element ? event.target : null,
+          ) ?? [],
+          event.clientX,
+          event.clientY,
+          config.hoverScope,
+        )
       : undefined;
     tooltip.hidden = !token;
     if (!token) return;
     // Note fields are HTML in Anki. Decode in an inert document, then render text only.
     const inert = document.createElement("template");
-    inert.innerHTML = gloss(token, config, states[token.key]);
+    inert.innerHTML = gloss(token, config, session?.states[token.key]);
     const text = inert.content.textContent ?? "";
     tooltip.textContent =
       token.entry.lemma + " · " + text.replace(/\s+/g, " ").trim();
@@ -146,42 +112,13 @@ import {
     },
     true,
   );
-  const dirty = new Set<Node>();
   const observer = new MutationObserver((records) => {
     const changed = records.filter(
       (r) => !host.contains(r.target) && r.target !== host,
     );
-    if (!running || !changed.length) return;
-    for (const record of changed)
-      dirty.add(
-        record.target.nodeType === Node.TEXT_NODE
-          ? record.target.parentNode!
-          : record.target,
-      );
+    if (!session || !changed.length) return;
     tooltip.hidden = true;
-    clearTimeout(timer);
-    const epoch = ++generation;
-    timer = setTimeout(async () => {
-      const roots = [...dirty].filter((n) => n.isConnected);
-      dirty.clear();
-      const minimal = roots.filter(
-        (n) => !roots.some((other) => other !== n && other.contains(n)),
-      );
-      const retained = tokens.filter(
-        (t) =>
-          t.range.startContainer.isConnected &&
-          !minimal.some((n) => n.contains(t.range.startContainer)),
-      );
-      try {
-        await load([...retained, ...minimal.flatMap((n) => extract(n))], epoch);
-      } catch {
-        if (epoch === generation) {
-          clear();
-          summary.textContent = t("notRunning");
-          retry.hidden = false;
-        }
-      }
-    }, 200);
+    session.update(changed);
   });
   observer.observe(document.documentElement, {
     subtree: true,
@@ -225,14 +162,48 @@ import {
         config = await settings();
         if (!registry || !HighlightCtor)
           throw new Error("Highlight API unavailable");
-        await load(extract(document.body), epoch);
+        if (epoch !== generation) return;
+        const highlights = Object.fromEntries(
+          styles.map((name) => {
+            const highlight = new HighlightCtor() as {
+              add(range: Range): void;
+              delete(range: Range): void;
+            };
+            registry.set("voka-" + name, highlight);
+            return [name, highlight];
+          }),
+        ) as Record<
+          HighlightStyle,
+          { add(range: Range): void; delete(range: Range): void }
+        >;
+        session = new DynamicReading(
+          config,
+          highlights,
+          async (keys) => {
+            const response = await chrome.runtime.sendMessage({
+              type: "page-states",
+              keys,
+            });
+            if (response.error) throw new Error(response.error);
+            return response.data;
+          },
+          () => {
+            if (epoch !== generation) return;
+            clear();
+            summary.textContent = t("notRunning");
+            retry.hidden = false;
+          },
+          (tokens) => drawerUI.update(tokens, config),
+        );
+        await session.start(document.body);
+        if (epoch === generation) running = true;
       } catch {
         status = "unreachable";
         if (epoch === generation) clear();
       }
     }
     if (epoch !== generation) return;
-    drawerUI.update(tokens, config, status);
+    drawerUI.update(session?.tokens ?? [], config, status);
     retry.hidden = status === "ok";
     retry.disabled = false;
   }

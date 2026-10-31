@@ -8,7 +8,8 @@
     "test": "vitest run",
     "check:anki": "tsx scripts/check-anki.ts",
     "check:import": "tsx scripts/check-import.ts",
-    "check:highlight": "tsx scripts/check-highlight.ts"
+    "check:highlight": "tsx scripts/check-highlight.ts",
+    "check:dynamic": "tsx scripts/check-dynamic.ts"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.24",

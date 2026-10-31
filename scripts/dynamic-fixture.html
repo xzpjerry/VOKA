@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><title>T-09 React dynamic paragraphs</title>
+  <style>
+    body {
+      font: 18px/1.6 system-ui;
+      margin: 32px;
+    }
+    p {
+      margin: 12px 0;
+      max-width: 900px;
+    }
+  </style>
+  <div id="app"></div>
+  <script src="/react.js"></script>
+  <script src="/react-dom.js"></script>
+  <script>
+    const h = React.createElement;
+    let update;
+    function App() {
+      const [rows, setRows] = React.useState(
+        Array.from({ length: 2000 }, (_, i) => ({
+          id: i,
+          text: "achieve improve encourage develop " + i,
+        })),
+      );
+      update = setRows;
+      return h(
+        "main",
+        null,
+        rows.map((row) => h("p", { key: row.id, "data-id": row.id }, row.text)),
+      );
+    }
+    ReactDOM.createRoot(document.getElementById("app")).render(h(App));
+    window.appendParagraph = () =>
+      update((rows) => [
+        ...rows,
+        { id: 2000, text: "achieve improve newparagraph" },
+      ]);
+    window.replaceParagraph = () =>
+      update((rows) =>
+        rows.map((row) =>
+          row.id === 0
+            ? { id: 3000, text: "develop achieve replacement" }
+            : row,
+        ),
+      );
+    window.removeParagraph = () =>
+      update((rows) => rows.filter((row) => row.id !== 3000));
+  </script>
+</html>
