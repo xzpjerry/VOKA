@@ -37,5 +37,41 @@
   },
   "status_not_new_ankiconnect": {
     "message": "请升级到 Anki ≥ 26.08 与新版 AnkiConnect，并确认所需方法可用。"
+  },
+  "importTitle": {
+    "message": "测试词表导入 · English B1"
+  },
+  "importPromise": {
+    "message": "不会修改、移动或重置任何已有卡片"
+  },
+  "importDaily": {
+    "message": "新卡由 Anki 按你的每日新卡上限逐步引入"
+  },
+  "importPreview": {
+    "message": "导入预览"
+  },
+  "importConfirm": {
+    "message": "确认导入"
+  },
+  "importDeck": {
+    "message": "目标牌组"
+  },
+  "importType": {
+    "message": "笔记类型"
+  },
+  "importExists": {
+    "message": "已存在"
+  },
+  "importNew": {
+    "message": "新建"
+  },
+  "importConflict": {
+    "message": "冲突"
+  },
+  "importSkipped": {
+    "message": "跳过"
+  },
+  "importConfirmed": {
+    "message": "回读确认"
   }
 }
