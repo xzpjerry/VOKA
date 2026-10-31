@@ -153,7 +153,8 @@ try {
     page.evaluate(() => {
       const root = document.getElementById("voka-drawer")!.shadowRoot!;
       return {
-        summary: root.querySelector("[role=status]")!.textContent,
+        summary: root.querySelector(".drawer-toggle [role=status]")!
+          .textContent,
         counts: [...root.querySelectorAll("[data-filter]")].map(
           (el) => el.textContent,
         ),
@@ -338,22 +339,20 @@ try {
           .getElementById("voka-drawer")!
           .shadowRoot!.querySelector("[role=tooltip]") as HTMLElement
       ).hidden,
-  ).catch(async error => {
-    console.error("Disconnect state", await page.evaluate(() => ({highlights:[...CSS.highlights.keys()], drawer:document.getElementById("voka-drawer")!.shadowRoot!.textContent})));
-    throw error;
-  });
+  );
   await page.waitForFunction(() =>
     /未运行|not running/i.test(
       document
         .getElementById("voka-drawer")!
-        .shadowRoot!.querySelector("[role=status]")!.textContent!,
+        .shadowRoot!.querySelector(".drawer-toggle [role=status]")!
+        .textContent!,
     ),
   );
   const summary = await page.evaluate(
     () =>
       document
         .getElementById("voka-drawer")!
-        .shadowRoot!.querySelector("[role=status]")!.textContent,
+        .shadowRoot!.querySelector(".drawer-toggle [role=status]")!.textContent,
   );
   assert.match(
     summary!,

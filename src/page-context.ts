@@ -1,17 +1,11 @@
 import { sentenceAt } from "./contexts";
 import { excluded } from "./reading";
+import { textBlock } from "./dynamic-reading";
 /** Project the containing block to text while keeping the target's exact offset. */
 export function sentenceForRange(range: Range) {
   const parent = range.startContainer.parentElement;
   if (!parent || excluded(parent)) throw new Error("无法保存这个区域的例句");
-  let block = parent;
-  while (
-    block.parentElement &&
-    !/^(P|LI|H[1-6]|TD|TH|BLOCKQUOTE|DIV|ARTICLE|SECTION|BODY)$/.test(
-      block.tagName,
-    )
-  )
-    block = block.parentElement;
+  const block = textBlock(range.startContainer) || parent;
   const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, {
     acceptNode: (n) =>
       excluded(n.parentElement)

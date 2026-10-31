@@ -81,6 +81,13 @@ it.each([
         title: "Page",
       },
       config,
+      async (key) => ({
+        lemma: key.slice(3),
+        level: deck === "Unleveled" ? "" : deck,
+        Reading: "",
+        GlossNative: "",
+        GlossTarget: "",
+      }),
     );
     const notes = call.mock.calls.find(([m]) => m === "notes.createMany")![1]
       .notes;

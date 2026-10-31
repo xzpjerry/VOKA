@@ -1,4 +1,8 @@
-import { normalizeSentence, type Context } from "./contexts";
+import {
+  defaultReplacement,
+  normalizeSentence,
+  type Context,
+} from "./contexts";
 import { sentenceForRange } from "./page-context";
 import {
   gloss,
@@ -110,6 +114,8 @@ export function fullCard(
       view.exists ? { fields, cards: [] } : undefined,
     );
     card.append(element("p", text(primary) || "词典没有"));
+    if (primary && token.entry.dictionaryStatus === "missing")
+      card.append(element("small", "词典没有"));
     const alternate =
       config().glossLanguage === "native" && config().nativeLanguage !== "en"
         ? (fields.GlossTarget ?? token.entry.GlossTarget)
@@ -150,9 +156,7 @@ export function fullCard(
       () => {
         if (view.contexts.length === 3) {
           list = !list;
-          selected = [...view.contexts]
-            .reverse()
-            .find((c) => c.hash !== view.pin)?.hash;
+          selected = defaultReplacement({ ...view, meta: {} });
           render();
         } else void mutate("save", sentence!);
       },
@@ -231,6 +235,7 @@ export function fullCard(
         if (current !== epoch) return;
         view = refreshed;
         list = view.contexts.length === 3;
+        selected = defaultReplacement({ ...view, meta: {} });
       } catch {
         /* retain error */
       }

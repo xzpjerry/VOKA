@@ -1,8 +1,9 @@
 import puppeteer from "puppeteer";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { loadData } from "../src/data";
 import { rpc } from "../src/background/gateway";
 import { lookup, DEFAULT_TARGET } from "../src/background/import";
 const call = (method: string, params = {}, write = false) =>
@@ -14,8 +15,22 @@ const ids = (await lookup(call, DEFAULT_TARGET, [key])).get(key)!;
 const original = ids.length
   ? (await call("notes.getMany", { ids })).items[0].result
   : undefined;
-const beforeA2 = (
-  await call("notes.search", { query: '"voka::level::A2"', limit: 1000 })
+const data = await loadData(async (name) =>
+  JSON.parse(
+    await readFile(
+      new URL(`../public/data/${name}.json`, import.meta.url),
+      "utf8",
+    ),
+  ),
+);
+const appleEntry = data.lookupEntry(key);
+const manualEntry = data.lookupEntry("en:banana");
+assert(["A1", "A2"].includes(manualEntry.level));
+const beforeAppleLevel = (
+  await call("notes.search", {
+    query: "tag:voka::level::" + appleEntry.level,
+    limit: 1000,
+  })
 ).ids.length;
 const sentences: Record<string, string> = {
   "/1": 'We shared a fresh <span id="word">apple</span> after lunch.',
@@ -31,14 +46,14 @@ const sentences: Record<string, string> = {
     '<span id="word">apple</span>' +
     " in the garden".repeat(35) +
     ".",
-  "/travel": 'We <span id="word">travel</span> together every summer.',
+  "/manual": `People enjoy the <span id="word">${manualEntry.lemma}</span> after lunch.`,
   "/unknown":
     'We observed a <span id="word">vokacontextfixture</span> in the garden.',
 };
 const server = createServer((req, res) => {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.end(
-    `<!doctype html><title>Context ${req.url}</title><style>body{font:22px/1.7 Georgia;padding:40px;max-width:800px}a,button{margin:20px}</style><p id="sentence">${sentences[req.url!] || sentences["/1"]}</p><p>We can <span id="highlight">achieve</span> a difficult goal.</p><a href="#clicked" id="link">achieve</a><button id="pagebutton" onclick="this.textContent='clicked'">achieve</button>`,
+    `<!doctype html><title>Context ${req.url}</title><style>body{font:22px/1.7 Georgia;padding:40px;max-width:800px}a,button{margin:20px}</style><p id="sentence">${sentences[req.url!] || sentences["/1"]}</p><p>This change can <span id="highlight">benefit</span> the entire community.</p><a href="#clicked" id="link">benefit</a><button id="pagebutton" onclick="this.textContent='clicked'">benefit</button>`,
   );
 });
 await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
@@ -189,8 +204,8 @@ try {
     "clicked",
   );
   await click("highlight");
-  await waitCard("achieve");
-  assert.match(await cardText(), /achieve/);
+  await waitCard("benefit");
+  assert.match(await cardText(), /benefit/);
   await page.keyboard.press("Escape");
   await click("word", 2);
   await waitCard();
@@ -202,18 +217,29 @@ try {
   const cards = (await call("cards.getMany", { ids: note.cardIds })).items.map(
     (i: any) => i.result,
   );
-  const decks = await call("decks.list");
-  const a2 = decks.find((d: any) => d.name === "VOKA::English::A2");
-  assert(a2);
-  assert(cards.every((c: any) => c.deck.id === a2.id));
   if (!original) {
-    assert(a2);
-    assert(cards.every((c: any) => c.deck.id === a2.id));
-    assert(note.tags.includes("voka::level::A2"));
+    assert(
+      cards.every(
+        (c: any) => c.deck.name === "VOKA::English::" + appleEntry.level,
+      ),
+    );
+    assert(note.tags.includes("voka::level::" + appleEntry.level));
     assert.equal(
-      (await call("notes.search", { query: '"voka::level::A2"', limit: 1000 }))
-        .ids.length,
-      beforeA2 + 1,
+      (
+        await call("notes.search", {
+          query: "tag:voka::level::" + appleEntry.level,
+          limit: 1000,
+        })
+      ).ids.length,
+      beforeAppleLevel + 1,
+    );
+  } else {
+    const originalCards = (
+      await call("cards.getMany", { ids: original.cardIds })
+    ).items.map((i: any) => i.result);
+    assert.deepEqual(
+      cards.map((c: any) => c.deck),
+      originalCards.map((c: any) => c.deck),
     );
   }
   // Pin it, edit it directly in Anki, and ensure a later save preserves the edit and clears the stale pin.
@@ -341,52 +367,56 @@ try {
   await click("word", 2);
   await waitCard("vokacontextfixture");
   assert.match(await cardText(), /词典没有/);
-  const travelBefore = (await lookup(call, DEFAULT_TARGET, ["en:travel"])).get(
-    "en:travel",
+  const manualKey = "en:" + manualEntry.lemma;
+  const manualBefore = (await lookup(call, DEFAULT_TARGET, [manualKey])).get(
+    manualKey,
   )!;
-  const a2Before = (
-    await call("notes.search", { query: "tag:voka::level::A2", limit: 1000 })
+  const levelBefore = (
+    await call("notes.search", {
+      query: "tag:voka::level::" + manualEntry.level,
+      limit: 1000,
+    })
   ).ids.length;
-  await open("/travel");
+  await open("/manual");
   await click("word", 2);
-  const createdTravel = travelBefore.length === 0;
-  if (createdTravel) await waitCard("travel");
-  else
-    await page.waitForFunction(
-      () =>
-        document
-          .getElementById("voka-drawer")!
-          .shadowRoot!.querySelector("#voka-card h2")?.textContent === "travel",
-    );
-  if (createdTravel) {
+  const createdManual = manualBefore.length === 0;
+  if (createdManual) {
+    await waitCard(manualEntry.lemma);
     assert.match(await cardText(), /加入 Anki（含这句例句）/);
     await save();
-    const travelIds = (await lookup(call, DEFAULT_TARGET, ["en:travel"])).get(
-      "en:travel",
+    const manualIds = (await lookup(call, DEFAULT_TARGET, [manualKey])).get(
+      manualKey,
     )!;
-    assert.equal(travelIds.length, 1);
-    const travel = (await call("notes.getMany", { ids: travelIds })).items[0]
+    assert.equal(manualIds.length, 1);
+    const manual = (await call("notes.getMany", { ids: manualIds })).items[0]
       .result;
-    assert(travel.tags.includes("voka::level::A2"));
-    const travelCards = (
-      await call("cards.getMany", { ids: travel.cardIds })
+    assert(manual.tags.includes("voka::level::" + manualEntry.level));
+    const manualCards = (
+      await call("cards.getMany", { ids: manual.cardIds })
     ).items.map((i: any) => i.result);
-    assert(travelCards.every((c: any) => c.deck.name === "VOKA::English::A2"));
+    assert(
+      manualCards.every(
+        (c: any) => c.deck.name === "VOKA::English::" + manualEntry.level,
+      ),
+    );
     assert.equal(
       (
         await call("notes.search", {
-          query: "tag:voka::level::A2",
+          query: "tag:voka::level::" + manualEntry.level,
           limit: 1000,
         })
       ).ids.length,
-      a2Before + 1,
+      levelBefore + 1,
     );
   }
   const result = {
-    createdTravel,
+    createdManual,
+    manualKey,
+    manualLevel: manualEntry.level,
+    dataVersion: data.pack.version,
     browser: await browser.version(),
     port: 8766,
-    createdA2: !original,
+    createdApple: !original,
     noteId: note.id,
     replacement,
     fields: note.fields,
@@ -396,7 +426,7 @@ try {
       "replacement chooses oldest unpinned by default",
       "single click unhighlighted ignored; link and button preserved; single highlighted click opens",
       "actual surface bold; short rejected; long window; footnotes removed; duplicate refused",
-      "A2 add without whole-level import; no full URL by default",
+      "below-target add to its own real-data level deck without whole-level import; no full URL by default",
     ],
   };
   await writeFile(

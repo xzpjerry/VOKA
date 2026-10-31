@@ -8,8 +8,7 @@ import {
 } from "./import";
 import { questionHtml, answerHtml, css } from "../data/template";
 import { replaceGlossCss } from "./gloss";
-import { normalizeKey } from "../key";
-import { testPack, testReadingEntries } from "../data/test-pack";
+import { lookupEntry } from "../data";
 import {
   addContext,
   contextFields,
@@ -82,6 +81,7 @@ export async function cardContext(
   call: Call,
   request: ContextRequest,
   config: ReadingSettings & { storeFullUrl?: boolean },
+  resolveEntry: (key: string) => Promise<Entry> = lookupEntry,
 ) {
   let note = await readNote(call, request.key);
   if (request.action === "read") return view(note);
@@ -125,10 +125,7 @@ export async function cardContext(
     );
   }
   if (!note) {
-    const lemma = request.key.slice(3);
-    const entry: Entry = [...testPack.entries, ...testReadingEntries].find(
-      (e) => normalizeKey(e.lemma) === request.key,
-    ) || { lemma, level: "", Reading: "", GlossNative: "", GlossTarget: "" };
+    const entry = await resolveEntry(request.key);
     const deck = "VOKA::English::" + (entry.level || "Unleveled");
     if (
       !(await call("noteTypes.list")).some(
@@ -161,16 +158,20 @@ export async function cardContext(
       await call("decks.create", { name: deck }, true);
     const actual = {
       ...entry,
-      GlossNative: config.nativeLanguage === "en" ? "" : entry.GlossNative,
+      Reading: escapeHtml(entry.Reading),
+      GlossTarget: escapeHtml(entry.GlossTarget),
+      GlossNative:
+        config.nativeLanguage === "en" ? "" : escapeHtml(entry.GlossNative),
     };
     state.meta = JSON.parse(await vokaMeta(actual));
     const fields: Record<string, string> = {
       ...Object.fromEntries(CORE_FIELDS.map((f) => [f, ""])),
       Key: request.key,
-      Word: entry.lemma,
-      Reading: entry.Reading,
+      Word: escapeHtml(entry.lemma),
+      Variants: escapeHtml(entry.Variants || ""),
+      Reading: actual.Reading,
       GlossNative: actual.GlossNative,
-      GlossTarget: entry.GlossTarget,
+      GlossTarget: actual.GlossTarget,
       ...contextFields(state),
     };
     const notes = [
