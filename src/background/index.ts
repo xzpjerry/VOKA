@@ -1,4 +1,4 @@
-import { loadData } from "../data";
+import { LEVELS, loadData } from "../data";
 import { normalizeKey } from "../key";
 import { updateGlossCss } from "./gloss";
 import { pageStates } from "./reading";
@@ -30,7 +30,19 @@ async function checked(config: Parameters<typeof checkConnection>[0]) {
 }
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== chrome.runtime.id) return;
-  if (message?.type === "check-connection") {
+  if (
+    message?.type === "request-access" &&
+    sender.url?.split("?")[0] === chrome.runtime.getURL("options.html")
+  ) {
+    settings()
+      .then((config) =>
+        rpc(config, "access.requestPermission", {}, { timeoutMs: 120000 }),
+      )
+      .then(
+        (data) => reply({ data }),
+        (error) => reply({ error: String(error) }),
+      );
+  } else if (message?.type === "check-connection") {
     settings()
       .then(checked)
       .then(reply, () => reply("unreachable"));
@@ -82,7 +94,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     );
   } else if (
     ["preview-import", "execute-import"].includes(message?.type) &&
-    sender.url === chrome.runtime.getURL("options.html")
+    sender.url?.split("?")[0] === chrome.runtime.getURL("options.html")
   ) {
     if (importBusy) {
       reply({ error: "导入正在进行，请等待完成。" });
@@ -95,11 +107,18 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       if (status !== "ok") throw new Error(status);
       const call = (method: string, params = {}, write = false) =>
         gatewayCall(config, method, params, { sideEffecting: write });
+      const level = LEVELS.includes(message.level)
+        ? message.level
+        : config.targetLevel;
+      const target = {
+        noteType: "VOKA Vocabulary · English",
+        deck: `VOKA::English::${level}`,
+      };
       return message.type === "preview-import"
-        ? previewImport(call)
+        ? previewImport(call, target)
         : executeImport(
             call,
-            undefined,
+            target,
             config.glossLanguage,
             config.nativeLanguage,
           );
@@ -145,4 +164,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
     .catch((error) =>
       console.error("VOKA gloss CSS update failed; setting retained", error),
     );
+});
+
+chrome.runtime.onInstalled.addListener(({ reason }) => {
+  if (reason === "install")
+    void chrome.tabs.create({
+      url: chrome.runtime.getURL("options.html?wizard=1"),
+    });
 });

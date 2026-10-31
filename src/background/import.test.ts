@@ -311,3 +311,24 @@ it.each([
     }
   },
 );
+it("selected level controls preview, deck and note tags", async () => {
+  const base = gateway();
+  const call = vi.fn(async (method: string, params: any = {}) => {
+    if (["noteTypes.create", "decks.create"].includes(method)) return {};
+    return base(method, params);
+  });
+  const entries = [{ ...testPack.entries[0], level: "A2" }];
+  const target = {
+    noteType: "VOKA Vocabulary · English",
+    deck: "VOKA::English::A2",
+  };
+  const preview = await previewImport(call, target, entries);
+  expect(preview.counts.new).toBe(1);
+  expect(preview.rows[0].entry.level).toBe("A2");
+  await executeImport(call, target, "native", "zh", entries);
+  const created = call.mock.calls.find(
+    ([method]) => method === "notes.createMany",
+  )![1].notes[0];
+  expect(created.deck.name).toBe("VOKA::English::A2");
+  expect(created.tags).toEqual(["voka", "voka::level::A2"]);
+});

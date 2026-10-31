@@ -137,7 +137,8 @@ export async function previewImport(
     (d: { name: string }) => d.name === target.deck,
   );
   if (typeExists) await verifyType(call, target);
-  const selected = entries.filter((e) => e.level === "B1");
+  const level = target.deck.split("::").at(-1);
+  const selected = entries.filter((e) => e.level === level);
   const keys = selected.map((e) => normalizeKey(e.lemma));
   const matches = typeExists
     ? await lookup(call, target, keys)
@@ -260,7 +261,7 @@ export async function executeImport(
     candidates.map(async ({ key, entry }) => ({
       noteType: { name: target.noteType },
       deck: { name: target.deck },
-      tags: ["voka", "voka::level::B1"],
+      tags: ["voka", `voka::level::${entry.level}`],
       fields: {
         ...Object.fromEntries(CORE_FIELDS.map((f) => [f, ""])),
         Key: key,
