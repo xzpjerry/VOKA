@@ -2,8 +2,16 @@
 import puppeteer from "puppeteer";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { resolve } from "node:path";
-import { mkdir, writeFile } from "node:fs/promises";
+import { resolve, join } from "node:path";
+import { tmpdir } from "node:os";
+import {
+  cp,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 let mode = "old";
 let allowed = false;
 const calls: { mode: string; method: string }[] = [];
@@ -54,11 +62,30 @@ await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
 const mockPort = (server.address() as { port: number }).port;
 let browser;
 const evidence: Record<string, unknown> = {};
+// Seed the isolated port from the service worker before onInstalled opens the
+// wizard. The write is queued during worker startup, well before the new page
+// loads and reads settings, so it never sends a request to the default 8765.
+const scratch = await mkdtemp(join(tmpdir(), "voka-onboarding-"));
+const extension = join(scratch, "extension");
+await cp(resolve("dist"), extension, { recursive: true });
+const backgroundFile = join(extension, "background.js");
+const seed =
+  'chrome.storage.local.get("port").then((seeded) => {' +
+  'if (typeof seeded.port !== "number") return chrome.storage.local.set({ port: 8766, apiKey: "" }); });';
+await writeFile(
+  backgroundFile,
+  seed + (await readFile(backgroundFile, "utf8")),
+);
+const netlog = join(scratch, "netlog.json");
 try {
   browser = await puppeteer.launch({
     headless: false,
-    enableExtensions: [resolve("dist")],
-    args: ["--no-first-run"],
+    enableExtensions: [extension],
+    args: [
+      "--no-first-run",
+      `--log-net-log=${netlog}`,
+      "--net-log-capture-mode=IncludeSensitive",
+    ],
   });
   const worker = (await (
     await browser.waitForTarget((t) => t.type() === "service_worker")
@@ -68,16 +95,56 @@ try {
     (t) => t.url() === `chrome-extension://${id}/options.html?wizard=1`,
   );
   const wizard = (await wizardTarget.page())!;
-  await wizard.waitForSelector("#checks li");
+  // No clicks: the first check runs as part of opening step ①.
+  await wizard.waitForFunction(
+    () => document.querySelector("#status")?.textContent === "已连接",
+  );
+  assert.equal(
+    await wizard.$eval("#port", (e: HTMLInputElement) => e.value),
+    "8766",
+  );
+  assert.equal(
+    await wizard.$eval("#nextConnection", (e: HTMLButtonElement) => e.disabled),
+    false,
+  );
+  const autoChecks = await wizard.$$eval("#checks li", (els) =>
+    els.map((e) => e.textContent),
+  );
+  assert.equal(autoChecks.length, 4);
+  assert(autoChecks.every((text) => text?.includes("通过")));
+  assert.equal(
+    await wizard.$eval("#retry", (e: HTMLButtonElement) => e.disabled),
+    false,
+  );
   evidence.install =
-    "onInstalled opened full-page wizard; waits for first port confirmation";
+    "onInstalled opened full-page wizard; saved port 8766 auto-checked on open with no click";
+  // Reload with an unreachable saved port: the open-time check must report it
+  // without a click, and changing storage while open must not retrigger it.
+  const closed = createServer();
+  await new Promise<void>((done) => closed.listen(0, "127.0.0.1", done));
+  const closedPort = (closed.address() as { port: number }).port;
+  await new Promise<void>((done) => closed.close(() => done()));
+  await worker.evaluate(
+    (port) => chrome.storage.local.set({ port }),
+    closedPort,
+  );
+  await wizard.reload();
+  await wizard.waitForFunction(
+    () => document.querySelector("#status")?.textContent === "VOKA 未运行：请检查 Anki",
+  );
+  assert.match(
+    await wizard.$eval("#checks", (e) => e.textContent!),
+    /2055492159/,
+  );
   assert.equal(
     await wizard.$eval("#nextConnection", (e: HTMLButtonElement) => e.disabled),
     true,
   );
-  await worker.evaluate(() =>
-    chrome.storage.local.set({ port: 8766, apiKey: "" }),
-  );
+  evidence.autoCheckClosedPort = {
+    port: closedPort,
+    result: "unreachable on open, no click required",
+  };
+  await worker.evaluate(() => chrome.storage.local.set({ port: 8766 }));
   await wizard.reload();
   await wizard.waitForFunction(
     () => document.querySelector("#status")?.textContent === "已连接",
@@ -171,12 +238,6 @@ try {
       true,
     );
   }
-  // Reserve then close a port to ensure an unreachable endpoint.
-  const closed = createServer();
-  await new Promise<void>((done) => closed.listen(0, "127.0.0.1", done));
-  const closedPort = (closed.address() as { port: number }).port;
-  await new Promise<void>((done) => closed.close(() => done()));
-  await checkPort(closedPort, /2055492159/);
   for (const [state, expected] of [
     ["old", /升级到 Anki/],
     ["version", /升级到 Anki/],
@@ -218,8 +279,23 @@ try {
   );
   assert(!calls.some((c) => /create|update|delete/.test(c.method)));
   evidence.mock =
-    "closed port, legacy endpoint, old Anki, HTTP 401, HTTP 403 → access.requestPermission → explicit recheck → real 8766 success; no polling; no import writes";
+    "legacy endpoint, old Anki, HTTP 401, HTTP 403 → access.requestPermission → explicit recheck → real 8766 success; no polling; no import writes";
   evidence.browser = await browser.version();
+  await browser.close();
+  browser = undefined;
+  const log = await readFile(netlog, "utf8");
+  const hits = (port: number) =>
+    (log.match(new RegExp(`(?<!\\d)127\\.0\\.0\\.1:${port}(?!\\d)`, "g")) ?? [])
+      .length;
+  const request8766 = hits(8766);
+  const request8765 = hits(8765);
+  assert.equal(request8765, 0, "browser acceptance must never request 8765");
+  assert(request8766 > 0, "expected real 8766 connection checks");
+  evidence.requestLog = {
+    "127.0.0.1:8765": request8765,
+    "127.0.0.1:8766": request8766,
+    source: "Chrome netlog captured for the whole acceptance run",
+  };
   await writeFile(
     "docs/research/onboarding-evidence/results.json",
     JSON.stringify(evidence, null, 2),
@@ -228,4 +304,5 @@ try {
 } finally {
   await browser?.close();
   server.close();
+  await rm(scratch, { recursive: true, force: true }).catch(() => {});
 }

@@ -258,20 +258,9 @@ for (const id of ["skip", "finish"])
     location.href = chrome.runtime.getURL("options.html");
   });
 layout();
-// On first install, let the user confirm the local port before the first request.
-if (wizard && !(await chrome.storage.local.get("port")).port) {
-  $("status").textContent = "请确认 AnkiConnect 端口，然后点「重新检测」。";
-  for (const title of [
-    "连接本机 Anki",
-    "新版 AnkiConnect · Anki ≥ 26.08",
-    "允许 VOKA 访问",
-    "API Key",
-  ]) {
-    const li = document.createElement("li");
-    li.textContent = `${title} · 等待检测`;
-    $("checks").append(li);
-  }
-} else await refresh();
+// Spec 13.1: check the saved port (default 8765) once as soon as the wizard opens.
+// There is no polling; only 重新检测 or a page reload checks again.
+await refresh();
 // Render source metadata and complete upstream notices without interpreting data as HTML.
 async function showAttributions() {
   const section = document.createElement("section");

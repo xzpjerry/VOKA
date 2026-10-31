@@ -1,5 +1,9 @@
 {
-  "install": "onInstalled opened full-page wizard; waits for first port confirmation",
+  "install": "onInstalled opened full-page wizard; saved port 8766 auto-checked on open with no click",
+  "autoCheckClosedPort": {
+    "port": 49867,
+    "result": "unreachable on open, no click required"
+  },
   "real": {
     "anki": "26.09.3 at 8766",
     "counts": [
@@ -14,6 +18,11 @@
     "persistence": "nativeLanguage, glossLanguage, targetLevel",
     "attribution": "Princeton and complete source details retained"
   },
-  "mock": "closed port, legacy endpoint, old Anki, HTTP 401, HTTP 403 → access.requestPermission → explicit recheck → real 8766 success; no polling; no import writes",
-  "browser": "Chrome/156.0.8078.47"
+  "mock": "legacy endpoint, old Anki, HTTP 401, HTTP 403 → access.requestPermission → explicit recheck → real 8766 success; no polling; no import writes",
+  "browser": "Chrome/156.0.8078.47",
+  "requestLog": {
+    "127.0.0.1:8765": 0,
+    "127.0.0.1:8766": 519,
+    "source": "Chrome netlog captured for the whole acceptance run"
+  }
 }
