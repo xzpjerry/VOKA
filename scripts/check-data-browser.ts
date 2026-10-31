@@ -1,4 +1,4 @@
-/** Real-pack browser acceptance. Anki API operations are read-only, fixed 8766. */
+/** Real-pack browser acceptance, fixed 8766. Notes are read-only; gloss settings can update marker CSS. */
 import puppeteer from "puppeteer";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
@@ -130,7 +130,7 @@ try {
         browser: await browser.version(),
         highlights,
         attributions: "all sources and complete notices present",
-        anki: "8766 read-only; no imports",
+        anki: "8766; notes read-only, no imports; language settings may update marker CSS",
       },
       null,
       2,
