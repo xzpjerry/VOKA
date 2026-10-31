@@ -1,0 +1,27 @@
+{
+  "model": "gpt-6-luna",
+  "batch": 9,
+  "count": 25,
+  "request_sha256": "18238e416af63667d04af4aa3793a501b98337f62e42c72711770d84da835bdf",
+  "command": [
+    "codex",
+    "exec",
+    "--ignore-user-config",
+    "--ephemeral",
+    "--skip-git-repo-check",
+    "--sandbox",
+    "read-only",
+    "-m",
+    "gpt-6-luna",
+    "-c",
+    "model_reasoning_effort=\"low\"",
+    "--json",
+    "--output-schema",
+    "/var/folders/yk/2lljgrk579j5rnps181xvyfc0000gn/T/voka-gloss-mfumnvlo/schema.json",
+    "-o",
+    "/Users/xzpjerry/orca/workspaces/VOKA/p0-gloss-pilot/docs/research/gloss-pilot/gpt-6-luna/09.json",
+    "-"
+  ],
+  "seconds": 10.124,
+  "returncode": 0
+}

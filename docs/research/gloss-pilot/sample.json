@@ -1,0 +1,4200 @@
+{
+  "seed": 20261031,
+  "sources": {
+    "cefrj": "82701d4ad7ae5793c397245cc55a294482dafb41adf2c718b21e40df08613c8d",
+    "octanove": "9bfd669dadfd9627b5e0e509c01ce825de10a412cc8f225d10499875d1f65606",
+    "oewn": "ab96095e5377f7396d8902aae5b517584e73bf984a41c99169b51a6bfae202ee"
+  },
+  "words": [
+    {
+      "lemma": "april",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the month following March and preceding May"
+        ]
+      }
+    },
+    {
+      "lemma": "as",
+      "level": "A1",
+      "pos": [
+        "n",
+        "r"
+      ],
+      "oewn": {
+        "n": [
+          "a very poisonous metallic element that has three allotropic forms; arsenic and arsenic compounds are used as herbicides and insecticides and in various alloys; found in arsenopyrite and orpiment and realgar"
+        ],
+        "r": [
+          "to the same degree (often followed by ‘as’)"
+        ]
+      }
+    },
+    {
+      "lemma": "bank",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "sloping land (especially the slope beside a body of water)",
+          "a financial institution that accepts deposits and channels the money into lending activities"
+        ],
+        "v": [
+          "tip laterally",
+          "enclose with a bank"
+        ]
+      }
+    },
+    {
+      "lemma": "behind",
+      "level": "A1",
+      "pos": [
+        "a",
+        "n",
+        "r"
+      ],
+      "oewn": {
+        "a": [
+          "having the lower score or lagging position in a contest"
+        ],
+        "n": [
+          "the fleshy part of the human body that you sit on"
+        ],
+        "r": [
+          "in or to or toward the rear",
+          "remaining in a place or condition that has been left or departed from"
+        ]
+      }
+    },
+    {
+      "lemma": "better",
+      "level": "A1",
+      "pos": [
+        "a",
+        "n",
+        "r",
+        "v"
+      ],
+      "oewn": {
+        "a": [
+          "(comparative of ‘good’) superior to another (of the same class or set or kind) in excellence or quality or desirability or suitability; more highly skilled than another",
+          "(comparative of ‘good’) changed for the better in health or fitness"
+        ],
+        "n": [
+          "something superior in quality or condition or effect",
+          "someone who bets"
+        ],
+        "r": [
+          "comparative of ‘well’; in a better or more excellent manner or more advantageously or attractively or to a greater degree etc.",
+          "from a position of superiority or authority"
+        ],
+        "v": [
+          "surpass in excellence",
+          "to make better"
+        ]
+      }
+    },
+    {
+      "lemma": "bread",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "food made from dough of flour or meal and usually raised with yeast or baking powder and then baked",
+          "informal terms for money"
+        ],
+        "v": [
+          "cover with bread crumbs"
+        ]
+      }
+    },
+    {
+      "lemma": "child",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a young person of either sex",
+          "a human offspring (son or daughter) of any age"
+        ]
+      }
+    },
+    {
+      "lemma": "coke",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "Coca Cola is a trademarked cola",
+          "carbon fuel produced by distillation of coal"
+        ],
+        "v": [
+          "become coke"
+        ]
+      }
+    },
+    {
+      "lemma": "culture",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a particular society at a particular time and place",
+          "the tastes in art and manners that are favored by a social group"
+        ],
+        "v": [
+          "grow in a special preparation"
+        ]
+      }
+    },
+    {
+      "lemma": "december",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the last (12th) month of the year"
+        ]
+      }
+    },
+    {
+      "lemma": "difficult",
+      "level": "A1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "not easy; requiring great physical or mental effort to accomplish or comprehend or endure",
+          "hard to control"
+        ]
+      }
+    },
+    {
+      "lemma": "door",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a swinging or sliding barrier that will close the entrance to a room or building or vehicle",
+          "the entrance (the space in a wall) through which you enter or leave a room or building; the space that a door can close"
+        ]
+      }
+    },
+    {
+      "lemma": "drama",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a dramatic work intended for performance by actors on a stage",
+          "an episode that is turbulent or highly emotional"
+        ]
+      }
+    },
+    {
+      "lemma": "driver",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the operator of a motor vehicle",
+          "someone who drives animals that pull a vehicle"
+        ]
+      }
+    },
+    {
+      "lemma": "every",
+      "level": "A1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "(used of count nouns) each and all of the members of a group considered singly and without exception",
+          "each and all of a series of entities or intervals as specified"
+        ]
+      }
+    },
+    {
+      "lemma": "file",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a set of related records (either written or electronic) kept together",
+          "a line of persons or things ranged one behind the other"
+        ],
+        "v": [
+          "record in a public office or in a court of law",
+          "smooth with a file"
+        ]
+      }
+    },
+    {
+      "lemma": "grandfather",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the father of your father or mother"
+        ]
+      }
+    },
+    {
+      "lemma": "guitar",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a stringed instrument usually having six strings; played by strumming or plucking"
+        ]
+      }
+    },
+    {
+      "lemma": "hair",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a covering for the body (or parts of it) consisting of a dense growth of threadlike structures (as on the human head); helps to prevent heat loss",
+          "a very small distance or space"
+        ]
+      }
+    },
+    {
+      "lemma": "learn",
+      "level": "A1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "gain knowledge or skills",
+          "get to know or become aware of, usually accidentally"
+        ]
+      }
+    },
+    {
+      "lemma": "leave",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the period of time during which you are absent from work or duty",
+          "permission to do something"
+        ],
+        "v": [
+          "go away from a place",
+          "go and leave behind, either intentionally or by neglect or forgetfulness"
+        ]
+      }
+    },
+    {
+      "lemma": "light",
+      "level": "A1",
+      "pos": [
+        "a",
+        "n",
+        "r",
+        "v"
+      ],
+      "oewn": {
+        "a": [
+          "of comparatively little physical weight or density",
+          "(used of color) having a relatively small amount of coloring agent"
+        ],
+        "n": [
+          "a divine presence believed by Quakers to enlighten and guide the soul",
+          "(physics) electromagnetic radiation that can produce a visual sensation"
+        ],
+        "r": [
+          "with few burdens"
+        ],
+        "v": [
+          "introduce light into",
+          "begin to smoke"
+        ]
+      }
+    },
+    {
+      "lemma": "may",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the month following April and preceding June",
+          "thorny Eurasian shrub of small tree having dense clusters of white to scarlet flowers followed by deep red berries; established as an escape in eastern North America"
+        ]
+      }
+    },
+    {
+      "lemma": "nice",
+      "level": "A1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "pleasant or pleasing or agreeable in nature or appearance",
+          "socially or conventionally correct; refined or virtuous"
+        ]
+      }
+    },
+    {
+      "lemma": "nothing",
+      "level": "A1",
+      "pos": [
+        "n",
+        "r"
+      ],
+      "oewn": {
+        "n": [
+          "a quantity of no importance; thing (object:), singular, negative pronoun; pronoun, thing, singular; quantifier: negative existential"
+        ],
+        "r": [
+          "in no respect; to no degree"
+        ]
+      }
+    },
+    {
+      "lemma": "olympics",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the modern revival of the ancient games held once every 4 years in a selected country"
+        ]
+      }
+    },
+    {
+      "lemma": "partner",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a person's partner in marriage",
+          "an associate in an activity or endeavor or sphere of common interest"
+        ],
+        "v": [
+          "provide with a partner",
+          "act as a partner"
+        ]
+      }
+    },
+    {
+      "lemma": "piece",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a separate part of a whole",
+          "an item that is an instance of some type"
+        ],
+        "v": [
+          "to join or unite the pieces of",
+          "create by putting components or members together"
+        ]
+      }
+    },
+    {
+      "lemma": "present",
+      "level": "A1",
+      "pos": [
+        "a",
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "a": [
+          "temporal sense; intermediate between past and future; now existing or happening or in consideration",
+          "being or existing in a specified place"
+        ],
+        "n": [
+          "the period of time that is happening now; any continuous stretch of time including the moment of speech",
+          "something presented as a gift"
+        ],
+        "v": [
+          "give an exhibition of to an interested audience",
+          "bring forward and present to the mind"
+        ]
+      }
+    },
+    {
+      "lemma": "read",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "something that is read"
+        ],
+        "v": [
+          "interpret something that is written or printed",
+          "have or contain a certain wording or form"
+        ]
+      }
+    },
+    {
+      "lemma": "run",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a score in baseball made by a runner touching all four bases safely",
+          "the act of testing something"
+        ],
+        "v": [
+          "move fast by using one's feet, with one foot off the ground at any given time",
+          "flee; take to one's heels; cut and run"
+        ]
+      }
+    },
+    {
+      "lemma": "shoulder",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the part of the body between the neck and the upper arm",
+          "a cut of meat including the upper joint of the foreleg"
+        ],
+        "v": [
+          "lift onto one's shoulders",
+          "push with the shoulders"
+        ]
+      }
+    },
+    {
+      "lemma": "smell",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the sensation that results when olfactory receptors in the nose are stimulated by particular chemicals in gaseous form",
+          "any property detected by the olfactory system"
+        ],
+        "v": [
+          "inhale the odor of; perceive by the olfactory sense",
+          "emit an odor"
+        ]
+      }
+    },
+    {
+      "lemma": "snow",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "precipitation falling from clouds in the form of ice crystals",
+          "a layer of snowflakes (white crystals of frozen water) covering the ground"
+        ],
+        "v": [
+          "fall as snow",
+          "conceal one's true motives from especially by elaborately feigning good intentions so as to gain an end"
+        ]
+      }
+    },
+    {
+      "lemma": "son",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a male human offspring"
+        ]
+      }
+    },
+    {
+      "lemma": "speak",
+      "level": "A1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "express in speech",
+          "exchange thoughts; talk with"
+        ]
+      }
+    },
+    {
+      "lemma": "student",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a learner who is enrolled in an educational institution",
+          "someone (especially a child) who learns (as from a teacher) or takes up knowledge or beliefs"
+        ]
+      }
+    },
+    {
+      "lemma": "topic",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the subject matter of a conversation or discussion",
+          "some situation or event that is thought about"
+        ]
+      }
+    },
+    {
+      "lemma": "touch",
+      "level": "A1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the event of something coming in contact with the body",
+          "the faculty by which external objects or forces are perceived through contact with the body (especially the hands)"
+        ],
+        "v": [
+          "make physical contact with, come in contact with",
+          "perceive via the tactile sense"
+        ]
+      }
+    },
+    {
+      "lemma": "waiter",
+      "level": "A1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a person whose occupation is to serve at table (as in a restaurant)",
+          "a person who waits or awaits"
+        ]
+      }
+    },
+    {
+      "lemma": "ancestor",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "someone from whom you are descended (but usually more remote than a grandparent)"
+        ]
+      }
+    },
+    {
+      "lemma": "award",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a grant made by a law court",
+          "a tangible symbol signifying approval or distinction"
+        ],
+        "v": [
+          "give, especially as an honor or reward",
+          "give as judged due or on the basis of merit"
+        ]
+      }
+    },
+    {
+      "lemma": "badminton",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a game played on a court with light long-handled rackets used to volley a shuttlecock over a net"
+        ]
+      }
+    },
+    {
+      "lemma": "calendar",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a system of timekeeping that defines the beginning and length and divisions of the year",
+          "a list or register of events (appointments or social events or court cases etc.)"
+        ],
+        "v": [
+          "enter into a calendar"
+        ]
+      }
+    },
+    {
+      "lemma": "chairman",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the male officer who presides at the meetings of an organization"
+        ],
+        "v": [
+          "act or preside as chair, as of an academic department in a university"
+        ]
+      }
+    },
+    {
+      "lemma": "chef",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a professional cook"
+        ]
+      }
+    },
+    {
+      "lemma": "common",
+      "level": "A2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "belonging to or participated in by a community as a whole; public",
+          "having no special distinction or quality; widely known or commonly encountered; average or ordinary or usual"
+        ],
+        "n": [
+          "a piece of open land for recreational use in an urban area"
+        ]
+      }
+    },
+    {
+      "lemma": "contact",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "close interaction",
+          "the act of touching physically"
+        ],
+        "v": [
+          "be in or establish communication with",
+          "be in direct physical contact with; make contact"
+        ]
+      }
+    },
+    {
+      "lemma": "context",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "discourse that surrounds a language unit and helps to determine its interpretation",
+          "the set of facts or circumstances that surround a situation or event"
+        ]
+      }
+    },
+    {
+      "lemma": "convenient",
+      "level": "A2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "suited to your comfort or purpose or needs",
+          "large and roomy (‘convenient’ is archaic in this sense)"
+        ]
+      }
+    },
+    {
+      "lemma": "crime",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "(criminal law) an act punishable by law; usually considered an evil act",
+          "an evil act not necessarily punishable by law"
+        ]
+      }
+    },
+    {
+      "lemma": "double",
+      "level": "A2",
+      "pos": [
+        "a",
+        "n",
+        "r",
+        "v"
+      ],
+      "oewn": {
+        "a": [
+          "having more than one decidedly dissimilar aspects or qualities",
+          "consisting of or involving two parts or components usually in pairs"
+        ],
+        "n": [
+          "a base hit on which the batter stops safely at second base",
+          "a stand-in for movie stars to perform dangerous stunts"
+        ],
+        "r": [
+          "downward and forward",
+          "two together"
+        ],
+        "v": [
+          "increase twofold",
+          "hit a two-base hit"
+        ]
+      }
+    },
+    {
+      "lemma": "easily",
+      "level": "A2",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "with ease (‘easy’ is sometimes used informally for ‘easily’)",
+          "without doubt"
+        ]
+      }
+    },
+    {
+      "lemma": "exactly",
+      "level": "A2",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "indicating exactness or preciseness",
+          "just as it should be"
+        ]
+      }
+    },
+    {
+      "lemma": "fall",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the season when the leaves fall from the trees",
+          "a sudden drop from an upright position"
+        ],
+        "v": [
+          "descend in free fall under the influence of gravity",
+          "move downward and lower, but not necessarily all the way"
+        ]
+      }
+    },
+    {
+      "lemma": "feather",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "branching, hair-like structure that grows on the bodies of birds",
+          "turning an oar parallel to the water between pulls"
+        ],
+        "v": [
+          "join tongue and groove, in carpentry",
+          "cover or fit with feathers"
+        ]
+      }
+    },
+    {
+      "lemma": "guidebook",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "something that offers basic information or instruction"
+        ]
+      }
+    },
+    {
+      "lemma": "hate",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the emotion of intense dislike; a feeling of dislike so strong that it demands action"
+        ],
+        "v": [
+          "dislike intensely; feel antipathy or aversion towards",
+          "to have and express negative sentiments about a person"
+        ]
+      }
+    },
+    {
+      "lemma": "hero",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a person distinguished by exceptional courage and nobility and strength",
+          "the principal character in a play or movie or novel or poem"
+        ]
+      }
+    },
+    {
+      "lemma": "honey",
+      "level": "A2",
+      "pos": [
+        "a",
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "a": [
+          "of something having the color of honey"
+        ],
+        "n": [
+          "a sweet yellow liquid produced by bees",
+          "a beloved person; used as terms of endearment"
+        ],
+        "v": [
+          "sweeten with honey"
+        ]
+      }
+    },
+    {
+      "lemma": "lawyer",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a professional person authorized to practice law; conducts lawsuits or gives legal advice"
+        ]
+      }
+    },
+    {
+      "lemma": "lead",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "an advantage held by a competitor in a race",
+          "evidence pointing to a possible solution",
+          "a soft heavy toxic malleable metallic element; bluish white when freshly cut but tarnishes readily to dull grey",
+          "mixture of graphite with clay in different degrees of hardness; the marking substance in a pencil"
+        ],
+        "v": [
+          "take somebody somewhere",
+          "produce as a result or residue"
+        ]
+      }
+    },
+    {
+      "lemma": "necessary",
+      "level": "A2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "absolutely essential",
+          "unavoidably determined by prior circumstances"
+        ],
+        "n": [
+          "anything indispensable"
+        ]
+      }
+    },
+    {
+      "lemma": "photography",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the act of taking and printing photographs",
+          "the process of producing images of objects on photosensitive surfaces"
+        ]
+      }
+    },
+    {
+      "lemma": "plant",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "buildings for carrying on industrial labor",
+          "(botany) a living organism lacking the power of locomotion"
+        ],
+        "v": [
+          "put or set (seeds, seedlings, or plants) into the ground",
+          "fix or set securely or deeply"
+        ]
+      }
+    },
+    {
+      "lemma": "pleased",
+      "level": "A2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "experiencing or manifesting pleasure",
+          "feeling pleasurable satisfaction over something by which you measures your self-worth"
+        ]
+      }
+    },
+    {
+      "lemma": "police",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the force of policemen and officers"
+        ],
+        "v": [
+          "maintain the security of by carrying out a patrol"
+        ]
+      }
+    },
+    {
+      "lemma": "portrait",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a word picture of a person's appearance and character",
+          "any likeness of a person, in any medium"
+        ]
+      }
+    },
+    {
+      "lemma": "probably",
+      "level": "A2",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "with considerable certainty; without much doubt",
+          "easy to believe on the basis of available evidence"
+        ]
+      }
+    },
+    {
+      "lemma": "punctuation",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "something that makes repeated and regular interruptions or divisions",
+          "the marks used to clarify meaning by indicating separation of words into sentences and clauses and phrases"
+        ]
+      }
+    },
+    {
+      "lemma": "rate",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a magnitude or frequency relative to a time unit",
+          "amount of a charge or payment relative to some basis"
+        ],
+        "v": [
+          "assign a rank or rating to",
+          "be worthy of or have a certain rating"
+        ]
+      }
+    },
+    {
+      "lemma": "rent",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a payment or series of payments made by the lessee to an owner for use of some property, facility, equipment, or service",
+          "an opening made forcibly as by pulling apart"
+        ],
+        "v": [
+          "let for money",
+          "grant use or occupation of under a term of contract"
+        ]
+      }
+    },
+    {
+      "lemma": "rob",
+      "level": "A2",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "take something away by force or without the consent of the owner",
+          "rip off; ask an unreasonable price"
+        ]
+      }
+    },
+    {
+      "lemma": "safe",
+      "level": "A2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "free from danger or the risk of harm",
+          "(of an undertaking) secure from risk"
+        ],
+        "n": [
+          "strongbox where valuables can be safely kept",
+          "a ventilated or refrigerated cupboard for securing provisions from pests"
+        ]
+      }
+    },
+    {
+      "lemma": "shell",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "ammunition consisting of a cylindrical metal casing containing an explosive charge and a projectile; fired from a large gun",
+          "the material that forms the hard outer covering of many animals"
+        ],
+        "v": [
+          "use explosives on",
+          "create by using explosives"
+        ]
+      }
+    },
+    {
+      "lemma": "statue",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a sculpture representing a human or animal"
+        ]
+      }
+    },
+    {
+      "lemma": "tap",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the sound made by a gentle blow",
+          "a gentle blow"
+        ],
+        "v": [
+          "cut a female screw thread with a tap",
+          "draw from or dip into to get something"
+        ]
+      }
+    },
+    {
+      "lemma": "tune",
+      "level": "A2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a succession of notes forming a distinctive sequence",
+          "the property of producing accurately a note of a given pitch"
+        ],
+        "v": [
+          "adjust for (better) functioning",
+          "adjust the pitches of (musical instruments)"
+        ]
+      }
+    },
+    {
+      "lemma": "valley",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a long depression in the surface of the land that usually contains a river"
+        ]
+      }
+    },
+    {
+      "lemma": "violin",
+      "level": "A2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "bowed stringed instrument that is the highest member of the violin family; this instrument has four strings and a hollow body and an unfretted fingerboard and is played with a bow"
+        ]
+      }
+    },
+    {
+      "lemma": "absolute",
+      "level": "B1",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "perfect or complete or pure",
+          "complete and without restriction or qualification; sometimes used informally as intensifiers"
+        ],
+        "n": [
+          "something that is conceived or that exists independently and not in relation to other things; something that does not depend on anything else and is beyond human control; something that is not relative"
+        ]
+      }
+    },
+    {
+      "lemma": "aim",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "an anticipated outcome that is intended or that guides your planned actions",
+          "the goal intended to be attained (and which is believed to be attainable)"
+        ],
+        "v": [
+          "point or cause to go (blows, weapons, or objects such as photographic equipment) towards",
+          "propose or intend"
+        ]
+      }
+    },
+    {
+      "lemma": "attract",
+      "level": "B1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "direct toward itself or oneself by means of some psychological power or physical attributes",
+          "be attractive to"
+        ]
+      }
+    },
+    {
+      "lemma": "bomb",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "an explosive device fused to explode under specific conditions",
+          "strong sealed vessel for measuring heat of combustion"
+        ],
+        "v": [
+          "throw bombs at or attack with bombs",
+          "fail to get a passing grade"
+        ]
+      }
+    },
+    {
+      "lemma": "bracelet",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a band of cloth or leather or metal links attached to a wristwatch and wrapped around the wrist",
+          "jewelry worn around the wrist for decoration"
+        ]
+      }
+    },
+    {
+      "lemma": "brainstorming",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a group problem-solving technique in which members spontaneously share ideas and solutions"
+        ]
+      }
+    },
+    {
+      "lemma": "brick",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "rectangular block of clay baked by the sun or in a kiln; used as a building or paving material",
+          "a good fellow; helpful and trustworthy"
+        ],
+        "v": [
+          "To stop working (of an electronic device)"
+        ]
+      }
+    },
+    {
+      "lemma": "burglar",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a thief who enters a building with intent to steal"
+        ]
+      }
+    },
+    {
+      "lemma": "canal",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "(astronomy) an indistinct surface feature of Mars once thought to be a system of channels; they are now believed to be an optical illusion",
+          "a bodily passage or tube lined with epithelial cells and conveying a secretion or other substance"
+        ],
+        "v": [
+          "provide (a city) with a canal"
+        ]
+      }
+    },
+    {
+      "lemma": "cancer",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "(astrology) a person who is born while the sun is in Cancer",
+          "any malignant growth or tumor caused by abnormal and uncontrolled cell division; it may spread to other parts of the body through the lymphatic system or the blood stream"
+        ]
+      }
+    },
+    {
+      "lemma": "complement",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a word or phrase used to complete a grammatical construction",
+          "a complete number or quantity"
+        ],
+        "v": [
+          "make complete or perfect; supply what is wanting or form the complement to"
+        ]
+      }
+    },
+    {
+      "lemma": "contribute",
+      "level": "B1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "bestow a quality on",
+          "contribute to some cause"
+        ]
+      }
+    },
+    {
+      "lemma": "disagreement",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a conflict of people's opinions or actions or characters",
+          "a difference between conflicting facts or claims or opinions"
+        ]
+      }
+    },
+    {
+      "lemma": "ecological",
+      "level": "B1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "characterized by the interdependence of living organisms in an environment",
+          "of or relating to the science of ecology"
+        ]
+      }
+    },
+    {
+      "lemma": "eliminate",
+      "level": "B1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "terminate, end, or take out",
+          "get rid of something"
+        ]
+      }
+    },
+    {
+      "lemma": "fashionable",
+      "level": "B1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "being or in accordance with current social fashions",
+          "having elegance or taste or refinement in manners or dress"
+        ]
+      }
+    },
+    {
+      "lemma": "foundation",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the basis on which something is grounded",
+          "an institution supported by an endowment"
+        ]
+      }
+    },
+    {
+      "lemma": "geography",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "study of the earth's surface; includes people's responses to topography and climate and soil and vegetation"
+        ]
+      }
+    },
+    {
+      "lemma": "glance",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a quick look"
+        ],
+        "v": [
+          "throw a glance at; take a brief look at",
+          "hit at an angle"
+        ]
+      }
+    },
+    {
+      "lemma": "hesitate",
+      "level": "B1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "pause or hold back in uncertainty or unwillingness",
+          "interrupt temporarily an activity before continuing"
+        ]
+      }
+    },
+    {
+      "lemma": "horizon",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the line at which the sky and Earth appear to meet",
+          "the range of interest or activity that can be anticipated"
+        ]
+      }
+    },
+    {
+      "lemma": "income",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the financial gain (earned or unearned) accruing over a given period of time"
+        ]
+      }
+    },
+    {
+      "lemma": "insane",
+      "level": "B1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "afflicted with or characteristic of mental derangement",
+          "very foolish"
+        ]
+      }
+    },
+    {
+      "lemma": "judgment",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "an opinion formed by judging something",
+          "the act of judging or assessing a person or situation or event"
+        ]
+      }
+    },
+    {
+      "lemma": "massive",
+      "level": "B1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "imposing in size or bulk or solidity",
+          "being the same substance throughout"
+        ]
+      }
+    },
+    {
+      "lemma": "mislead",
+      "level": "B1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "lead someone in the wrong direction or give someone wrong directions",
+          "give false or misleading information to"
+        ]
+      }
+    },
+    {
+      "lemma": "motive",
+      "level": "B1",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "causing or able to cause motion",
+          "impelling to action"
+        ],
+        "n": [
+          "the psychological feature that arouses an organism to action toward a desired goal; the reason for the action; that which gives purpose and direction to behavior",
+          "a theme that is repeated or elaborated in a piece of music"
+        ]
+      }
+    },
+    {
+      "lemma": "motor",
+      "level": "B1",
+      "pos": [
+        "a",
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "a": [
+          "conveying information to the muscles from the CNS",
+          "causing or able to cause motion"
+        ],
+        "n": [
+          "machine that converts other forms of energy into mechanical energy and so imparts motion",
+          "a nonspecific agent that imparts motion"
+        ],
+        "v": [
+          "travel or be transported in a vehicle"
+        ]
+      }
+    },
+    {
+      "lemma": "nevertheless",
+      "level": "B1",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "despite anything to the contrary (usually preceding a concession)"
+        ]
+      }
+    },
+    {
+      "lemma": "permanent",
+      "level": "B1",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "continuing or enduring without marked change in status or condition or place",
+          "not capable of being reversed or returned to the original condition"
+        ],
+        "n": [
+          "a series of waves in the hair made by applying heat and chemicals"
+        ]
+      }
+    },
+    {
+      "lemma": "philosopher",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a specialist in philosophy",
+          "a wise person who is calm and rational; someone who lives a life of reason with equanimity"
+        ]
+      }
+    },
+    {
+      "lemma": "prejudice",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a partiality that prevents objective consideration of an issue or situation"
+        ],
+        "v": [
+          "disadvantage by prejudice",
+          "influence (somebody's) opinion in advance"
+        ]
+      }
+    },
+    {
+      "lemma": "race",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "any competition",
+          "a contest of speed"
+        ],
+        "v": [
+          "move hurridly",
+          "compete in a race"
+        ]
+      }
+    },
+    {
+      "lemma": "relate",
+      "level": "B1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "make a logical or causal connection",
+          "be relevant to"
+        ]
+      }
+    },
+    {
+      "lemma": "spice",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "aromatic substances of vegetable origin used as a preservative",
+          "any of a variety of pungent aromatic vegetable substances used for flavoring food"
+        ],
+        "v": [
+          "make more interesting or flavorful",
+          "add herbs or spices to"
+        ]
+      }
+    },
+    {
+      "lemma": "surround",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the area in which something exists or lives"
+        ],
+        "v": [
+          "extend on all sides of simultaneously; encircle",
+          "envelop completely"
+        ]
+      }
+    },
+    {
+      "lemma": "tin",
+      "level": "B1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a silvery malleable metallic element that resists corrosion; used in many alloys and to coat other metals to prevent corrosion; obtained chiefly from cassiterite where it occurs as tin oxide",
+          "a vessel (box, can, pan, etc.) made of tinplate and used mainly in baking"
+        ],
+        "v": [
+          "plate with tin",
+          "preserve in a can or tin"
+        ]
+      }
+    },
+    {
+      "lemma": "tourism",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the business of providing services to tourists"
+        ]
+      }
+    },
+    {
+      "lemma": "vehicle",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a conveyance that transports people or objects",
+          "a medium for the expression or achievement of something"
+        ]
+      }
+    },
+    {
+      "lemma": "webcam",
+      "level": "B1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a digital camera designed to take digital photographs and transmit them over the internet"
+        ]
+      }
+    },
+    {
+      "lemma": "agony",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "intense feelings of suffering; acute mental or physical pain",
+          "a state of acute pain"
+        ]
+      }
+    },
+    {
+      "lemma": "barley",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a grain of barley",
+          "cultivated since prehistoric times; grown for forage and grain"
+        ]
+      }
+    },
+    {
+      "lemma": "bombing",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "an attack by dropping bombs",
+          "the use of bombs for sabotage; a tactic frequently used by terrorists"
+        ]
+      }
+    },
+    {
+      "lemma": "casually",
+      "level": "B2",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "not methodically or according to plan",
+          "in an unconcerned manner"
+        ]
+      }
+    },
+    {
+      "lemma": "chaotic",
+      "level": "B2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "lacking a visible order or organization",
+          "completely unordered and unpredictable and confusing"
+        ]
+      }
+    },
+    {
+      "lemma": "cocktail",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a short mixed drink",
+          "an appetizer served as a first course at a meal"
+        ]
+      }
+    },
+    {
+      "lemma": "cocoa",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a beverage made from cocoa powder and milk and sugar; usually drunk hot",
+          "powder of ground roasted cacao beans with most of the fat removed"
+        ]
+      }
+    },
+    {
+      "lemma": "cornet",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a brass musical instrument with a brilliant tone; has a narrow tube and a flared bell and is played by means of valves"
+        ]
+      }
+    },
+    {
+      "lemma": "deer",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "distinguished from Bovidae by the male's having solid deciduous antlers"
+        ]
+      }
+    },
+    {
+      "lemma": "employee",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a worker who is hired to perform a job"
+        ]
+      }
+    },
+    {
+      "lemma": "glow",
+      "level": "B2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "an alert and refreshed state",
+          "light from nonthermal sources"
+        ],
+        "v": [
+          "emit a steady even light without flames",
+          "have a complexion with a strong bright color, such as red or pink"
+        ]
+      }
+    },
+    {
+      "lemma": "greatness",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the property possessed by something or someone of outstanding importance or eminence",
+          "unusual largeness in size or extent or number"
+        ]
+      }
+    },
+    {
+      "lemma": "guts",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "fortitude and determination"
+        ]
+      }
+    },
+    {
+      "lemma": "housekeeper",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a servant who is employed to perform domestic task in a household"
+        ]
+      }
+    },
+    {
+      "lemma": "humbug",
+      "level": "B2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "pretentious or silly talk or writing",
+          "communication (written or spoken) intended to deceive"
+        ],
+        "v": [
+          "trick or deceive"
+        ]
+      }
+    },
+    {
+      "lemma": "illustrate",
+      "level": "B2",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "clarify by giving an example of",
+          "depict with an illustration"
+        ]
+      }
+    },
+    {
+      "lemma": "impressionist",
+      "level": "B2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "relating to or characteristic of Impressionism"
+        ],
+        "n": [
+          "an artist who follows the theories of Impressionism"
+        ]
+      }
+    },
+    {
+      "lemma": "ineffective",
+      "level": "B2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "not producing an intended effect",
+          "lacking in power or forcefulness"
+        ]
+      }
+    },
+    {
+      "lemma": "institution",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "an organization founded and united for a specific purpose",
+          "an establishment consisting of a building or complex of buildings where an organization for the promotion of some cause is situated"
+        ]
+      }
+    },
+    {
+      "lemma": "insufficient",
+      "level": "B2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of a quantity not able to fulfill a need or requirement"
+        ]
+      }
+    },
+    {
+      "lemma": "intruder",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "someone who intrudes on the privacy or property of another without permission"
+        ]
+      }
+    },
+    {
+      "lemma": "leak",
+      "level": "B2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "an accidental hole that allows something (fluid or light etc.) to enter or escape",
+          "soft watery rot in fruits and vegetables caused by fungi"
+        ],
+        "v": [
+          "tell anonymously",
+          "be leaked"
+        ]
+      }
+    },
+    {
+      "lemma": "manufacturer",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a business engaged in manufacturing some product",
+          "someone who manufactures something"
+        ]
+      }
+    },
+    {
+      "lemma": "mask",
+      "level": "B2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a covering to disguise or conceal the face",
+          "activity that tries to conceal something"
+        ],
+        "v": [
+          "hide under a false appearance",
+          "put a mask on or cover with a mask"
+        ]
+      }
+    },
+    {
+      "lemma": "motion",
+      "level": "B2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "the use of movements (especially of the hands) to communicate familiar or prearranged signals",
+          "a natural event that involves a change in the position or location of something"
+        ],
+        "v": [
+          "show, express or direct through movement"
+        ]
+      }
+    },
+    {
+      "lemma": "neighboring",
+      "level": "B2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "having a common boundary or edge; abutting; touching"
+        ]
+      }
+    },
+    {
+      "lemma": "obedience",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the act of obeying; dutiful or submissive behavior with respect to another person",
+          "the trait of being willing to obey"
+        ]
+      }
+    },
+    {
+      "lemma": "overall",
+      "level": "B2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "involving only main features",
+          "including everything"
+        ],
+        "n": [
+          "(usually plural) work clothing consisting of denim trousers (usually with a bib and shoulder straps)",
+          "a loose protective coverall or smock worn over ordinary clothing for dirty work"
+        ]
+      }
+    },
+    {
+      "lemma": "patriotic",
+      "level": "B2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "inspired by love for your country"
+        ]
+      }
+    },
+    {
+      "lemma": "quotable",
+      "level": "B2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "able or fit to be repeated or quoted",
+          "suitable for or worthy of quotation"
+        ]
+      }
+    },
+    {
+      "lemma": "racist",
+      "level": "B2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "based on racial intolerance",
+          "discriminatory especially on the basis of race or religion"
+        ],
+        "n": [
+          "a person with a prejudiced belief that one racial group is superior to others"
+        ]
+      }
+    },
+    {
+      "lemma": "recession",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the state of the economy declines; a widespread decline in the GDP and employment and trade lasting from six months to a year",
+          "a small concavity"
+        ]
+      }
+    },
+    {
+      "lemma": "repression",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a state of forcible subjugation",
+          "(psychiatry) the classical defense mechanism that protects you from impulses or ideas that would cause anxiety by preventing them from becoming conscious"
+        ]
+      }
+    },
+    {
+      "lemma": "skyward",
+      "level": "B2",
+      "pos": [
+        "a",
+        "r"
+      ],
+      "oewn": {
+        "a": [
+          "directed toward heaven or the sky"
+        ],
+        "r": [
+          "toward the sky"
+        ]
+      }
+    },
+    {
+      "lemma": "tanned",
+      "level": "B2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "(of skin) having a tan color from exposure to the sun",
+          "converted to leather by a tanning agent"
+        ]
+      }
+    },
+    {
+      "lemma": "thermometer",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "measuring instrument for measuring temperature"
+        ]
+      }
+    },
+    {
+      "lemma": "vacant",
+      "level": "B2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "without an occupant or incumbent",
+          "devoid of intelligence or thought"
+        ]
+      }
+    },
+    {
+      "lemma": "version",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "an interpretation of a matter from a particular viewpoint",
+          "something a little different from others of the same type"
+        ]
+      }
+    },
+    {
+      "lemma": "waistcoat",
+      "level": "B2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a man's sleeveless garment worn underneath a coat"
+        ]
+      }
+    },
+    {
+      "lemma": "wondrous",
+      "level": "B2",
+      "pos": [
+        "a",
+        "r"
+      ],
+      "oewn": {
+        "a": [
+          "extraordinarily good or great; used especially as intensifiers"
+        ],
+        "r": [
+          "(used as an intensifier) excellently"
+        ]
+      }
+    },
+    {
+      "lemma": "adjoin",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "lie adjacent to another or share a boundary",
+          "be in direct physical contact with; make contact"
+        ]
+      }
+    },
+    {
+      "lemma": "alleviate",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "provide physical relief, as from pain",
+          "make easier"
+        ]
+      }
+    },
+    {
+      "lemma": "apprenticeship",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the position of apprentice"
+        ]
+      }
+    },
+    {
+      "lemma": "candid",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "characterized by directness in manner or speech; without subtlety or evasion",
+          "informal or natural; especially caught off guard or unprepared"
+        ]
+      }
+    },
+    {
+      "lemma": "conscientiously",
+      "level": "C1",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "with extreme conscientiousness"
+        ]
+      }
+    },
+    {
+      "lemma": "contractor",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "someone (a person or firm) who contracts to build things",
+          "the bridge player in contract bridge who wins the bidding and can declare which suit is to be trumps"
+        ]
+      }
+    },
+    {
+      "lemma": "detrimentally",
+      "level": "C1",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "in a detrimental manner"
+        ]
+      }
+    },
+    {
+      "lemma": "discourse",
+      "level": "C1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "extended verbal expression in speech or writing",
+          "an address of a religious nature (usually delivered during a church service)"
+        ],
+        "v": [
+          "to consider or examine in speech or writing",
+          "carry on a conversation"
+        ]
+      }
+    },
+    {
+      "lemma": "divergent",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "diverging from another or from a standard",
+          "tending to move apart in different directions"
+        ]
+      }
+    },
+    {
+      "lemma": "effortless",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "requiring or apparently requiring no effort",
+          "not showing effort or strain"
+        ]
+      }
+    },
+    {
+      "lemma": "elevate",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "give a promotion to or assign to a higher position",
+          "raise from a lower to a higher position"
+        ]
+      }
+    },
+    {
+      "lemma": "elude",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "escape, either physically or mentally",
+          "be incomprehensible to; escape understanding by"
+        ]
+      }
+    },
+    {
+      "lemma": "endorsement",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a promotional statement (as found on the dust jackets of books)",
+          "a speech seconding a motion"
+        ]
+      }
+    },
+    {
+      "lemma": "ethical",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of or relating to the philosophical study of ethics",
+          "conforming to accepted standards of social or professional behavior"
+        ]
+      }
+    },
+    {
+      "lemma": "favorably",
+      "level": "C1",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "showing approval"
+        ]
+      }
+    },
+    {
+      "lemma": "flashback",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a transition (in literary or theatrical works or films) to an earlier event or scene that interrupts the normal chronological development of the story",
+          "an unexpected but vivid recurrence of a past experience (especially a recurrence of the effects of an hallucinogenic drug taken much earlier)"
+        ]
+      }
+    },
+    {
+      "lemma": "fuse",
+      "level": "C1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "an electrical device that can interrupt the flow of electrical current when it is overloaded",
+          "any igniter that is used to initiate the burning of a propellant"
+        ],
+        "v": [
+          "mix together different elements",
+          "become plastic or fluid or liquefied from heat"
+        ]
+      }
+    },
+    {
+      "lemma": "harass",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "annoy continually or chronically",
+          "exhaust by attacking repeatedly"
+        ]
+      }
+    },
+    {
+      "lemma": "immortalize",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "be or provide a memorial to a person or an event",
+          "make famous forever"
+        ]
+      }
+    },
+    {
+      "lemma": "irate",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "feeling or showing extreme anger"
+        ]
+      }
+    },
+    {
+      "lemma": "oversee",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "watch and direct"
+        ]
+      }
+    },
+    {
+      "lemma": "pathos",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a quality that arouses emotions (especially pity or sorrow)",
+          "a feeling of sympathy and sorrow for the misfortunes of others"
+        ]
+      }
+    },
+    {
+      "lemma": "pinnacle",
+      "level": "C1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "(architecture) a slender upright spire at the top of a buttress or tower",
+          "the highest level or degree attainable; the highest stage of development"
+        ],
+        "v": [
+          "surmount with a pinnacle",
+          "raise on or as if on a pinnacle"
+        ]
+      }
+    },
+    {
+      "lemma": "possessor",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a person who owns something"
+        ]
+      }
+    },
+    {
+      "lemma": "precision",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the quality of being reproducible in amount or performance"
+        ]
+      }
+    },
+    {
+      "lemma": "prohibitive",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "tending to discourage (especially of prices)"
+        ]
+      }
+    },
+    {
+      "lemma": "prophet",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "an authoritative person who divines the future",
+          "someone who speaks by divine inspiration; someone who is an interpreter of the will of God"
+        ]
+      }
+    },
+    {
+      "lemma": "reenact",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "enact or perform again",
+          "enact again"
+        ]
+      }
+    },
+    {
+      "lemma": "renown",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the state or quality of being widely honored and acclaimed"
+        ]
+      }
+    },
+    {
+      "lemma": "rotate",
+      "level": "C1",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "turn on or around an axis or a center",
+          "exchange on a regular basis"
+        ]
+      }
+    },
+    {
+      "lemma": "scrutiny",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the act of examining something closely (as for mistakes)",
+          "a prolonged intense look"
+        ]
+      }
+    },
+    {
+      "lemma": "sedentary",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "requiring sitting or little activity"
+        ]
+      }
+    },
+    {
+      "lemma": "somersault",
+      "level": "C1",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "an acrobatic feat in which the feet roll over the head (either forward or backward) and return"
+        ],
+        "v": [
+          "do a somersault"
+        ]
+      }
+    },
+    {
+      "lemma": "structural",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "relating to or caused by structure, especially political or economic structure",
+          "relating to or having or characterized by structure"
+        ]
+      }
+    },
+    {
+      "lemma": "stuffily",
+      "level": "C1",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "in a stuffy manner"
+        ]
+      }
+    },
+    {
+      "lemma": "suburbia",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a residential district located on the outskirts of a city",
+          "suburbanites considered as a cultural class or subculture"
+        ]
+      }
+    },
+    {
+      "lemma": "superficially",
+      "level": "C1",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "in a superficial manner"
+        ]
+      }
+    },
+    {
+      "lemma": "uninspiring",
+      "level": "C1",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "depressing to the spirit"
+        ]
+      }
+    },
+    {
+      "lemma": "viciously",
+      "level": "C1",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "in a vicious manner"
+        ]
+      }
+    },
+    {
+      "lemma": "washtub",
+      "level": "C1",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a tub in which clothes or linens can be washed"
+        ]
+      }
+    },
+    {
+      "lemma": "acrobatic",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "vigorously active"
+        ]
+      }
+    },
+    {
+      "lemma": "all-encompassing",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "broad in scope or content"
+        ]
+      }
+    },
+    {
+      "lemma": "archival",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of or relating to or contained in or serving as an archive"
+        ]
+      }
+    },
+    {
+      "lemma": "centralized",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "drawn toward a center or brought under the control of a central authority"
+        ]
+      }
+    },
+    {
+      "lemma": "concurrence",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "agreement of results or opinions",
+          "acting together, as agents or circumstances or events"
+        ]
+      }
+    },
+    {
+      "lemma": "contractual",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "relating to or part of a binding legal agreement"
+        ]
+      }
+    },
+    {
+      "lemma": "cordon",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a series of sentinels or of military posts enclosing or guarding some place or thing",
+          "cord or ribbon worn as an insignia of honor or rank"
+        ]
+      }
+    },
+    {
+      "lemma": "detract",
+      "level": "C2",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "take away a part from; diminish"
+        ]
+      }
+    },
+    {
+      "lemma": "echo",
+      "level": "C2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "(Greek mythology) a nymph who was spurned by Narcissus and pined away until only her voice remained",
+          "the repetition of a sound resulting from reflection of the sound waves"
+        ],
+        "v": [
+          "to say again or imitate",
+          "ring or echo with sound"
+        ]
+      }
+    },
+    {
+      "lemma": "elasticity",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the tendency of a body to return to its original shape after it has been stretched or compressed"
+        ]
+      }
+    },
+    {
+      "lemma": "embodiment",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a new personification of a familiar idea",
+          "a concrete representation of an otherwise nebulous concept"
+        ]
+      }
+    },
+    {
+      "lemma": "emolument",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "compensation received by virtue of holding an office or having employment (usually in the form of wages or fees)"
+        ]
+      }
+    },
+    {
+      "lemma": "emulate",
+      "level": "C2",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "strive to equal or match, especially by imitating",
+          "imitate the function of (another system), as by modifying the hardware or the software"
+        ]
+      }
+    },
+    {
+      "lemma": "euphemistic",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of or the nature of euphemism"
+        ]
+      }
+    },
+    {
+      "lemma": "extracurricular",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "outside the regular academic curriculum",
+          "outside the regular duties of your job or profession"
+        ]
+      }
+    },
+    {
+      "lemma": "flighty",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "guided by whim and fancy",
+          "unpredictably excitable (especially of horses)"
+        ]
+      }
+    },
+    {
+      "lemma": "frolic",
+      "level": "C2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "gay or light-hearted recreational activity for diversion or amusement"
+        ],
+        "v": [
+          "play boisterously"
+        ]
+      }
+    },
+    {
+      "lemma": "fruition",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the condition of bearing fruit",
+          "enjoyment derived from use or possession"
+        ]
+      }
+    },
+    {
+      "lemma": "gale",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a strong wind moving 45-90 knots; force 7 to 10 on Beaufort scale"
+        ]
+      }
+    },
+    {
+      "lemma": "glitz",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "tasteless showiness"
+        ]
+      }
+    },
+    {
+      "lemma": "imposition",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the act of imposing something (as a tax or an embargo)",
+          "an uncalled-for burden"
+        ]
+      }
+    },
+    {
+      "lemma": "inchoate",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "only partly in existence; imperfectly formed"
+        ]
+      }
+    },
+    {
+      "lemma": "interrogatively",
+      "level": "C2",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "in a questioning format",
+          "with curiosity"
+        ]
+      }
+    },
+    {
+      "lemma": "locomotive",
+      "level": "C2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "of or relating to locomotion"
+        ],
+        "n": [
+          "a wheeled vehicle consisting of a self-propelled engine that is used to draw trains along railway tracks"
+        ]
+      }
+    },
+    {
+      "lemma": "magnanimous",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "noble and generous in spirit",
+          "generous and understanding and tolerant"
+        ]
+      }
+    },
+    {
+      "lemma": "materialize",
+      "level": "C2",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "come into being; become reality"
+        ]
+      }
+    },
+    {
+      "lemma": "melancholy",
+      "level": "C2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "characterized by or causing or expressing sadness",
+          "grave or even gloomy in character"
+        ],
+        "n": [
+          "a feeling of thoughtful sadness",
+          "a constitutional tendency to be gloomy and depressed"
+        ]
+      }
+    },
+    {
+      "lemma": "meticulously",
+      "level": "C2",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "in a meticulous manner"
+        ]
+      }
+    },
+    {
+      "lemma": "mottled",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "having spots or patches of color"
+        ]
+      }
+    },
+    {
+      "lemma": "oblique",
+      "level": "C2",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "slanting or inclined in direction or course or position — neither parallel nor perpendicular nor right-angled",
+          "indirect in departing from the accepted or proper way; misleading"
+        ],
+        "n": [
+          "any grammatical case other than the nominative",
+          "a diagonally arranged abdominal muscle on either side of the torso"
+        ]
+      }
+    },
+    {
+      "lemma": "parable",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a short moral story (often with animal characters)",
+          "(New Testament) any of the stories told by Jesus to convey his religious message"
+        ]
+      }
+    },
+    {
+      "lemma": "paradoxical",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "seemingly contradictory but nonetheless possibly true"
+        ]
+      }
+    },
+    {
+      "lemma": "primeval",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "having existed from the beginning; in an earliest or original stage or state"
+        ]
+      }
+    },
+    {
+      "lemma": "promenade",
+      "level": "C2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a formal ball held for a school class toward the end of the academic year",
+          "a public area set aside as a pedestrian walk"
+        ],
+        "v": [
+          "march in a procession in a public place",
+          "take a leisurely walk"
+        ]
+      }
+    },
+    {
+      "lemma": "rebound",
+      "level": "C2",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "a movement back from an impact",
+          "a reaction to a crisis or setback or frustration"
+        ],
+        "v": [
+          "spring back; spring away from an impact",
+          "return to a former condition"
+        ]
+      }
+    },
+    {
+      "lemma": "residue",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "matter that remains after something has been removed",
+          "something left after other parts have been taken away"
+        ]
+      }
+    },
+    {
+      "lemma": "rhetorical",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of or relating to rhetoric",
+          "given to rhetoric, emphasizing style at the expense of thought"
+        ]
+      }
+    },
+    {
+      "lemma": "salivary",
+      "level": "C2",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of or relating to saliva"
+        ]
+      }
+    },
+    {
+      "lemma": "taciturnity",
+      "level": "C2",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the trait of being uncommunicative; not volunteering anything more than necessary"
+        ]
+      }
+    },
+    {
+      "lemma": "telescopically",
+      "level": "C2",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "in a telescopic manner"
+        ]
+      }
+    },
+    {
+      "lemma": "ablate",
+      "level": "Unleveled",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "wear away through erosion or vaporization",
+          "remove an organ or bodily structure"
+        ]
+      }
+    },
+    {
+      "lemma": "adventuristic",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of or pertaining to adventurism"
+        ]
+      }
+    },
+    {
+      "lemma": "affirmable",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "capable of being affirmed or asserted"
+        ]
+      }
+    },
+    {
+      "lemma": "afrikaans",
+      "level": "Unleveled",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "belonging or relating to white people of South Africa whose ancestors were Dutch or to their language"
+        ],
+        "n": [
+          "an official language of the Republic of South Africa; closely related to Dutch and Flemish"
+        ]
+      }
+    },
+    {
+      "lemma": "animatistic",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of or pertaining to animatism"
+        ]
+      }
+    },
+    {
+      "lemma": "arthroscopy",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a minimally invasive operation to repair a damaged joint; the surgeon examines the joint with an arthroscope while making repairs through a small incision"
+        ]
+      }
+    },
+    {
+      "lemma": "bluish-purple",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of purple tinged with blue"
+        ]
+      }
+    },
+    {
+      "lemma": "bolus",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a small round soft mass (as of chewed food)",
+          "a large pill; used especially in veterinary medicine"
+        ]
+      }
+    },
+    {
+      "lemma": "bringing",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the act of delivering or distributing something (as goods or mail)"
+        ]
+      }
+    },
+    {
+      "lemma": "brit",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a native or inhabitant of Great Britain",
+          "the young of a herring or sprat or similar fish"
+        ]
+      }
+    },
+    {
+      "lemma": "cocky",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "overly self-confident or self-assertive"
+        ]
+      }
+    },
+    {
+      "lemma": "comrade",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a fellow member of the Communist Party",
+          "a friend who is frequently in the company of another"
+        ]
+      }
+    },
+    {
+      "lemma": "cub",
+      "level": "Unleveled",
+      "pos": [
+        "n",
+        "v"
+      ],
+      "oewn": {
+        "n": [
+          "an awkward and inexperienced youth",
+          "a male child (a familiar term of address to a boy)"
+        ],
+        "v": [
+          "give birth to cubs"
+        ]
+      }
+    },
+    {
+      "lemma": "darky",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "(ethnic slur) offensive term for Black people"
+        ]
+      }
+    },
+    {
+      "lemma": "desalination",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the removal of salt (especially from sea water)"
+        ]
+      }
+    },
+    {
+      "lemma": "dimorphic",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "occurring or existing in two different forms"
+        ]
+      }
+    },
+    {
+      "lemma": "disarrangement",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a condition in which an orderly system has been disrupted"
+        ]
+      }
+    },
+    {
+      "lemma": "electrotherapist",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "someone who specializes in the treatment of disease by electricity"
+        ]
+      }
+    },
+    {
+      "lemma": "engorgement",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "congestion with blood",
+          "eating ravenously or voraciously to satiation"
+        ]
+      }
+    },
+    {
+      "lemma": "flickering",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "shining unsteadily"
+        ]
+      }
+    },
+    {
+      "lemma": "gantrisin",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a sulfonamide (trade name Gantrisin) used to treat infections of the urinary tract"
+        ]
+      }
+    },
+    {
+      "lemma": "hydrocephaly",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "an abnormal condition in which cerebrospinal fluid collects in the ventricles of the brain; in infants it can cause abnormally rapid growth of the head and bulging fontanelles and a small face; in adults the symptoms are primarily neurological"
+        ]
+      }
+    },
+    {
+      "lemma": "industrialist",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "someone who manages or has significant financial interest in an industrial enterprise"
+        ]
+      }
+    },
+    {
+      "lemma": "infolding",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the folding in of an outer layer so as to form a pocket in the surface"
+        ]
+      }
+    },
+    {
+      "lemma": "interpellate",
+      "level": "Unleveled",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "question formally about policy or government business"
+        ]
+      }
+    },
+    {
+      "lemma": "laid-back",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "unhurried and relaxed"
+        ]
+      }
+    },
+    {
+      "lemma": "lidocaine",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a local anesthetic (trade names Lidocaine and Xylocaine) used topically on the skin and mucous membranes"
+        ]
+      }
+    },
+    {
+      "lemma": "macadamise",
+      "level": "Unleveled",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "surface with macadam"
+        ]
+      }
+    },
+    {
+      "lemma": "measured",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "having notes of fixed rhythmic value",
+          "the rhythmic arrangement of syllables"
+        ]
+      }
+    },
+    {
+      "lemma": "mesomorphic",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "having a robust muscular body-build characterized by predominance of structures (bone and muscle and connective tissue) developed from the embryonic mesodermal layer"
+        ]
+      }
+    },
+    {
+      "lemma": "mimetic",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "characterized by or of the nature of or using mimesis",
+          "exhibiting mimicry"
+        ]
+      }
+    },
+    {
+      "lemma": "misestimate",
+      "level": "Unleveled",
+      "pos": [
+        "v"
+      ],
+      "oewn": {
+        "v": [
+          "to reckon wrongly",
+          "calculate incorrectly"
+        ]
+      }
+    },
+    {
+      "lemma": "nandu",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "smaller of two tall fast-running flightless birds similar to ostriches but three-toed; found from Peru to Strait of Magellan"
+        ]
+      }
+    },
+    {
+      "lemma": "neo-renaissance",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "an all-encompassing designation that covers many 19th century architectural revival styles which were neither Grecian nor Gothic but which instead drew inspiration from a wide range of classicizing Italian modes."
+        ]
+      }
+    },
+    {
+      "lemma": "neolithic",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "of or relating to the most recent period of the Stone Age (following the mesolithic)"
+        ]
+      }
+    },
+    {
+      "lemma": "organ-grinder",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a street musician who plays a hand organ or hurdy-gurdy"
+        ]
+      }
+    },
+    {
+      "lemma": "pachytene",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the third stage of the prophase of meiosis"
+        ]
+      }
+    },
+    {
+      "lemma": "pajama",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a pair of loose trousers tied by a drawstring around the waist; worn by men and women in some Asian countries",
+          "(usually plural) loose-fitting nightclothes worn for sleeping or lounging; have a jacket top and trousers"
+        ]
+      }
+    },
+    {
+      "lemma": "parallax",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the apparent displacement of an object as seen from two different points that are not on a line with the object"
+        ]
+      }
+    },
+    {
+      "lemma": "penitence",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "remorse for your past conduct"
+        ]
+      }
+    },
+    {
+      "lemma": "polyploid",
+      "level": "Unleveled",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "of a cell or organism having more than twice the haploid number of chromosomes"
+        ],
+        "n": [
+          "(genetics) an organism or cell having more than twice the haploid number of chromosomes"
+        ]
+      }
+    },
+    {
+      "lemma": "postmortal",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "occurring or done after death"
+        ]
+      }
+    },
+    {
+      "lemma": "preterist",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a theologian who believes that the Scripture prophecies of the Apocalypse (the Book of Revelation) have already been fulfilled"
+        ]
+      }
+    },
+    {
+      "lemma": "prostatic",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "relating to the prostate gland"
+        ]
+      }
+    },
+    {
+      "lemma": "psychoneurotic",
+      "level": "Unleveled",
+      "pos": [
+        "a",
+        "n"
+      ],
+      "oewn": {
+        "a": [
+          "affected with emotional disorder"
+        ],
+        "n": [
+          "a person suffering from neurosis"
+        ]
+      }
+    },
+    {
+      "lemma": "pyrrhuloxia",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "crested grey-and-red bird of southwest United States and Mexico"
+        ]
+      }
+    },
+    {
+      "lemma": "redfish",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "North Atlantic rockfish",
+          "large edible fish found off coast of United States from Massachusetts to Mexico"
+        ]
+      }
+    },
+    {
+      "lemma": "reincarnation",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "embodiment in a new form (especially the reappearance or a person in another form)",
+          "a second or new birth"
+        ]
+      }
+    },
+    {
+      "lemma": "scourer",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "someone who cleanses by scouring",
+          "someone who travels widely and energetically"
+        ]
+      }
+    },
+    {
+      "lemma": "self-effacing",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "reluctant to draw attention to yourself"
+        ]
+      }
+    },
+    {
+      "lemma": "showboy",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a man who dances in a chorus line"
+        ]
+      }
+    },
+    {
+      "lemma": "stumpy",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "short and thick; as e.g. having short legs and heavy musculature"
+        ]
+      }
+    },
+    {
+      "lemma": "sumerology",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "the archeology of ancient Sumerians"
+        ]
+      }
+    },
+    {
+      "lemma": "theorizer",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "someone who theorizes (especially in science or art)"
+        ]
+      }
+    },
+    {
+      "lemma": "thundershower",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "a short rainstorm accompanied by thunder and lightning"
+        ]
+      }
+    },
+    {
+      "lemma": "unenlivened",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "not made lively or brightened"
+        ]
+      }
+    },
+    {
+      "lemma": "unsparingly",
+      "level": "Unleveled",
+      "pos": [
+        "r"
+      ],
+      "oewn": {
+        "r": [
+          "in a scathing and unsparing manner"
+        ]
+      }
+    },
+    {
+      "lemma": "wheezing",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "relating to breathing with a whistling sound"
+        ]
+      }
+    },
+    {
+      "lemma": "willful",
+      "level": "Unleveled",
+      "pos": [
+        "a"
+      ],
+      "oewn": {
+        "a": [
+          "done by design",
+          "habitually disposed to disobedience and opposition"
+        ]
+      }
+    },
+    {
+      "lemma": "works",
+      "level": "Unleveled",
+      "pos": [
+        "n"
+      ],
+      "oewn": {
+        "n": [
+          "buildings for carrying on industrial labor",
+          "everything available; usually preceded by ‘the’"
+        ]
+      }
+    }
+  ]
+}
