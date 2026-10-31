@@ -1,0 +1,27 @@
+{
+  "model": "gpt-6.1-sol",
+  "batch": 2,
+  "count": 25,
+  "request_sha256": "c5d8f55498e9764be00282ac895402204b4322e4649236942e824a69f3457940",
+  "command": [
+    "codex",
+    "exec",
+    "--ignore-user-config",
+    "--ephemeral",
+    "--skip-git-repo-check",
+    "--sandbox",
+    "read-only",
+    "-m",
+    "gpt-6.1-sol",
+    "-c",
+    "model_reasoning_effort=\"low\"",
+    "--json",
+    "--output-schema",
+    "/var/folders/yk/2lljgrk579j5rnps181xvyfc0000gn/T/voka-gloss-ghm4w91v/schema.json",
+    "-o",
+    "/Users/xzpjerry/orca/workspaces/VOKA/p0-gloss-pilot/docs/research/gloss-pilot/gpt-6.1-sol/02.json",
+    "-"
+  ],
+  "seconds": 19.56,
+  "returncode": 0
+}
