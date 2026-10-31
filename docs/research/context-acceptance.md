@@ -1,6 +1,6 @@
 # Full cards and real context sentences — issue #22
 
-Verified 2026-10-31 using Chrome for Testing 156.0.8078.47 and the isolated AnkiConnect v1 instance at **127.0.0.1:8766**. No requests were sent to 8765. The final implementation is rebased onto the real-data pipeline (#43), drawer (#42), and block-level dynamic reading (#44).
+Verified 2026-10-31 using Chrome for Testing 156.0.8078.47 and the isolated AnkiConnect v1 instance at **127.0.0.1:8766**. No requests were sent to 8765. The final implementation is rebased onto the real-data pipeline (#43), drawer (#42), and block-level dynamic reading (#44), and onboarding/settings (#45).
 
 ## Reproduce
 
@@ -11,7 +11,7 @@ npm run check:contexts
 npm run check:highlight
 ```
 
-Build passes; all **99 tests across 11 files** pass. The new pure tests cover sentence segmentation/windowing, actual-surface bolding, HTML escaping, normalization, dedupe, slot ordering, single-pin behavior, stale pins, and replacement selection. DOM tests cover inline markup, punctuation-free list items/headings/table cells and excluded editable regions. Gateway tests cover fresh merges, changed-fields-only updates, stale replacement hashes, conflicting Keys, unknown write outcome readback without retry, A2 adds, and unlevelled adds.
+Build passes; all **100 tests across 11 files** pass. The new pure tests cover sentence segmentation/windowing, actual-surface bolding, HTML escaping, normalization, dedupe, slot ordering, single-pin behavior, stale pins, and replacement selection. DOM tests cover inline markup, punctuation-free list items/headings/table cells and excluded editable regions. Gateway tests cover fresh merges, changed-fields-only updates, stale replacement hashes, conflicting Keys, unknown write outcome readback without retry, A2 adds, and unlevelled adds.
 
 ## T-10: four pages and an Anki edit
 
@@ -41,7 +41,7 @@ With target level B1, the final first production-data run creates only **`en:ban
 
 Earlier, before #43 landed, the same flow created synthetic `travel` in A2; [first-run.json](context-evidence/first-run.json) retains that historical result. The production results are authoritative for current levels (`apple` and `banana` are A1 in the real dataset). Existing synthetic notes are not migrated or moved.
 
-The default source is domain, title and date; the real browser check verifies that the URL/path is absent. The flat setting `storeFullUrl` defaults to false and is exposed in Options. Full-URL source construction is unit tested.
+The default source is domain, title and date; the real browser check verifies that the URL/path is absent. The flat setting `storeFullUrl` defaults to false and is exposed in Options. The live browser check toggles that Options checkbox and verifies persistence in both directions; full-URL source construction is unit tested.
 
 ## Remaining limits
 

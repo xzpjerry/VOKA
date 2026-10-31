@@ -409,6 +409,25 @@ try {
       levelBefore + 1,
     );
   }
+  const options = await browser.newPage();
+  await options.goto(
+    await worker.evaluate(() => chrome.runtime.getURL("options.html")),
+  );
+  await options.waitForFunction(() => {
+    const input = document.querySelector<HTMLInputElement>("#storeFullUrl");
+    return input && !input.checked && !input.closest("fieldset")?.disabled;
+  });
+  await options.click("#storeFullUrl");
+  await options.waitForFunction(
+    async () =>
+      (await chrome.storage.local.get("storeFullUrl")).storeFullUrl === true,
+  );
+  await options.click("#storeFullUrl");
+  await options.waitForFunction(
+    async () =>
+      (await chrome.storage.local.get("storeFullUrl")).storeFullUrl === false,
+  );
+  await options.close();
   const result = {
     createdManual,
     manualKey,
