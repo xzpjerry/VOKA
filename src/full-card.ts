@@ -23,6 +23,7 @@ export function fullCard(
   config: () => ReadingSettings,
   updated: (key: string, fields: Record<string, string>) => void,
   stateFor: (key: string) => WordState | undefined = () => undefined,
+  choose: (token: Token, entry: Token["entry"]) => Promise<void> = async () => {},
 ) {
   const card = document.createElement("aside");
   card.id = "voka-card";
@@ -109,6 +110,29 @@ export function fullCard(
     );
     const candidates = element("div");
     candidates.dataset.slot = "lemma-candidates";
+    const others = token.candidates?.filter((entry) => entry.lemma !== token.entry.lemma) ?? [];
+    if (others.length) {
+      candidates.append(element("span", `「${token.range.toString()}」也可能是：`));
+      for (const entry of others) {
+        const option = button(entry.lemma, () => void (async () => {
+          if (busy) return;
+          busy = true;
+          render();
+          const current = epoch;
+          try {
+            await choose(token, entry);
+            if (current === epoch) await open(token);
+          } catch (error) {
+            if (current !== epoch) return;
+            message = (error as Error).message;
+            busy = false;
+            render();
+          }
+        })());
+        option.dataset.key = `en:${entry.lemma}`;
+        candidates.append(option);
+      }
+    }
     card.append(candidates);
     const primary = gloss(
       token,
@@ -235,6 +259,7 @@ export function fullCard(
     if (busy) return;
     busy = true;
     message = "";
+    render();
     const current = epoch;
     try {
       const next = await request(action, { ...extra, title: document.title });

@@ -156,3 +156,20 @@ it("reapplies manual precedence to existing ranges without rescanning", async ()
   expect(lookup).toHaveBeenCalledTimes(1);
   session.stop();
 });
+it("keeps a surface choice for existing and newly scanned occurrences", async () => {
+  document.body.innerHTML = "<p>saw saw</p>";
+  const highlights = { target: new Set<Range>(), learning: new Set<Range>(), unknown: new Set<Range>(), weak: new Set<Range>() };
+  const session = new DynamicReading(config, highlights, async () => ({}), () => {}, undefined, resolveWords);
+  await session.start(document.body);
+  session.states["en:see"] = { fields: { ManualStatus: "unknown" }, cards: [] };
+  session.choose("saw", { key: "en:see", entry: data.lookupEntry("see") });
+  expect(session.tokens.map(t => t.key)).toEqual(["en:see", "en:see"]);
+  expect(highlights.unknown.size).toBe(2);
+  const observer = new MutationObserver(records => session.update(records));
+  observer.observe(document.body, { subtree: true, childList: true });
+  document.body.insertAdjacentHTML("beforeend", "<p>saw</p>");
+  await vi.waitFor(() => expect(session.tokens).toHaveLength(3));
+  expect(session.tokens.every(t => t.key === "en:see")).toBe(true);
+  expect(highlights.unknown.size).toBe(3);
+  observer.disconnect(); session.stop();
+});

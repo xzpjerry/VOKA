@@ -1,6 +1,7 @@
 import { createDrawer } from "./drawer";
 import { DynamicReading } from "./dynamic-reading";
 import { fullCard } from "./full-card";
+import { normalizeKey } from "./key";
 import { containsPoint, excluded, type Token } from "./reading";
 import { check, settings, t } from "./shared";
 import {
@@ -65,6 +66,7 @@ import {
   let config: ReadingSettings;
   let running = false,
     generation = 0;
+  const choices = new Map<string, { key: string; entry: Token["entry"] }>();
   const card = fullCard(
     root,
     () => config,
@@ -85,6 +87,19 @@ import {
       drawerUI.update(session.tokens, config);
     },
     (key) => session?.states[key],
+    async (token, entry) => {
+      const current = session;
+      if (!current) return;
+      const key = normalizeKey(entry.lemma);
+      const response = await chrome.runtime.sendMessage({ type: "page-states", keys: [key] });
+      if (response.error) throw new Error(response.error);
+      if (current !== session) return;
+      Object.assign(current.states, response.data);
+      const surface = token.range.toString().toLowerCase();
+      choices.set(surface, { key, entry });
+      current.choose(surface, { key, entry });
+      tooltip.hidden = true;
+    },
   );
   const interactive = (event: MouseEvent) =>
     event
@@ -278,7 +293,8 @@ import {
                 words: words.slice(start, start + 1000),
               });
               if (response.error) throw new Error(response.error);
-              Object.assign(matches, response.data);
+              for (const [word, match] of Object.entries(response.data))
+                Object.assign(matches, { [word]: { ...(match as object), ...choices.get(word.toLowerCase()) } });
             }
             return matches;
           },
