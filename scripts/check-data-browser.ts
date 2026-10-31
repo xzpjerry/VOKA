@@ -2,8 +2,9 @@
 import puppeteer from "puppeteer";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { mkdir } from "node:fs/promises";
-import { resolve } from "node:path";
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve, join } from "node:path";
 const server = createServer((_req, res) => {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.end(
@@ -13,11 +14,22 @@ const server = createServer((_req, res) => {
 await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
 const port = (server.address() as { port: number }).port;
 let browser;
+// Queue the isolated port before onInstalled opens the auto-checking wizard.
+const scratch = await mkdtemp(join(tmpdir(), "voka-gloss-browser-"));
+const extension = join(scratch, "extension");
+await cp(resolve("dist"), extension, { recursive: true });
+const backgroundFile = join(extension, "background.js");
+await writeFile(backgroundFile,
+  'chrome.storage.local.get("port").then((seeded) => {' +
+  'if (typeof seeded.port !== "number") return chrome.storage.local.set({ port: 8766, apiKey: "" }); });' +
+  await readFile(backgroundFile, "utf8"),
+);
+const netlog = join(scratch, "netlog.json");
 try {
   browser = await puppeteer.launch({
     headless: false,
-    enableExtensions: [resolve("dist")],
-    args: ["--no-first-run"],
+    enableExtensions: [extension],
+    args: ["--no-first-run", `--log-net-log=${netlog}`],
   });
   const worker = (await (
     await browser.waitForTarget((t) => t.type() === "service_worker")
@@ -139,4 +151,11 @@ try {
 } finally {
   await browser?.close();
   server.close();
+  try {
+    const network = await readFile(netlog, "utf8");
+    assert(!network.includes("127.0.0.1:8765"), "browser contacted forbidden port 8765");
+    console.log("network: no requests to 8765");
+  } finally {
+    await rm(scratch, { recursive: true, force: true });
+  }
 }
