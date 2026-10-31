@@ -108,10 +108,10 @@ export type Token = {
   range: Range;
   style: HighlightStyle | null;
 };
-export function extract(root: Node): Token[] {
+export function extract(root: Node, accept = (_node: Node) => true): Token[] {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode: (node) =>
-      excluded(node.parentElement)
+      !accept(node) || excluded(node.parentElement)
         ? NodeFilter.FILTER_REJECT
         : NodeFilter.FILTER_ACCEPT,
   });
