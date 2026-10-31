@@ -1,6 +1,6 @@
 {
   "chrome": "Chrome/156.0.8078.47",
-  "fixture": "*.localhost:54519",
+  "fixture": "*.localhost:55279",
   "t31": {
     "denyListed": {
       "remembered": true,

@@ -2,7 +2,7 @@
 
 Checked 2026-10-31 with Chrome for Testing 156.0.8078.47 and the isolated AnkiConnect instance at **127.0.0.1:8766**. No Anki writes were needed or performed.
 
-`npm run build && npm test` passes (14 files, 120 tests). `npm run check:anki` passes: gateway status `ok`, read-only deck/type listing, and classification of a closed temporary port as `unreachable`. `npm run check:scope` passes against the built extension; machine-readable results and screenshots are in [site-scope-evidence](site-scope-evidence/).
+`npm run build && npm test` passes (16 files, 127 tests). `npm run check:anki` passes: gateway status `ok`, read-only deck/type listing, and classification of a closed temporary port as `unreachable`. `npm run check:scope` passes against the built extension; machine-readable results and screenshots are in [site-scope-evidence](site-scope-evidence/).
 
 ## Behavior checked
 
@@ -23,3 +23,7 @@ The native Chrome Allow/Deny permission bubble was **not automated**. The harnes
 Real Gmail, Outlook, and messaging accounts were not opened. The deny-list behavior uses a local fixture added through the real editor; unit tests separately verify built-in Gmail and password-vault host matching. Installation prompt wording was not observed in native Chrome UI; the manifest/grants and the visible all-sites warning in Settings were checked. Protected Chrome pages and file URLs are outside automatic HTTP(S) reading scope. Native prompt acceptance/denial, a real toolbar-click permission request, and browser-restart persistence still need a human check.
 
 Chrome's permission API requires requests to originate in a user gesture; see the [official permissions reference](https://developer.chrome.com/docs/extensions/reference/api/permissions). The toolbar starts the request before awaiting content injection, and Settings requests access directly from its grant button.
+
+## Toolbar gesture review fix
+
+After rebasing onto the merged lemma-candidate work, the toolbar now uses a module-level site-scope cache initialized at worker start and updated synchronously by storage events. In remembered mode `chrome.permissions.request` is called synchronously inside the toolbar listener before any storage read or injection; the manual injection call is unchanged. A delayed startup snapshot cannot overwrite a newer storage event. Direct listener regression tests assert the permission call before yielding, verify mode changes, and cover that startup race; these complement the unchanged native-prompt limitations above.

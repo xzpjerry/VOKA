@@ -7,12 +7,22 @@ import { pageStates } from "./reading";
 import { previewImport, executeImport, importTarget } from "./import";
 import { checkConnection, rpc, GatewayError } from "./gateway";
 import { settings } from "../shared";
-import { httpHost } from "../site-scope";
+import { httpHost, isSiteScope, type SiteScope } from "../site-scope";
 import {
   rememberSite,
   scheduleSiteSync,
   shouldAutoRun,
 } from "./sites";
+// Permission requests must remain synchronous with the toolbar user gesture.
+// Warm this cache on every worker start; storage events keep it current without
+// requiring a storage read in the click handler.
+let toolbarSiteScope: SiteScope = "activeTab";
+let scopeRevision = 0;
+void chrome.storage.local.get({ siteScope: "activeTab" }).then((value) => {
+  // An intervening storage event is newer than this startup snapshot.
+  if (scopeRevision === 0)
+    toolbarSiteScope = isSiteScope(value.siteScope) ? value.siteScope : "activeTab";
+}).catch((error) => console.error("VOKA site-scope cache failed", error));
 let importBusy = false;
 let importController: AbortController | undefined;
 let contextQueue = Promise.resolve();
@@ -207,11 +217,10 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
 });
 chrome.action.onClicked.addListener(async (tab) => {
   if (!tab.id) return;
-  const config = await settings();
   const host = httpHost(tab.url);
   // Start the optional permission request before awaiting injection. A denied
   // site can still be remembered; its deny-list entry only prevents auto-run.
-  const remembering = config.siteScope === "remembered" && host
+  const remembering = toolbarSiteScope === "remembered" && host
     ? rememberSite(host)
     : Promise.resolve(false);
   try {
@@ -229,6 +238,11 @@ chrome.action.onClicked.addListener(async (tab) => {
 let glossUpdate = Promise.resolve();
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return;
+  if (changes.siteScope) {
+    ++scopeRevision;
+    toolbarSiteScope = isSiteScope(changes.siteScope.newValue)
+      ? changes.siteScope.newValue : "activeTab";
+  }
   if (
     changes.siteScope ||
     changes.denyList ||
