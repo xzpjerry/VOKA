@@ -127,6 +127,13 @@ for (const item of notes.items) {
     rendered.push({ key: note.fields.Key, glossNative: entry.GlossNative, cardId });
   }
 }
+const beforeRepeat = await call("notes.getMany", { ids });
+const methodOffset = methods.length;
+const repeated = await executeImport(call, target, "native", "zh", entries);
+assert.deepEqual(repeated.confirmed, []);
+assert.equal(repeated.total, 0);
+assert(!methods.slice(methodOffset).some((method) => /create|update|validate/.test(method)));
+assert.deepEqual(await call("notes.getMany", { ids }), beforeRepeat);
 } finally {
   await browser.close();
 }

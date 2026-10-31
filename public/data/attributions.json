@@ -190,8 +190,8 @@
           "lemmas": 34199
         },
         "gpt-6-luna (effort max)": {
-          "batches": 4,
-          "lemmas": 400
+          "batches": 24,
+          "lemmas": 2399
         }
       },
       "prompt": "tools/gloss/prompt.txt",
@@ -199,11 +199,11 @@
       "attribution": "VOKA-generated Simplified Chinese native glosses derived from Open English WordNet 2025 (CC BY 4.0; includes Princeton WordNet material). Generated with model(s) deepseek/deepseek-flash, gpt-6-luna (effort max) through Codex/OpenCode CLI on 2026-10-31; prompt SHA-256 56cf4d1e5d64dc904dc4aab3ee42784a55da63cd365ec9581e22629ee0749a9b. Modifications: generated per single-word OEWN lemma, grouped by OEWN POS, at most three senses per POS and at most ten Han characters per sense. Chinese text is VOKA's own; no ECDICT or Wiktionary data is included.",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
       "complete": false,
-      "entryCount": 34599,
+      "entryCount": 36598,
       "sourceLemmaCount": 74441,
-      "missingCount": 39842,
-      "rawBytes": 1792918,
-      "gzipBytes": 541643
+      "missingCount": 37843,
+      "rawBytes": 1852653,
+      "gzipBytes": 562987
     }
   ],
   "notices": {

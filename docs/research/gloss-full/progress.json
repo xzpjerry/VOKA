@@ -1,25 +1,35 @@
 {
   "status": "partial",
-  "generatedAt": "2026-10-31T13:46:28.093152+00:00",
+  "generatedAt": "2026-10-31T13:50:58.592311+00:00",
   "models": [
     "deepseek/deepseek-flash",
     "gpt-6-luna"
   ],
   "batchSize": 100,
   "batchesTotal": 745,
-  "batchesCached": 346,
-  "batchesRemaining": 399,
+  "batchesCached": 366,
+  "batchesRemaining": 379,
   "lemmasTotal": 74441,
-  "lemmasDone": 34599,
-  "lemmasMissing": 39842,
+  "lemmasDone": 36598,
+  "lemmasMissing": 37843,
   "byConfiguration": {
     "deepseek/deepseek-flash": {
       "batches": 342,
       "lemmas": 34199
     },
     "gpt-6-luna (effort max)": {
-      "batches": 4,
-      "lemmas": 400
+      "batches": 24,
+      "lemmas": 2399
+    }
+  },
+  "timingByConfiguration": {
+    "deepseek/deepseek-flash": {
+      "callSeconds": 14482.881,
+      "elapsedEnvelopeSeconds": 2042.925
+    },
+    "gpt-6-luna (effort max)": {
+      "callSeconds": 1201.668,
+      "elapsedEnvelopeSeconds": 313.086
     }
   },
   "byModel": {
@@ -28,8 +38,8 @@
       "lemmas": 34199
     },
     "gpt-6-luna": {
-      "batches": 4,
-      "lemmas": 400
+      "batches": 24,
+      "lemmas": 2399
     }
   },
   "resumeCommand": "python3 tools/gloss/generate.py --model gpt-6-luna --effort max --timeout 1800 --workers 4 --batch-size 100",

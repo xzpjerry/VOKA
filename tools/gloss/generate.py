@@ -258,6 +258,13 @@ def run_cli(request: str, model: str, cwd: str, timeout: int, effort: str = "low
         answer, error_events = opencode_answer(stdout)
     else:
         answer, error_events = "", []
+        for line in stdout.splitlines():
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if event.get("type") in {"error", "turn.failed"}:
+                error_events.append(json.dumps(event, ensure_ascii=False)[:2000])
         if answer_path and Path(answer_path).exists():
             answer = Path(answer_path).read_text()
             Path(answer_path).unlink(missing_ok=True)
@@ -429,6 +436,10 @@ def collect_round(
         for word in batch:
             result = valid_result_for(record, word)
             errors = validate(word, result)
+            if record.get("transport_error"):
+                errors = ["transport error: " + record["transport_error"]]
+            elif record.get("parse_error"):
+                errors = ["parse error: " + record["parse_error"]]
             if errors:
                 if not record.get("parse_error") and not record.get("transport_error"):
                     format_invalid += 1
@@ -585,11 +596,14 @@ def write_progress(
 ) -> None:
     """Exact resume state, including which model produced each cached batch."""
     records = []
-    for path in BATCHES.glob("r0-*.json"):
+    timing_records = []
+    for path in BATCHES.glob("r*-*.json"):
         try:
             record = json.loads(path.read_text())
             if not record.get("transport_error"):
-                records.append(record)
+                timing_records.append(record)
+                if record.get("round") == 0:
+                    records.append(record)
         except (json.JSONDecodeError, OSError):
             continue
     by_configuration: dict[str, dict] = {}
@@ -607,6 +621,22 @@ def write_progress(
     for lemma in entries:
         model = sources.get(lemma, {}).get("model", "unknown")
         by_model_lemmas[model] = by_model_lemmas.get(model, 0) + 1
+    timings = {}
+    for record in timing_records:
+        label = provenance(record)
+        try:
+            end = datetime.datetime.fromisoformat(record["started_at"]).timestamp()
+        except (KeyError, ValueError):
+            continue
+        seconds = float(record.get("seconds") or 0)
+        timing = timings.setdefault(label, {"first": end - seconds, "last": end, "callSeconds": 0})
+        timing["first"] = min(timing["first"], end - seconds)
+        timing["last"] = max(timing["last"], end)
+        timing["callSeconds"] += seconds
+    timing_summary = {label: {
+        "callSeconds": round(value["callSeconds"], 3),
+        "elapsedEnvelopeSeconds": round(value["last"] - value["first"], 3),
+    } for label, value in timings.items()}
     models = sorted(set(by_model_batches) | set(by_model_lemmas))
     total_batches = (len(words) + batch_size - 1) // batch_size
     progress = {
@@ -621,6 +651,7 @@ def write_progress(
         "lemmasDone": len(entries),
         "lemmasMissing": len(missing),
         "byConfiguration": by_configuration,
+        "timingByConfiguration": timing_summary,
         "byModel": {
             model: {
                 "batches": by_model_batches.get(model, 0),
@@ -731,11 +762,17 @@ def assemble(
         "sourceLemmaCount": len(words),
         "entryCount": len(entries),
         "missingCount": len(missing),
-        "formatInvalidAfterRetries": rounds[-1].get("formatInvalidWords", 0) if rounds else 0,
-        "unprocessedCount": rounds[-1].get("unprocessedWords", 0) if rounds else len(missing),
+        "formatInvalidAfterRetries": sum(
+            reasons != ["batch result missing"] and not any(reason.startswith(("parse error:", "transport error:")) for reason in reasons)
+            for reasons in failures.values()
+        ),
+        "unprocessedCount": len(words) - processed,
         "processedCount": processed,
         "formatValidRate": round(len(entries) / processed * 100, 4) if processed else 0,
-        "formatViolationRateAfterRetries": round((rounds[-1].get("formatInvalidWords", 0) if rounds else 0) / processed * 100, 4) if processed else 0,
+        "formatViolationRateAfterRetries": round(sum(
+            reasons != ["batch result missing"] and not any(reason.startswith(("parse error:", "transport error:")) for reason in reasons)
+            for reasons in failures.values()
+        ) / processed * 100, 4) if processed else 0,
         "coveragePercent": round(len(entries) / len(words) * 100, 4) if words else 0,
         "missingLemmas": missing,
         "generationSeconds": round(
@@ -746,6 +783,7 @@ def assemble(
         "batchesTotal": progress["batchesTotal"],
         "byModel": progress["byModel"],
         "byConfiguration": progress["byConfiguration"],
+        "timingByConfiguration": progress["timingByConfiguration"],
         "rounds": rounds,
         "byLevel": {
             level: {
@@ -765,6 +803,36 @@ def assemble(
     dump(RESEARCH / "stats.json", stats)
     dump(RESEARCH / "failures.json", {lemma: failures.get(lemma, ["not processed"]) for lemma in missing})
     write_spot_check(words, valid)
+    report = [
+        "# Native gloss generation report (#30)", "",
+        f"Generated {len(entries):,} / {len(words):,} OEWN lemmas; {len(missing):,} missing. "
+        f"Pack complete: {not missing}. Data version: {DATA_VERSION}.", "",
+        f"Pack size: {len(raw):,} bytes raw / {gzip_size:,} bytes gzip.", "",
+        f"Processed-word format-valid rate: {stats['formatValidRate']:.4f}%; "
+        f"remaining format violations: {stats['formatInvalidAfterRetries']:,} "
+        f"({stats['formatViolationRateAfterRetries']:.4f}%). "
+        f"Unprocessed words: {stats['unprocessedCount']:,}; "
+        "coverage and format compliance are separate measures.", "",
+        "| Model / effort | Round-0 batches | Valid lemmas |", "|---|---:|---:|",
+    ]
+    for configuration, counts in progress["byConfiguration"].items():
+        report.append(f"| {configuration} | {counts['batches']} | {counts['lemmas']} |")
+    report += ["", "Timing from cached requests (parallel call durations overlap):", ""]
+    for configuration, timing in progress["timingByConfiguration"].items():
+        report.append(f"- {configuration}: {timing['callSeconds']:,.3f} cumulative call seconds; "
+                      f"{timing['elapsedEnvelopeSeconds']:,.3f} elapsed seconds from first to last cached result.")
+    report += ["", f"This assembly invocation took {wall_seconds:.3f} seconds. "
+               "Elapsed envelopes include pauses between calls and exclude failed attempts that produced no cache record.", "",
+               "The unchanged pilot prompt and validator require exact POS coverage, one to three distinct "
+               "senses per POS, and one to ten Han characters per sense. Two retry rounds are allowed; "
+               "an assemble-only snapshot does not generate retries.", "",
+               "See [stats.json](stats.json) for per-round/per-level counts, "
+               "[failures.json](failures.json) for every missing lemma and its last known reason, "
+               "and [progress.json](progress.json) for the exact resume command. "
+               "[spot-check.csv](spot-check.csv) contains 30 seeded random generated entries per CEFR level "
+               "plus 30 unleveled entries, with OEWN grounding alongside the Chinese glosses. "
+               "This is a human-review sample, not a claim that full-corpus semantic quality has been reviewed.", ""]
+    (RESEARCH / "generation-report.md").write_text("\n".join(report))
     print(json.dumps(stats["byLevel"], ensure_ascii=False), flush=True)
 
 
@@ -826,6 +894,10 @@ def main() -> None:
         parser.error("workers must be 1..32")
     if not 1 <= args.batch_size <= 200:
         parser.error("batch size must be 1..200")
+    if not 0 <= args.retries <= 2:
+        parser.error("format retries must be 0..2")
+    if args.max_attempts < 1 or args.timeout < 1 or args.backoff < 0:
+        parser.error("max-attempts and timeout must be positive; backoff must be nonnegative")
     if not args.model.strip():
         parser.error("model must not be empty")
 
@@ -862,6 +934,7 @@ def main() -> None:
     sources: dict[str, dict] = {}
     rounds: list[dict] = []
     invalid: dict[str, list[str]] = {}
+    failure_reasons: dict[str, list[str]] = {}
     pending = words
     if args.limit_batches:
         pending = words[: args.limit_batches * args.batch_size]
@@ -883,6 +956,11 @@ def main() -> None:
                     args.backoff,
                     args.effort,
                 )
+                for lemma, reasons in invalid.items():
+                    if reasons != ["batch result missing"] or lemma not in failure_reasons:
+                        failure_reasons[lemma] = reasons
+                for lemma in found:
+                    failure_reasons.pop(lemma, None)
                 valid.update(found)
                 sources.update(found_sources)
                 rounds.append(stats)
@@ -900,6 +978,11 @@ def main() -> None:
                 round_no,
                 [pending[i : i + args.batch_size] for i in range(0, len(pending), args.batch_size)],
             )
+            for lemma, reasons in invalid.items():
+                if reasons != ["batch result missing"] or lemma not in failure_reasons:
+                    failure_reasons[lemma] = reasons
+            for lemma in found:
+                failure_reasons.pop(lemma, None)
             valid.update(found)
             sources.update(found_sources)
             rounds.append(stats)
@@ -923,7 +1006,7 @@ def main() -> None:
         started_at,
         time.monotonic() - started,
         args.batch_size,
-        invalid,
+        failure_reasons,
     )
 
 

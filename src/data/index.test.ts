@@ -74,10 +74,10 @@ describe("production offline data", () => {
     );
     expect(found.length).toBeGreaterThan(0);
     expect(found.some((entry) => entry.GlossNative !== "")).toBe(true);
-    for (const poses of Object.values(native.entries) as Record<
-      string,
-      string[]
-    >[]) {
+    for (const [lemma, poses] of Object.entries(native.entries) as [string, Record<string, string[]>][]) {
+      expect(Object.keys(poses).sort()).toEqual(
+        [...new Set(Object.keys(packs[2].entries[lemma]).map((pos) => pos.split("-")[0]))].sort(),
+      );
       expect(Object.keys(poses).length).toBeGreaterThan(0);
       for (const senses of Object.values(poses)) {
         expect(senses.length).toBeGreaterThanOrEqual(1);
