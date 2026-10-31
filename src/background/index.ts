@@ -3,10 +3,11 @@ import { normalizeKey } from "../key";
 import { cardContext } from "./contexts";
 import { updateGlossCss } from "./gloss";
 import { pageStates } from "./reading";
-import { previewImport, executeImport } from "./import";
+import { previewImport, executeImport, importTarget } from "./import";
 import { checkConnection, rpc, GatewayError } from "./gateway";
 import { settings } from "../shared";
 let importBusy = false;
+let importController: AbortController | undefined;
 let contextQueue = Promise.resolve();
 async function notifyDisconnected() {
   for (const tab of await chrome.tabs.query({})) {
@@ -120,14 +121,24 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       () => reply({ error: "unreachable" }),
     );
   } else if (
-    ["preview-import", "execute-import"].includes(message?.type) &&
+    ["preview-import", "execute-import", "cancel-import"].includes(
+      message?.type,
+    ) &&
     sender.url?.split("?")[0] === chrome.runtime.getURL("options.html")
   ) {
+    if (message.type === "cancel-import") {
+      importController?.abort();
+      reply({ data: { cancelling: !!importController } });
+      return true;
+    }
     if (importBusy) {
       reply({ error: "导入正在进行，请等待完成。" });
       return;
     }
     importBusy = true;
+    const controller =
+      message.type === "execute-import" ? new AbortController() : undefined;
+    if (controller) importController = controller;
     (async () => {
       const config = await settings();
       const status = await checked(config);
@@ -137,18 +148,24 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       const level = LEVELS.includes(message.level)
         ? message.level
         : config.targetLevel;
-      const target = {
-        noteType: "VOKA Vocabulary · English",
-        deck: `VOKA::English::${level}`,
-      };
-      return message.type === "preview-import"
-        ? previewImport(call, target)
-        : executeImport(
-            call,
-            target,
-            config.glossLanguage,
-            config.nativeLanguage,
-          );
+      const target = importTarget(level, config.testImportTarget);
+      if (message.type === "preview-import")
+        return previewImport(call, target);
+      return executeImport(
+        call,
+        target,
+        config.glossLanguage,
+        config.nativeLanguage,
+        undefined,
+        {
+          signal: controller!.signal,
+          onProgress: (data) => {
+            void chrome.runtime
+              .sendMessage({ type: "import-progress", data })
+              .catch(() => {});
+          },
+        },
+      );
     })()
       .then(
         (data) => reply({ data }),
@@ -156,6 +173,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       )
       .finally(() => {
         importBusy = false;
+        if (importController === controller) importController = undefined;
       });
   } else return;
   return true;

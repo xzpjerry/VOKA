@@ -8,6 +8,8 @@
     "test": "vitest run",
     "check:anki": "tsx scripts/check-anki.ts",
     "check:import": "tsx scripts/check-import.ts",
+    "check:level-import": "tsx scripts/check-level-import.ts",
+    "cleanup:level-import": "tsx scripts/cleanup-level-import.ts",
     "check:highlight": "tsx scripts/check-highlight.ts",
     "check:manual": "tsx scripts/check-manual.ts",
     "check:dynamic": "tsx scripts/check-dynamic.ts",

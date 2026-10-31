@@ -232,6 +232,13 @@ it("a repeated import does not write or validate existing notes", async () => {
   ).toEqual({
     confirmed: [],
     failures: [],
+    conflicts: [],
+    cancelled: false,
+    interrupted: false,
+    total: 0,
+    processed: 0,
+    created: 0,
+    remaining: 0,
   });
 });
 it("bounds production-size searches and writes to v1 batch limits", async () => {
@@ -331,4 +338,259 @@ it("selected level controls preview, deck and note tags", async () => {
   )![1].notes[0];
   expect(created.deck.name).toBe("VOKA::English::A2");
   expect(created.tags).toEqual(["voka", "voka::level::A2"]);
+});
+/** In-memory v1 collection with real Key read-back semantics. */
+function batchGateway() {
+  const notesByKey = new Map<string, { id: string; key: string }[]>();
+  const idToKey = new Map<string, string>();
+  const calls: { method: string; size?: number }[] = [];
+  let nextId = 1;
+  let createCalls = 0;
+  let failCreateCall: number | undefined;
+  const call = vi.fn(async (method: string, params: any = {}) => {
+    calls.push({ method, size: params.notes?.length });
+    if (method === "noteTypes.list")
+      return [{ name: "VOKA Vocabulary · English" }];
+    if (method === "decks.list") return [{ name: "VOKA::English::B1" }];
+    if (method === "noteTypes.get")
+      return { fields: CORE_FIELDS.map((name) => ({ name })) };
+    if (method === "notes.search") {
+      const keys = [...String(params.query).matchAll(/Key:([^"\s)]+)/g)].map(
+        (match) => match[1],
+      );
+      return {
+        ids: keys.flatMap((key) =>
+          (notesByKey.get(key) ?? []).map((note) => note.id),
+        ),
+        nextCursor: null,
+      };
+    }
+    if (method === "notes.getMany")
+      return {
+        items: params.ids.map((id: string, index: number) => ({
+          index,
+          result: { id, fields: { Key: idToKey.get(id) } },
+        })),
+      };
+    if (method === "notes.validateMany")
+      return {
+        items: params.notes.map((_: unknown, index: number) => ({
+          index,
+          result: { valid: true, issues: [] },
+        })),
+      };
+    if (method === "notes.createMany") {
+      createCalls++;
+      if (createCalls === failCreateCall)
+        throw new GatewayError("unreachable", "unknown");
+      return {
+        items: params.notes.map((note: any, index: number) => {
+          const id = String(nextId++),
+            key = note.fields.Key;
+          idToKey.set(id, key);
+          notesByKey.set(key, [...(notesByKey.get(key) ?? []), { id, key }]);
+          return { index, result: { noteId: id, cardIds: [id] } };
+        }),
+      };
+    }
+    throw new Error(method);
+  });
+  return {
+    call,
+    calls,
+    notesByKey,
+    get createCalls() {
+      return createCalls;
+    },
+    failCreateOn(callNumber: number) {
+      failCreateCall = callNumber;
+    },
+  };
+}
+const batchEntries = (count: number) =>
+  Array.from({ length: count }, (_, i) => ({
+    ...testPack.entries[0],
+    lemma: `batch${i}`,
+  }));
+it("runs 200-note batches as validate → create → read back before the next batch", async () => {
+  const entries = batchEntries(250);
+  const gateway = batchGateway();
+  const progress: any[] = [];
+  const result = await executeImport(
+    gateway.call,
+    undefined,
+    "native",
+    "zh",
+    entries,
+    { onProgress: (p) => progress.push(p) },
+  );
+  expect(result).toMatchObject({
+    confirmed: entries.map((e) => "en:" + e.lemma),
+    failures: [],
+    cancelled: false,
+    interrupted: false,
+    total: 250,
+    processed: 250,
+    created: 250,
+    remaining: 0,
+  });
+  expect(
+    gateway.call.mock.calls
+      .filter(([m]) => m === "notes.validateMany")
+      .map(([, p]) => p.notes.length),
+  ).toEqual([100, 100, 50]);
+  const methods = gateway.calls.map((c) => c.method);
+  const firstCreate = methods.indexOf("notes.createMany");
+  const readback = methods.indexOf("notes.search", firstCreate);
+  const secondBatchValidate = methods.indexOf(
+    "notes.validateMany",
+    firstCreate,
+  );
+  expect(readback).toBeGreaterThan(firstCreate);
+  expect(secondBatchValidate).toBeGreaterThan(readback);
+  expect(
+    progress.filter((p) => p.phase === "batch-done").map((p) => p.batch),
+  ).toEqual([1, 2]);
+  expect(progress.at(-1)).toMatchObject({
+    phase: "done",
+    total: 250,
+    processed: 250,
+    created: 250,
+    remaining: 0,
+  });
+});
+it("cancels between batches, keeps written notes, and resumes only the remainder", async () => {
+  const entries = batchEntries(250);
+  const gateway = batchGateway();
+  const controller = new AbortController();
+  const progress: any[] = [];
+  const first = await executeImport(
+    gateway.call,
+    undefined,
+    "native",
+    "zh",
+    entries,
+    {
+      signal: controller.signal,
+      onProgress: (p) => {
+        progress.push(p);
+        if (p.phase === "batch-done" && p.batch === 1) controller.abort();
+      },
+    },
+  );
+  expect(first).toMatchObject({
+    cancelled: true,
+    interrupted: false,
+    created: 200,
+    processed: 200,
+    total: 250,
+    remaining: 50,
+  });
+  expect(progress.at(-1)?.phase).toBe("cancelled");
+  expect(
+    (await previewImport(gateway.call, undefined, entries)).counts,
+  ).toMatchObject({ new: 50, existing: 200, conflict: 0 });
+  const writes = gateway.createCalls;
+  const second = await executeImport(
+    gateway.call,
+    undefined,
+    "native",
+    "zh",
+    entries,
+  );
+  expect(second).toMatchObject({
+    cancelled: false,
+    interrupted: false,
+    created: 50,
+    total: 50,
+    remaining: 0,
+  });
+  expect(gateway.createCalls).toBe(writes + 1);
+  expect(
+    (await previewImport(gateway.call, undefined, entries)).counts,
+  ).toMatchObject({ new: 0, existing: 250 });
+});
+it("stops on a broken connection without resending and resumes only the remainder", async () => {
+  const entries = batchEntries(250);
+  const gateway = batchGateway();
+  gateway.failCreateOn(2);
+  const first = await executeImport(
+    gateway.call,
+    undefined,
+    "native",
+    "zh",
+    entries,
+  );
+  expect(first).toMatchObject({
+    cancelled: false,
+    interrupted: true,
+    total: 250,
+    processed: 200,
+    created: 100,
+    remaining: 150,
+  });
+  expect(first.confirmed).toHaveLength(100);
+  expect(first.failures).toHaveLength(100);
+  gateway.failCreateOn(0);
+  expect(
+    (await previewImport(gateway.call, undefined, entries)).counts,
+  ).toMatchObject({ new: 150, existing: 100 });
+  const second = await executeImport(
+    gateway.call,
+    undefined,
+    "native",
+    "zh",
+    entries,
+  );
+  expect(second).toMatchObject({
+    cancelled: false,
+    interrupted: false,
+    created: 150,
+    total: 150,
+    remaining: 0,
+  });
+  expect(
+    (await previewImport(gateway.call, undefined, entries)).counts,
+  ).toMatchObject({ new: 0, existing: 250 });
+});
+it("lists conflicts and never writes their Keys", async () => {
+  const base = gateway(true);
+  const call = vi.fn(
+    async (method: string, params: any = {}): Promise<any> => {
+      if (["noteTypes.create", "decks.create"].includes(method)) return {};
+      return base(method, params);
+    },
+  );
+  const result = await executeImport(
+    call,
+    undefined,
+    undefined,
+    undefined,
+    testPack.entries,
+  );
+  expect(result.conflicts).toEqual(["en:advice"]);
+  for (const [, params] of call.mock.calls.filter(
+    ([method]) => method === "notes.createMany",
+  ))
+    expect(
+      params.notes.map((note: any) => note.fields.Key),
+    ).not.toContain("en:advice");
+});
+it("never calls scheduling, card moves, structure edits, or deletes", async () => {
+  const entries = batchEntries(205);
+  const gateway = batchGateway();
+  await executeImport(
+    gateway.call,
+    undefined,
+    "native",
+    "zh",
+    entries,
+  );
+  const forbidden = gateway.calls.filter(
+    ({ method }) =>
+      /^(scheduling\.|cards\.(move|delete)|notes\.delete|decks\.delete|noteTypes\.(delete|editStructure))/.test(
+        method,
+      ),
+  );
+  expect(forbidden).toEqual([]);
 });
