@@ -1,4 +1,10 @@
 import type { Settings, Status } from "./background/gateway";
+import {
+  DEFAULT_DENY_SITES,
+  isSiteScope,
+  normalizeHostEntry,
+  type SiteScope,
+} from "./site-scope";
 export const t = (key: string) => chrome.i18n.getMessage(key);
 import { levels, type ReadingSettings } from "./reading";
 /** Test-only override so full-level acceptance can use throwaway Anki names. */
@@ -15,9 +21,13 @@ function testImportTarget(value: unknown): TestImportTarget | undefined {
     return undefined;
   return { noteType, deckPrefix };
 }
+export type SiteSettings = {
+  siteScope: SiteScope;
+  denyList: string[];
+  rememberedSites: string[];
+};
 export async function settings(): Promise<
-  Settings &
-    ReadingSettings & { storeFullUrl: boolean; testImportTarget?: TestImportTarget }
+  Settings & ReadingSettings & SiteSettings & { storeFullUrl: boolean; testImportTarget?: TestImportTarget }
 > {
   const value = await chrome.storage.local.get({
     port: 8765,
@@ -29,6 +39,9 @@ export async function settings(): Promise<
     hoverScope: "highlighted",
     storeFullUrl: false,
     testImportTarget: null,
+    siteScope: "activeTab",
+    denyList: [...DEFAULT_DENY_SITES],
+    rememberedSites: [],
   });
   return {
     port:
@@ -53,6 +66,27 @@ export async function settings(): Promise<
       const target = testImportTarget(value.testImportTarget);
       return target ? { testImportTarget: target } : {};
     })(),
+    siteScope: isSiteScope(value.siteScope) ? value.siteScope : "activeTab",
+    denyList: Array.isArray(value.denyList)
+      ? [
+          ...new Set(
+            value.denyList
+              .filter((entry: unknown): entry is string => typeof entry === "string")
+              .map(normalizeHostEntry)
+              .filter((entry: string | undefined): entry is string => !!entry),
+          ),
+        ]
+      : [...DEFAULT_DENY_SITES],
+    rememberedSites: Array.isArray(value.rememberedSites)
+      ? [
+          ...new Set(
+            value.rememberedSites
+              .filter((entry: unknown): entry is string => typeof entry === "string")
+              .map(normalizeHostEntry)
+              .filter((entry: string | undefined): entry is string => !!entry),
+          ),
+        ]
+      : [],
   };
 }
 export const check = (): Promise<Status> =>

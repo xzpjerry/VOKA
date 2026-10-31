@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit && vite build && vite build --config vite.content.config.ts",
+    "build": "tsc --noEmit && vite build && vite build --config vite.content.config.ts && vite build --config vite.content.config.ts --mode auto",
     "test": "vitest run",
     "check:anki": "tsx scripts/check-anki.ts",
     "check:import": "tsx scripts/check-import.ts",
@@ -16,7 +16,8 @@
     "data:build": "python3 tools/data/build.py",
     "check:data": "tsx scripts/check-data.ts",
     "check:data:browser": "tsx scripts/check-data-browser.ts",
-    "check:contexts": "tsx scripts/check-contexts.ts"
+    "check:contexts": "tsx scripts/check-contexts.ts",
+    "check:scope": "tsx scripts/check-site-scope.ts"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.24",

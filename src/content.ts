@@ -10,7 +10,25 @@ import {
   type ReadingSettings,
   type HighlightStyle,
 } from "./reading";
-(() => {
+declare const __VOKA_AUTO_RUN__: boolean;
+async function autoRunAllowed(): Promise<boolean> {
+  if (!__VOKA_AUTO_RUN__) return true;
+  try {
+    const response = await chrome.runtime.sendMessage({
+      type: "should-auto-run",
+      url: location.href,
+    });
+    return response?.run === true;
+  } catch {
+    return false;
+  }
+}
+void (async () => {
+  if (__VOKA_AUTO_RUN__) {
+    if (await autoRunAllowed()) start();
+  } else start();
+})();
+function start() {
   if (document.getElementById("voka-drawer")) {
     document.dispatchEvent(new Event("voka-refresh"));
     return;
@@ -317,4 +335,4 @@ import {
   root.append(style, drawer);
   document.documentElement.append(host);
   void refresh();
-})();
+}
