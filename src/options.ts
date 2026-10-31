@@ -99,3 +99,47 @@ for (const select of [nativeLanguage, glossLanguage])
       glossLanguage: glossLanguage.value,
     });
   });
+// Render source metadata and complete upstream notices without interpreting data as HTML.
+async function showAttributions() {
+  const section = document.createElement("section");
+  const heading = document.createElement("h2");
+  heading.textContent = t("aboutTitle");
+  section.append(heading);
+  document.querySelector("main")!.append(section);
+  try {
+    const response = await fetch(
+      chrome.runtime.getURL("data/attributions.json"),
+    );
+    if (!response.ok) throw new Error(String(response.status));
+    const metadata = await response.json();
+    for (const pack of metadata.packs) {
+      const details = document.createElement("details");
+      const summary = document.createElement("summary");
+      summary.textContent = `${pack.source[0].split("/").pop()} · ${pack.license} · ${pack.version}`;
+      const text = document.createElement("p");
+      text.textContent = `${pack.attribution} ${pack.dataVersion} · ${pack.generatedDate} · ${pack.entryCount}`;
+      const link = document.createElement("a");
+      link.href = pack.licenseUrl;
+      link.textContent = pack.license;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      details.append(summary, text, link);
+      section.append(details);
+    }
+    for (const [name, notice] of Object.entries(metadata.notices)) {
+      const details = document.createElement("details");
+      const summary = document.createElement("summary");
+      summary.textContent = name;
+      const text = document.createElement("pre");
+      text.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere";
+      text.textContent = String(notice);
+      details.append(summary, text);
+      section.append(details);
+    }
+  } catch {
+    const error = document.createElement("p");
+    error.textContent = t("dataLoadError");
+    section.append(error);
+  }
+}
+void showAttributions();

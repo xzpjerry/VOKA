@@ -1,3 +1,5 @@
+import { loadData } from "../data";
+import { normalizeKey } from "../key";
 import { updateGlossCss } from "./gloss";
 import { pageStates } from "./reading";
 import { previewImport, executeImport } from "./import";
@@ -33,11 +35,37 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       .then(checked)
       .then(reply, () => reply("unreachable"));
   } else if (
+    message?.type === "recognize-words" &&
+    Array.isArray(message.words) &&
+    message.words.length <= 10000 &&
+    message.words.every(
+      (word: unknown) =>
+        typeof word === "string" &&
+        word.length <= 200 &&
+        /^[\p{L}\p{M}'’-]+$/u.test(word),
+    )
+  ) {
+    (async () => {
+      const config = await settings();
+      if ((await checked(config)) !== "ok") throw new Error("unreachable");
+      const data = await loadData();
+      return Object.fromEntries(
+        message.words.map((word: string) => {
+          const lemma = data.lemmaCandidates(word)[0] ?? word;
+          const entry = data.lookupEntry(lemma);
+          return [word, { key: normalizeKey(entry.lemma), entry }];
+        }),
+      );
+    })().then(
+      (data) => reply({ data }),
+      (error) => reply({ error: String(error) }),
+    );
+  } else if (
     message?.type === "page-states" &&
     Array.isArray(message.keys) &&
     message.keys.length <= 10000 &&
     message.keys.every(
-      (k: unknown) => typeof k === "string" && /^en:[\p{L}\p{M}'-]+$/u.test(k),
+      (k: unknown) => typeof k === "string" && /^en:[\p{L}\p{M}'.-]+$/u.test(k),
     )
   ) {
     (async () => {

@@ -1,9 +1,4 @@
 import { normalizeKey } from "./key";
-import {
-  testPack,
-  testInflections,
-  testReadingEntries,
-} from "./data/test-pack";
 export const levels = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 export type Level = (typeof levels)[number];
 export type ReadingSettings = {
@@ -53,22 +48,10 @@ export function highlightRule(
 export interface Lemmatizer {
   candidates(surface: string): string[];
 }
-export const fixtureLemmatizer: Lemmatizer = {
-  candidates(surface) {
-    const lower = normalizeKey(surface).slice(3);
-    return [lower, ...(testInflections[lower] ?? [])];
-  },
-};
-const entries = new Map(
-  [...testPack.entries, ...testReadingEntries].map((e) => [
-    normalizeKey(e.lemma),
-    e,
-  ]),
-);
 export function recognize(
   surface: string,
-  lemmatizer: Lemmatizer = fixtureLemmatizer,
-  lookupEntry = (key: string) => entries.get(key),
+  lemmatizer: Lemmatizer,
+  lookupEntry: (key: string) => Token["entry"] | undefined,
 ) {
   for (const lemma of lemmatizer.candidates(surface)) {
     const key = normalizeKey(lemma),
@@ -103,12 +86,17 @@ export type Token = {
     level: string;
     GlossNative: string;
     GlossTarget: string;
+    dictionaryStatus?: "found" | "missing";
   };
   recognized: boolean;
   range: Range;
   style: HighlightStyle | null;
 };
-export function extract(root: Node, accept = (_node: Node) => true): Token[] {
+export function extract(
+  root: Node,
+  recognizeWord: (surface: string) => ReturnType<typeof recognize> = () => null,
+  accept = (_node: Node) => true,
+): Token[] {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode: (node) =>
       !accept(node) || excluded(node.parentElement)
@@ -119,9 +107,13 @@ export function extract(root: Node, accept = (_node: Node) => true): Token[] {
   const tokens: Token[] = [];
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     for (const part of segmenter.segment(node.textContent ?? "")) {
-      if (!part.isWordLike || !/^[\p{L}\p{M}'’-]+$/u.test(part.segment))
+      if (
+        !part.isWordLike ||
+        part.segment.length > 200 ||
+        !/^[\p{L}\p{M}'’-]+$/u.test(part.segment)
+      )
         continue;
-      const match = recognize(part.segment);
+      const match = recognizeWord(part.segment);
       const word = match ?? {
         key: normalizeKey(part.segment),
         entry: {

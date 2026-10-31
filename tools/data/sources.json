@@ -1,0 +1,42 @@
+[
+  {
+    "name": "cefrj.zip",
+    "url": "https://www.cefr-j.org/data/CEFRJ_wordlist_ver1.6.zip",
+    "sha256": "c837d2c00ab8954ed8db48e79afd8ef37099570295fec36950dbf9322303a37a"
+  },
+  {
+    "name": "octanove.csv",
+    "url": "https://raw.githubusercontent.com/openlanguageprofiles/olp-en-cefrj/d4e45b75b38f27b30dfc5c44d8c571aec7e7092f/octanove-vocabulary-profile-c1c2-1.0.csv",
+    "sha256": "18c33a407f2f89f7b8de9671c6d45fe3ea0bce45e7d2d7dcaab48d73e0f7b380"
+  },
+  {
+    "name": "oewn-json.zip",
+    "url": "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025-json.zip",
+    "sha256": "7d749f6e2c39e6970e4997839dcf6e42fd281f3c2fae0171d2192bae8cfa4b51"
+  },
+  {
+    "name": "oewn-wndb.zip",
+    "url": "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025.zip",
+    "sha256": "73355e48f8117a24ca9ebc23ed75b35434e6cd21cc9dd3984e80aff5a5f63636"
+  },
+  {
+    "name": "cmudict.dict",
+    "url": "https://raw.githubusercontent.com/cmusphinx/cmudict/74790861f652b15e4ac49015a90074ad62a27690/cmudict.dict",
+    "sha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22"
+  },
+  {
+    "name": "cmu-LICENSE",
+    "url": "https://raw.githubusercontent.com/cmusphinx/cmudict/74790861f652b15e4ac49015a90074ad62a27690/LICENSE",
+    "sha256": "bd4ce8e44170a5f9f481310ca85c51de3c4f851a65e679b40e603b143bd3542a"
+  },
+  {
+    "name": "oewn-LICENSE",
+    "url": "https://raw.githubusercontent.com/globalwordnet/english-wordnet/dc343f2683279ecbb13fab4e2fd778d7b162d287/LICENSE.md",
+    "sha256": "672cc8b5663e8dc74c4b07a9dcf477193853575b119908fd3dc0aeeb60a9dbbb"
+  },
+  {
+    "name": "princeton-LICENSE",
+    "url": "https://raw.githubusercontent.com/globalwordnet/english-wordnet/dc343f2683279ecbb13fab4e2fd778d7b162d287/WNDB_License.txt",
+    "sha256": "df30ec18fbabcdaf031b79ea026d3e6b959010cffe6dd7be9ac137822175b904"
+  }
+]

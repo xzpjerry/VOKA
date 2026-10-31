@@ -24,7 +24,7 @@ export function matchesFilter(token: Token, filter: Filter) {
       ? token.style === "target" || token.style === "unknown"
       : filter === "learning"
         ? token.style === "learning"
-        : !token.entry.GlossNative && !token.entry.GlossTarget)
+        : token.entry.dictionaryStatus === "missing")
   );
 }
 export function createDrawer(
@@ -141,7 +141,7 @@ export function createDrawer(
       );
       detail.textContent = [
         token.entry.level,
-        !token.entry.GlossNative && !token.entry.GlossTarget
+        token.entry.dictionaryStatus === "missing"
           ? t("drawerFilter_missing")
           : "",
       ]

@@ -1,0 +1,30 @@
+{
+  "cefrj.json": {
+    "raw": 136873,
+    "gzip": 27088
+  },
+  "octanove.json": {
+    "raw": 43256,
+    "gzip": 9183
+  },
+  "oewn.json": {
+    "raw": 7591321,
+    "gzip": 2313593
+  },
+  "readings.json": {
+    "raw": 3483049,
+    "gzip": 839720
+  },
+  "oewn-readings.json": {
+    "raw": 380836,
+    "gzip": 112670
+  },
+  "morphology.json": {
+    "raw": 97724,
+    "gzip": 23883
+  },
+  "attributions.json": {
+    "raw": 29148,
+    "gzip": 8888
+  }
+}

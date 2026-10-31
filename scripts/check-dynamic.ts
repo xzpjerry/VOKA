@@ -40,7 +40,7 @@ try {
     chrome.storage.local.set({
       port: 8766,
       apiKey: "",
-      targetLevel: "B1",
+      targetLevel: "A2",
       showAdvanced: false,
     }),
   );

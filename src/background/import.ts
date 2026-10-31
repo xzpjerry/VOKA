@@ -1,5 +1,6 @@
 import { replaceGlossCss, type GlossLanguage } from "./gloss";
-import { testPack } from "../data/test-pack";
+import { loadData, DATA_VERSION, type Entry } from "../data";
+export type { Entry } from "../data";
 import { questionHtml, answerHtml, css } from "../data/template";
 export const CORE_FIELDS = [
   "Key",
@@ -23,7 +24,6 @@ export const DEFAULT_TARGET = {
   deck: "VOKA::English::B1",
 };
 export type Target = typeof DEFAULT_TARGET;
-export type Entry = (typeof testPack.entries)[number];
 export type Call = (
   method: string,
   params?: Record<string, unknown>,
@@ -40,17 +40,24 @@ export async function contentHash(content: string): Promise<string> {
     b.toString(16).padStart(2, "0"),
   ).join("");
 }
-export async function vokaMeta(entry: Entry) {
+export async function vokaMeta(entry: Entry, version = DATA_VERSION) {
   const hashes = Object.fromEntries(
     await Promise.all(
       ["GlossNative", "GlossTarget", "Reading"].map(async (field) => [
         field,
-        await contentHash(entry[field as keyof Entry]),
+        await contentHash(
+          entry[field as "GlossNative" | "GlossTarget" | "Reading"],
+        ),
       ]),
     ),
   );
-  return JSON.stringify({ schema: 1, data: testPack.version, hashes });
+  return JSON.stringify({ schema: 1, data: version, hashes });
 }
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 const quote = (value: string) =>
   '"' + value.replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"';
 async function verifyType(call: Call, target: Target) {
@@ -67,6 +74,18 @@ async function verifyType(call: Call, target: Target) {
 }
 /** Read every page and compare actual field values: Anki searches are case insensitive. */
 export async function lookup(call: Call, target: Target, keys: string[]) {
+  // Bound search expression size: thousands of OR clauses exceed Anki parser limits.
+  if (keys.length > 100) {
+    const result = new Map<string, string[]>();
+    for (let start = 0; start < keys.length; start += 100)
+      for (const [key, ids] of await lookup(
+        call,
+        target,
+        keys.slice(start, start + 100),
+      ))
+        result.set(key, ids);
+    return result;
+  }
   const matches = new Map(keys.map((key) => [key, [] as string[]]));
   let cursor: string | undefined;
   do {
@@ -76,7 +95,14 @@ export async function lookup(call: Call, target: Target, keys: string[]) {
       ...(cursor ? { cursor } : {}),
     });
     if (result.ids.length) {
-      const notes = await call("notes.getMany", { ids: result.ids });
+      const items = [];
+      for (let start = 0; start < result.ids.length; start += 100) {
+        const batch = await call("notes.getMany", {
+          ids: result.ids.slice(start, start + 100),
+        });
+        items.push(...batch.items);
+      }
+      const notes = { items };
       for (const item of notes.items) {
         if (item.error)
           throw new Error("无法回读笔记：" + JSON.stringify(item.error));
@@ -91,8 +117,17 @@ export async function lookup(call: Call, target: Target, keys: string[]) {
 export async function previewImport(
   call: Call,
   target = DEFAULT_TARGET,
-  entries = testPack.entries,
+  entries?: Entry[],
 ) {
+  const pack = entries
+    ? {
+        source: "Explicit fixture",
+        license: "fixture",
+        version: DATA_VERSION,
+        entries,
+      }
+    : (await loadData()).pack;
+  entries = pack.entries;
   const types = await call("noteTypes.list");
   const decks = await call("decks.list");
   const typeExists = types.some(
@@ -125,9 +160,9 @@ export async function previewImport(
     target,
     typeExists,
     deckExists,
-    source: testPack.source,
-    license: testPack.license,
-    version: testPack.version,
+    source: pack.source,
+    license: pack.license,
+    version: pack.version,
     rows,
     counts: {
       new: rows.filter((r) => r.state === "new").length,
@@ -145,9 +180,36 @@ export async function executeImport(
   target = DEFAULT_TARGET,
   mode: GlossLanguage = "native",
   nativeLanguage: "zh" | "en" = "zh",
+  entries?: Entry[],
 ) {
+  // The v1 runtime advertises maxBatchItems=100. Keep each request bounded.
+  const transport = call;
+  call = async (method, params = {}, write = false) => {
+    const notes = params.notes as unknown[] | undefined;
+    if (
+      !["notes.validateMany", "notes.createMany"].includes(method) ||
+      !notes ||
+      notes.length <= 100
+    )
+      return transport(method, params, write);
+    const items = [];
+    for (let start = 0; start < notes.length; start += 100) {
+      const result = await transport(
+        method,
+        { ...params, notes: notes.slice(start, start + 100) },
+        write,
+      );
+      items.push(
+        ...result.items.map((item: { index: number }) => ({
+          ...item,
+          index: item.index + start,
+        })),
+      );
+    }
+    return { items };
+  };
   // Fresh read prevents a stale preview from overwriting anything.
-  const preview = await previewImport(call, target);
+  const preview = await previewImport(call, target, entries);
   const failures: { key: string; reason: string }[] = [];
   const candidates = preview.rows.filter((r) => r.state === "new");
   if (!candidates.length) return { confirmed: [] as string[], failures };
@@ -159,12 +221,14 @@ export async function executeImport(
     try {
       await call(method, params, true);
     } catch (error) {
-      if (!(
-        error &&
-        typeof error === "object" &&
-        "outcome" in error &&
-        error.outcome === "unknown"
-      ))
+      if (
+        !(
+          error &&
+          typeof error === "object" &&
+          "outcome" in error &&
+          error.outcome === "unknown"
+        )
+      )
         throw error;
       if (!(await exists()))
         throw new Error("写入结果不确定；已回读，未重发。请稍后重新预览。");
@@ -200,13 +264,18 @@ export async function executeImport(
       fields: {
         ...Object.fromEntries(CORE_FIELDS.map((f) => [f, ""])),
         Key: key,
-        Word: entry.lemma,
-        Reading: entry.Reading,
-        GlossNative: nativeLanguage === "en" ? "" : entry.GlossNative,
-        GlossTarget: entry.GlossTarget,
+        Word: escapeHtml(entry.lemma),
+        Variants: escapeHtml(entry.Variants ?? ""),
+        Reading: escapeHtml(entry.Reading),
+        GlossNative:
+          nativeLanguage === "en" ? "" : escapeHtml(entry.GlossNative),
+        GlossTarget: escapeHtml(entry.GlossTarget),
         VokaMeta: await vokaMeta({
           ...entry,
-          GlossNative: nativeLanguage === "en" ? "" : entry.GlossNative,
+          Reading: escapeHtml(entry.Reading),
+          GlossNative:
+            nativeLanguage === "en" ? "" : escapeHtml(entry.GlossNative),
+          GlossTarget: escapeHtml(entry.GlossTarget),
         }),
       },
     })),

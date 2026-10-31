@@ -41,7 +41,7 @@ if (process.argv.includes("--existing-type"))
     },
     true,
   );
-const before = await previewImport(call, target);
+const before = await previewImport(call, target, testPack.entries);
 console.log(
   "target",
   target,
@@ -63,7 +63,7 @@ const priorIds = [...priorMatches.values()].flat();
 const priorNotes = priorIds.length
   ? await call("notes.getMany", { ids: priorIds })
   : null;
-const run = await executeImport(call, target);
+const run = await executeImport(call, target, undefined, undefined, testPack.entries);
 assert.deepEqual(run.failures, []);
 const importedDatabase = snapshot();
 assert.equal(importedDatabase.scm, priorDatabase.scm);
@@ -82,7 +82,7 @@ console.log(
   importedDatabase.scm,
   "all pre-existing card scheduling, notes, and review history preserved",
 );
-const after = await previewImport(call, target);
+const after = await previewImport(call, target, testPack.entries);
 assert.equal(after.counts.new, 0);
 assert.equal(after.counts.existing, 12);
 const type: any = await call("noteTypes.get", {
@@ -125,7 +125,7 @@ for (const item of notes.items) {
 const cardIds = notes.items.flatMap((i: any) => i.result.cardIds);
 const cards = await call("cards.getMany", { ids: cardIds });
 const databaseBefore = snapshot();
-const again = await executeImport(call, target);
+const again = await executeImport(call, target, undefined, undefined, testPack.entries);
 assert.equal(again.confirmed.length, 0);
 assert.deepEqual(again.failures, []);
 const databaseAfter = snapshot();

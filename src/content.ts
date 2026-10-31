@@ -87,8 +87,14 @@ import {
     if (!token) return;
     // Note fields are HTML in Anki. Decode in an inert document, then render text only.
     const inert = document.createElement("template");
-    inert.innerHTML = gloss(token, config, session?.states[token.key]);
-    const text = inert.content.textContent ?? "";
+    const state = session?.states[token.key];
+    const value = gloss(token, config, state);
+    inert.innerHTML = state ? value : "";
+    const text =
+      (state ? (inert.content.textContent ?? "") : value) ||
+      (token.entry.dictionaryStatus === "missing"
+        ? t("dictionaryMissing")
+        : "");
     tooltip.textContent =
       token.entry.lemma + " · " + text.replace(/\s+/g, " ").trim();
     tooltip.style.left =
@@ -180,12 +186,16 @@ import {
           config,
           highlights,
           async (keys) => {
-            const response = await chrome.runtime.sendMessage({
-              type: "page-states",
-              keys,
-            });
-            if (response.error) throw new Error(response.error);
-            return response.data;
+            const states = {};
+            for (let start = 0; start < keys.length; start += 1000) {
+              const response = await chrome.runtime.sendMessage({
+                type: "page-states",
+                keys: keys.slice(start, start + 1000),
+              });
+              if (response.error) throw new Error(response.error);
+              Object.assign(states, response.data);
+            }
+            return states;
           },
           () => {
             if (epoch !== generation) return;
@@ -194,6 +204,18 @@ import {
             retry.hidden = false;
           },
           (tokens) => drawerUI.update(tokens, config),
+          async (words) => {
+            const matches = {};
+            for (let start = 0; start < words.length; start += 1000) {
+              const response = await chrome.runtime.sendMessage({
+                type: "recognize-words",
+                words: words.slice(start, start + 1000),
+              });
+              if (response.error) throw new Error(response.error);
+              Object.assign(matches, response.data);
+            }
+            return matches;
+          },
         );
         await session.start(document.body);
         if (epoch === generation) running = true;

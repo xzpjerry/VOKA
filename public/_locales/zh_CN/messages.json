@@ -39,7 +39,7 @@
     "message": "请升级到 Anki ≥ 26.08 与新版 AnkiConnect，并确认所需方法可用。"
   },
   "importTitle": {
-    "message": "测试词表导入 · English B1"
+    "message": "词表导入 · English B1"
   },
   "importPromise": {
     "message": "不会修改、移动或重置任何已有卡片"
@@ -130,5 +130,14 @@
   },
   "drawerLevel": {
     "message": "目标等级"
+  },
+  "aboutTitle": {
+    "message": "关于 · 数据来源与许可"
+  },
+  "dataLoadError": {
+    "message": "数据包加载失败，请重新加载扩展。"
+  },
+  "dictionaryMissing": {
+    "message": "词典没有"
   }
 }

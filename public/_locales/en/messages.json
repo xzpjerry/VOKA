@@ -39,7 +39,7 @@
     "message": "Upgrade to Anki ≥ 26.08 and new AnkiConnect; required methods must be available."
   },
   "importTitle": {
-    "message": "Test wordlist import · English B1"
+    "message": "Wordlist import · English B1"
   },
   "importPromise": {
     "message": "Existing cards will not be modified, moved, or reset."
@@ -130,5 +130,14 @@
   },
   "drawerLevel": {
     "message": "Target level"
+  },
+  "aboutTitle": {
+    "message": "About · Data sources and licenses"
+  },
+  "dataLoadError": {
+    "message": "Data packs could not be loaded. Reload the extension."
+  },
+  "dictionaryMissing": {
+    "message": "Not in dictionary"
   }
 }
