@@ -1,6 +1,19 @@
-import { check, t } from "./shared";
+import { check, settings, t } from "./shared";
+import {
+  extract,
+  gloss,
+  highlightRule,
+  hitTest,
+  type Token,
+  type WordState,
+  type ReadingSettings,
+  type HighlightStyle,
+} from "./reading";
 (() => {
-  if (document.getElementById("voka-drawer")) return;
+  if (document.getElementById("voka-drawer")) {
+    document.dispatchEvent(new Event("voka-refresh"));
+    return;
+  }
   const host = document.createElement("div");
   host.id = "voka-drawer";
   host.style.cssText =
@@ -15,7 +28,169 @@ import { check, t } from "./shared";
   summary.setAttribute("role", "status");
   const retry = document.createElement("button");
   retry.textContent = t("retry");
+  const tooltip = document.createElement("div");
+  tooltip.setAttribute("role", "tooltip");
+  tooltip.hidden = true;
+  tooltip.style.cssText =
+    "position:fixed;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100vw - 24px);padding:7px 10px;border-radius:6px;background:#17212b;color:white;font:14px system-ui;box-shadow:0 2px 10px #0003";
+  root.append(tooltip);
+  const pageStyle = document.createElement("style");
+  pageStyle.textContent =
+    "::highlight(voka-target){background:#ffe89a;color:inherit}::highlight(voka-learning){background:#c9e4ff;color:inherit}::highlight(voka-unknown){background:#ffc9c9;color:inherit}::highlight(voka-weak){background:#fff4cf;color:inherit}";
+  host.append(pageStyle);
+  type Registry = Map<string, unknown>;
+  const registry = (CSS as unknown as { highlights: Registry }).highlights;
+  const HighlightCtor = (
+    globalThis as unknown as { Highlight: new (...ranges: Range[]) => unknown }
+  ).Highlight;
+  const styles: HighlightStyle[] = ["target", "learning", "unknown", "weak"];
+  let tokens: Token[] = [],
+    states: Record<string, WordState> = {};
+  let config: ReadingSettings;
+  let running = false,
+    generation = 0,
+    timer: ReturnType<typeof setTimeout>;
+  function clear() {
+    running = false;
+    tokens = [];
+    states = {};
+    tooltip.hidden = true;
+    for (const name of styles) registry?.delete("voka-" + name);
+  }
+  function paint() {
+    for (const token of tokens)
+      token.style = highlightRule(
+        token.entry.level || states[token.key]?.level,
+        config,
+        states[token.key],
+      );
+    for (const name of styles) {
+      const highlight = new HighlightCtor();
+      for (const token of tokens)
+        if (token.style === name)
+          (highlight as { add(range: Range): void }).add(token.range);
+      registry.set("voka-" + name, highlight);
+    }
+  }
+  async function load(next: Token[], epoch: number) {
+    const keys = [...new Set(next.map((t) => t.key))];
+    const response = keys.length
+      ? await chrome.runtime.sendMessage({ type: "page-states", keys })
+      : { data: {} };
+    if (epoch !== generation) return;
+    if (response.error) throw new Error(response.error);
+    states = response.data;
+    tokens = next;
+    for (const token of tokens)
+      if (states[token.key]) {
+        token.recognized = true;
+        token.entry = {
+          ...token.entry,
+          lemma: states[token.key].fields.Word || token.entry.lemma,
+        };
+      }
+    running = true;
+    paint();
+  }
+  document.addEventListener("mousemove", (event) => {
+    const token = running
+      ? hitTest(tokens, event.clientX, event.clientY, config.hoverScope)
+      : undefined;
+    tooltip.hidden = !token;
+    if (!token) return;
+    // Note fields are HTML in Anki. Decode in an inert document, then render text only.
+    const inert = document.createElement("template");
+    inert.innerHTML = gloss(token, config, states[token.key]);
+    const text = inert.content.textContent ?? "";
+    tooltip.textContent =
+      token.entry.lemma + " · " + text.replace(/\s+/g, " ").trim();
+    tooltip.style.left =
+      Math.max(
+        12,
+        Math.min(event.clientX, innerWidth - tooltip.offsetWidth - 12),
+      ) + "px";
+    tooltip.style.top =
+      Math.max(
+        12,
+        Math.min(event.clientY + 20, innerHeight - tooltip.offsetHeight - 12),
+      ) + "px";
+  });
+  document.addEventListener("mouseleave", () => {
+    tooltip.hidden = true;
+  });
+  window.addEventListener(
+    "scroll",
+    () => {
+      tooltip.hidden = true;
+    },
+    true,
+  );
+  const dirty = new Set<Node>();
+  const observer = new MutationObserver((records) => {
+    const changed = records.filter(
+      (r) => !host.contains(r.target) && r.target !== host,
+    );
+    if (!running || !changed.length) return;
+    for (const record of changed)
+      dirty.add(
+        record.target.nodeType === Node.TEXT_NODE
+          ? record.target.parentNode!
+          : record.target,
+      );
+    tooltip.hidden = true;
+    clearTimeout(timer);
+    const epoch = ++generation;
+    timer = setTimeout(async () => {
+      const roots = [...dirty].filter((n) => n.isConnected);
+      dirty.clear();
+      const minimal = roots.filter(
+        (n) => !roots.some((other) => other !== n && other.contains(n)),
+      );
+      const retained = tokens.filter(
+        (t) =>
+          t.range.startContainer.isConnected &&
+          !minimal.some((n) => n.contains(t.range.startContainer)),
+      );
+      try {
+        await load([...retained, ...minimal.flatMap((n) => extract(n))], epoch);
+      } catch {
+        if (epoch === generation) {
+          clear();
+          summary.textContent = t("notRunning");
+          retry.hidden = false;
+        }
+      }
+    }, 200);
+  });
+  observer.observe(document.documentElement, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: [
+      "hidden",
+      "aria-hidden",
+      "contenteditable",
+      "style",
+      "class",
+      "role",
+    ],
+  });
+  chrome.storage.onChanged.addListener((_changes, area) => {
+    if (area === "local") void refresh();
+  });
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message?.type === "connection-lost") {
+      ++generation;
+      clear();
+      summary.textContent = t("notRunning");
+      retry.hidden = false;
+      retry.disabled = false;
+    }
+  });
   async function refresh() {
+    const epoch = ++generation;
+    clear();
     retry.disabled = true;
     summary.textContent = t("checking");
     let status;
@@ -24,10 +199,23 @@ import { check, t } from "./shared";
     } catch {
       status = "unreachable";
     }
+    if (status === "ok") {
+      try {
+        config = await settings();
+        if (!registry || !HighlightCtor)
+          throw new Error("Highlight API unavailable");
+        await load(extract(document.body), epoch);
+      } catch {
+        status = "unreachable";
+        if (epoch === generation) clear();
+      }
+    }
+    if (epoch !== generation) return;
     summary.textContent = t(status === "ok" ? "connected" : "notRunning");
     retry.hidden = status === "ok";
     retry.disabled = false;
   }
+  document.addEventListener("voka-refresh", () => void refresh());
   retry.addEventListener("click", refresh);
   drawer.append(summary, retry);
   root.append(style, drawer);

@@ -7,10 +7,13 @@
     "build": "tsc --noEmit && vite build && vite build --config vite.content.config.ts",
     "test": "vitest run",
     "check:anki": "tsx scripts/check-anki.ts",
-    "check:import": "tsx scripts/check-import.ts"
+    "check:import": "tsx scripts/check-import.ts",
+    "check:highlight": "tsx scripts/check-highlight.ts"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.24",
+    "happy-dom": "^21.0.4",
+    "puppeteer": "^25.16.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
