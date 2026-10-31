@@ -25,7 +25,7 @@ it("hashes exact UTF-8 content with SHA-256 and records version", async () => {
     meta = JSON.parse(await vokaMeta(entry));
   expect(meta).toEqual({
     schema: 1,
-    data: "test-2026.10",
+    data: "en-2026.10",
     hashes: {
       GlossNative: await contentHash(entry.GlossNative),
       GlossTarget: await contentHash(entry.GlossTarget),
@@ -73,7 +73,7 @@ function gateway(existing = false) {
 }
 it("preview is read only, reports conflicts, filters A2, and skips existing", async () => {
   const call = gateway(true),
-    p = await previewImport(call);
+    p = await previewImport(call, undefined, testPack.entries);
   expect(p.counts).toEqual({ new: 10, existing: 1, conflict: 1, skipped: 2 });
   expect(
     call.mock.calls.every(([method]) =>
@@ -89,7 +89,7 @@ it("preview is read only, reports conflicts, filters A2, and skips existing", as
 });
 it("missing type preview needs no note search", async () => {
   const call = gateway(),
-    p = await previewImport(call);
+    p = await previewImport(call, undefined, testPack.entries);
   expect(p.counts).toEqual({ new: 12, existing: 0, conflict: 0, skipped: 2 });
 });
 it("refuses mismatched field structure", async () => {
@@ -98,7 +98,9 @@ it("refuses mismatched field structure", async () => {
     .mockImplementationOnce(async () => [{ name: "VOKA Vocabulary · English" }])
     .mockImplementationOnce(async () => [])
     .mockImplementationOnce(async () => ({ fields: [{ name: "Word" }] }));
-  await expect(previewImport(call)).rejects.toThrow("字段不匹配");
+  await expect(
+    previewImport(call, undefined, testPack.entries),
+  ).rejects.toThrow("字段不匹配");
 });
 it("submits only valid notes once and resolves unknown writes by Key", async () => {
   const call = gateway(true);
@@ -133,7 +135,13 @@ it("submits only valid notes once and resolves unknown writes by Key", async () 
       throw new Error(method);
     },
   );
-  const result = await executeImport(call);
+  const result = await executeImport(
+    call,
+    undefined,
+    undefined,
+    undefined,
+    testPack.entries,
+  );
   expect(result.confirmed).toEqual(["en:achieve"]);
   expect(result.failures).toHaveLength(11);
   const writes = call.mock.calls.filter(([m]) => m === "notes.createMany");
@@ -173,7 +181,9 @@ it("reads paginated searches and compares exact Key values", async () => {
       throw new Error(method);
     },
   );
-  expect((await previewImport(call)).counts).toEqual({
+  expect(
+    (await previewImport(call, undefined, testPack.entries)).counts,
+  ).toEqual({
     new: 11,
     existing: 1,
     conflict: 0,
@@ -211,7 +221,58 @@ it("a repeated import does not write or validate existing notes", async () => {
       };
     throw new Error("Unexpected write: " + method);
   });
-  expect(await executeImport(call)).toEqual({ confirmed: [], failures: [] });
+  expect(
+    await executeImport(
+      call,
+      undefined,
+      undefined,
+      undefined,
+      testPack.entries,
+    ),
+  ).toEqual({
+    confirmed: [],
+    failures: [],
+  });
+});
+it("bounds production-size searches and writes to v1 batch limits", async () => {
+  const entries = Array.from({ length: 205 }, (_, i) => ({
+    ...testPack.entries[0],
+    lemma: `word${i}`,
+  }));
+  const call = vi.fn(async (method: string, params: any = {}): Promise<any> => {
+    if (method === "noteTypes.list")
+      return [{ name: "VOKA Vocabulary · English" }];
+    if (method === "decks.list") return [{ name: "VOKA::English::B1" }];
+    if (method === "noteTypes.get")
+      return { fields: CORE_FIELDS.map((name) => ({ name })) };
+    if (method === "notes.search") {
+      expect((params.query.match(/Key:/g) ?? []).length).toBeLessThanOrEqual(
+        100,
+      );
+      return { ids: [], nextCursor: null };
+    }
+    if (method === "notes.validateMany" || method === "notes.createMany") {
+      expect(params.notes.length).toBeLessThanOrEqual(100);
+      return {
+        items: params.notes.map((_: unknown, index: number) => ({
+          index,
+          result: { valid: true, noteId: String(index) },
+        })),
+      };
+    }
+    throw new Error(method);
+  });
+  await executeImport(call, undefined, undefined, undefined, entries);
+  expect(
+    call.mock.calls
+      .filter(([m]) => m === "notes.validateMany")
+      .map(([, p]) => p.notes.length),
+  ).toEqual([100, 100, 5]);
+  expect(
+    call.mock.calls
+      .filter(([m]) => m === "notes.createMany")
+      .map(([, p]) => p.notes.length),
+  ).toEqual([100, 100, 5]);
 });
 it.each([
   ["target", "zh"],
@@ -227,7 +288,13 @@ it.each([
         return base(method, params);
       },
     );
-    await executeImport(call, undefined, mode, nativeLanguage);
+    await executeImport(
+      call,
+      undefined,
+      mode,
+      nativeLanguage,
+      testPack.entries,
+    );
     const created = call.mock.calls.find(
       ([method]) => method === "noteTypes.create",
     )![1];

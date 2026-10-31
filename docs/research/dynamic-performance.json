@@ -1,12 +1,12 @@
 {
   "browser": "Chrome/156.0.8078.47",
   "paragraphs": 2000,
-  "initialMs": 652.8970830000001,
+  "initialMs": 769.8170000000002,
   "initialLongTasks": [],
   "scroll": {
     "longTasks": [],
     "frames": 180,
-    "maxFrameMs": 17.700000000000045,
+    "maxFrameMs": 17.700000000000273,
     "framesOver50ms": 0
   },
   "checks": "React append/replace/remove; 8000 initial ranges; unchanged initial HTML/layout; retained unaffected Range identity; no detached/empty ranges; no duplicate processing"

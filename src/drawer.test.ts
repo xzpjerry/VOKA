@@ -1,7 +1,19 @@
 // @vitest-environment happy-dom
 import { expect, it } from "vitest";
-import { extract, highlightRule } from "./reading";
+import { extract as extractRaw, highlightRule } from "./reading";
 import { pageWords, matchesFilter } from "./drawer";
+import { readFileSync } from "node:fs";
+import { createData } from "./data";
+const data = createData(
+  ["cefrj", "octanove", "oewn", "readings", "oewn-readings", "morphology"].map(
+    (name) => JSON.parse(readFileSync(`public/data/${name}.json`, "utf8")),
+  ),
+);
+const extract = (root: Node) =>
+  extractRaw(root, (surface) => {
+    const entry = data.lookupEntry(data.lemmaCandidates(surface)[0] ?? surface);
+    return { key: `en:${entry.lemma}`, entry };
+  });
 it("deduplicates inflected Keys, restores document order, and retains surface forms for missing entries", () => {
   document.body.innerHTML = "<p>achieved achieve Mxyz mxyz afford</p>";
   const tokens = extract(document.body);
@@ -27,6 +39,9 @@ it("keeps missing dictionary membership independent of highlight state and recal
     cards: [],
   });
   tokens[2].style = "target";
+  // Dictionary membership is independent of available note/gloss text.
+  tokens[0].entry.GlossTarget = "";
+  tokens[2].entry.GlossTarget = "user-authored definition";
   expect(tokens.filter((t) => matchesFilter(t, "target"))).toHaveLength(2);
   expect(tokens.filter((t) => matchesFilter(t, "learning"))).toHaveLength(1);
   expect(tokens.filter((t) => matchesFilter(t, "missing"))).toEqual([

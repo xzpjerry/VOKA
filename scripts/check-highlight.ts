@@ -1,3 +1,4 @@
+import { testPack } from "../src/data/test-pack";
 import puppeteer from "puppeteer";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
@@ -14,7 +15,7 @@ const call = (method: string, params = {}, write = false) =>
   rpc({ port: 8766, apiKey: "" }, method, params, {
     sideEffecting: write,
   }) as Promise<any>;
-await executeImport(call);
+await executeImport(call, undefined, undefined, undefined, testPack.entries);
 const keys = ["en:advice", "en:afford"];
 const found = await lookup(call, DEFAULT_TARGET, keys);
 const original = (
@@ -54,7 +55,7 @@ try {
       port: 8766,
       apiKey: "",
       hoverScope: "highlighted",
-      targetLevel: "B1",
+      targetLevel: "A2",
       showAdvanced: false,
     }),
   );
@@ -172,7 +173,7 @@ try {
   const initialDrawer = await drawer();
   assert.deepEqual(
     (await drawer()).counts.map((text) => Number(text!.match(/\d+$/)![0])),
-    [4, 0, 2, 9],
+    [4, 0, 1, 10],
   );
   assert.deepEqual((await drawer()).words, [
     "en:achieve",
@@ -191,7 +192,7 @@ try {
     const root = document.getElementById("voka-drawer")!.shadowRoot!;
     (root.querySelector('[data-filter="missing"]') as HTMLElement).click();
   });
-  assert.deepEqual((await drawer()).words, ["en:reading", "en:fixture"]);
+  assert.deepEqual((await drawer()).words, ["en:vokanonexistentlemma"]);
   await page.evaluate(() => {
     const root = document.getElementById("voka-drawer")!.shadowRoot!;
     (root.querySelector('[data-filter="target"]') as HTMLElement).click();
@@ -262,7 +263,11 @@ try {
     hover.value = "all";
     hover.dispatchEvent(new Event("change"));
   });
-  await page.waitForFunction(() => CSS.highlights.get("voka-weak")?.size === 1);
+  await page.waitForFunction(() =>
+    [...(CSS.highlights.get("voka-weak") ?? [])].some(
+      (r) => r.toString() === "abandoning",
+    ),
+  );
   await hover("apple");
   assert.equal((await tip()).hidden, false);
   assert.deepEqual(
@@ -273,7 +278,7 @@ try {
     [true, "all"],
   );
   await worker.evaluate(() =>
-    chrome.storage.local.set({ targetLevel: "B2", showAdvanced: false }),
+    chrome.storage.local.set({ targetLevel: "B1", showAdvanced: false }),
   );
   await page.waitForFunction(() =>
     [...(CSS.highlights.get("voka-target") ?? [])].some(
@@ -281,9 +286,13 @@ try {
     ),
   );
   await worker.evaluate(() =>
-    chrome.storage.local.set({ targetLevel: "B1", showAdvanced: true }),
+    chrome.storage.local.set({ targetLevel: "A2", showAdvanced: true }),
   );
-  await page.waitForFunction(() => CSS.highlights.get("voka-weak")?.size === 1);
+  await page.waitForFunction(() =>
+    [...(CSS.highlights.get("voka-weak") ?? [])].some(
+      (r) => r.toString() === "abandoning",
+    ),
+  );
   await page.evaluate(() => {
     document.getElementById("dynamic")!.textContent = "develop achieved";
   });
@@ -355,7 +364,7 @@ try {
         drawer: initialDrawer,
         summary,
         checks:
-          "exclusions; unchanged text/HTML/layout; imported B1 + not-in-Anki B2 target; manual known/unknown; hover scope; advanced inflection; dynamic text + exclusion; disconnect clears all; reconnect; single host",
+          "exclusions; unchanged text/HTML/layout; small imported fixture + real A2/B1 target; manual known/unknown; hover scope; advanced inflection; dynamic text + exclusion; disconnect clears all; reconnect; single host",
       },
       null,
       2,

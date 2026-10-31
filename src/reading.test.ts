@@ -3,13 +3,37 @@ import { describe, it, expect } from "vitest";
 import {
   highlightRule,
   excluded,
-  extract,
+  extract as extractRaw,
   containsPoint,
   hitTest,
-  recognize,
+  recognize as recognizeRaw,
   gloss,
   type Token,
 } from "./reading";
+import {
+  testPack,
+  testInflections,
+  testReadingEntries,
+} from "./data/test-pack";
+import { normalizeKey } from "./key";
+const entries = new Map(
+  [...testPack.entries, ...testReadingEntries].map((e) => [
+    normalizeKey(e.lemma),
+    e,
+  ]),
+);
+const recognize = (surface: string) =>
+  recognizeRaw(
+    surface,
+    {
+      candidates: (word) => {
+        const lower = normalizeKey(word).slice(3);
+        return [lower, ...(testInflections[lower] ?? [])];
+      },
+    },
+    (key) => entries.get(key),
+  );
+const extract = (root: Node) => extractRaw(root, recognize);
 const config = {
   targetLevel: "B1",
   showAdvanced: false,

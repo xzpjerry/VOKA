@@ -4,3 +4,4 @@ docs/VOKA-PRD.html
 node_modules/
 dist/
 .browser-test/
+.cache/

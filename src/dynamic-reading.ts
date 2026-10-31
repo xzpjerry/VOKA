@@ -21,6 +21,7 @@ export class DynamicReading {
   private revision = 0;
   private known = new Set<string>(); // Also caches Keys absent from Anki.
   readonly states: Record<string, WordState> = {};
+  private resolved = new Map<string, { key: string; entry: Token["entry"] }>();
   private stopped = false;
   private draining = false;
   private timer?: ReturnType<typeof setTimeout>;
@@ -30,6 +31,9 @@ export class DynamicReading {
     private lookup: (keys: string[]) => Promise<Record<string, WordState>>,
     private failed: () => void,
     private changed: (tokens: Token[]) => void = () => {},
+    private resolve?: (
+      words: string[],
+    ) => Promise<Record<string, { key: string; entry: Token["entry"] }>>,
   ) {}
   get tokens() {
     return [...this.blocks.values()].flat();
@@ -44,6 +48,7 @@ export class DynamicReading {
     this.pending.clear();
     this.blocks.clear();
     this.revisions.clear();
+    this.resolved.clear();
   }
   private remove(block: Element) {
     for (const token of this.blocks.get(block) ?? [])
@@ -122,9 +127,34 @@ export class DynamicReading {
           batch.push({
             block,
             revision: this.revisions.get(block)!,
-            tokens: extract(block, (node) => textBlock(node) === block),
+            tokens: extract(
+              block,
+              undefined,
+              (node) => textBlock(node) === block,
+            ),
           });
           if (performance.now() - began >= 8 || batch.length >= 32) break;
+        }
+        // Resolve new surface forms once per session before querying canonical Anki Keys.
+        const tokens = batch.flatMap((item) => item.tokens);
+        if (this.resolve) {
+          const words = [
+            ...new Set(tokens.map((token) => token.entry.lemma)),
+          ].filter((word) => !this.resolved.has(word));
+          if (words.length) {
+            const matches = await this.resolve(words);
+            if (this.stopped) return;
+            for (const [word, match] of Object.entries(matches))
+              this.resolved.set(word, match);
+          }
+          for (const token of tokens) {
+            const match = this.resolved.get(token.entry.lemma);
+            if (match) {
+              token.key = match.key;
+              token.entry = match.entry;
+              token.recognized = true;
+            }
+          }
         }
         const keys = [
           ...new Set(

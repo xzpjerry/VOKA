@@ -9,8 +9,8 @@ export async function pageStates(
 ): Promise<Record<string, WordState>> {
   const states: Record<string, WordState> = {};
   const unique = [...new Set(keys)];
-  for (let offset = 0; offset < unique.length; offset += 200) {
-    const batch = unique.slice(offset, offset + 200);
+  for (let offset = 0; offset < unique.length; offset += 100) {
+    const batch = unique.slice(offset, offset + 100);
     const query = `note:${quote(DEFAULT_TARGET.noteType)} (${batch.map((k) => quote("Key:" + k)).join(" or ")})`;
     const notes: any[] = [];
     let cursor: string | undefined;
@@ -21,7 +21,14 @@ export async function pageStates(
         ...(cursor ? { cursor } : {}),
       });
       if (result.ids.length) {
-        const data = await call("notes.getMany", { ids: result.ids });
+        const items = [];
+        for (let i = 0; i < result.ids.length; i += 100)
+          items.push(
+            ...(
+              await call("notes.getMany", { ids: result.ids.slice(i, i + 100) })
+            ).items,
+          );
+        const data = { items };
         for (const item of data.items) {
           if (item.error) throw new Error("Cannot read note");
           if (batch.includes(item.result.fields.Key)) notes.push(item.result);
@@ -39,7 +46,16 @@ export async function pageStates(
           ...(cursor ? { cursor } : {}),
         });
         if (result.ids.length) {
-          const data = await call("cards.getMany", { ids: result.ids });
+          const items = [];
+          for (let i = 0; i < result.ids.length; i += 100)
+            items.push(
+              ...(
+                await call("cards.getMany", {
+                  ids: result.ids.slice(i, i + 100),
+                })
+              ).items,
+            );
+          const data = { items };
           for (const item of data.items) {
             if (item.error) throw new Error("Cannot read card");
             cards.push(item.result);
