@@ -9,6 +9,7 @@
     "check:anki": "tsx scripts/check-anki.ts",
     "check:import": "tsx scripts/check-import.ts",
     "check:highlight": "tsx scripts/check-highlight.ts",
+    "check:manual": "tsx scripts/check-manual.ts",
     "check:dynamic": "tsx scripts/check-dynamic.ts",
     "data:build": "python3 tools/data/build.py",
     "check:data": "tsx scripts/check-data.ts",

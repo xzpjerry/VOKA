@@ -50,6 +50,34 @@ export class DynamicReading {
     this.revisions.clear();
     this.resolved.clear();
   }
+  /** Reapply rule 1 to existing ranges after a manual judgment, without rescanning. */
+  refresh(key: string) {
+    let touched = false;
+    for (const tokens of this.blocks.values()) {
+      const matching = tokens.filter((token) => token.key === key);
+      if (!matching.length) continue;
+      touched = true;
+      for (const token of matching)
+        if (token.style) this.highlights[token.style].delete(token.range);
+      for (const token of matching) {
+        const state = this.states[key];
+        if (state) {
+          token.recognized = true;
+          token.entry = {
+            ...token.entry,
+            lemma: state.fields.Word || token.entry.lemma,
+          };
+        }
+        token.style = highlightRule(
+          token.entry.level || state?.level,
+          this.config,
+          state,
+        );
+        if (token.style) this.highlights[token.style].add(token.range);
+      }
+    }
+    if (touched) this.changed(this.tokens);
+  }
   private remove(block: Element) {
     for (const token of this.blocks.get(block) ?? [])
       if (token.style) this.highlights[token.style].delete(token.range);

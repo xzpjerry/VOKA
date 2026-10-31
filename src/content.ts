@@ -80,6 +80,8 @@ import {
           token.recognized = true;
           token.entry.lemma = fields.Word || token.entry.lemma;
         }
+      // Manual judgments change the highlight immediately; a save does not.
+      session.refresh(key);
       drawerUI.update(session.tokens, config);
     },
     (key) => session?.states[key],

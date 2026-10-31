@@ -112,3 +112,47 @@ it("does not publish stale responses when a block changes during lookup", async 
   observer.disconnect();
   session.stop();
 });
+it("reapplies manual precedence to existing ranges without rescanning", async () => {
+  document.body.innerHTML = "<p>benefit banana</p>";
+  const highlights = {
+    target: new Set<Range>(),
+    learning: new Set<Range>(),
+    unknown: new Set<Range>(),
+    weak: new Set<Range>(),
+  };
+  const lookup = vi.fn(async (_keys: string[]) => ({}));
+  const session = new DynamicReading(
+    { ...config, targetLevel: "B1" },
+    highlights,
+    lookup,
+    () => {
+      throw Error("failed");
+    },
+    undefined,
+    resolveWords,
+  );
+  await session.start(document.body);
+  const texts = (ranges: Set<Range>) =>
+    [...ranges].map((range) => range.toString());
+  expect(texts(highlights.target)).toEqual(["benefit"]);
+  session.states["en:benefit"] = {
+    fields: { ManualStatus: "known" },
+    cards: [],
+  };
+  session.states["en:banana"] = {
+    fields: { ManualStatus: "unknown" },
+    cards: [],
+  };
+  session.refresh("en:benefit");
+  session.refresh("en:banana");
+  expect(texts(highlights.target)).toEqual([]);
+  expect(texts(highlights.unknown)).toEqual(["banana"]);
+  session.states["en:benefit"].fields.ManualStatus = "";
+  session.states["en:banana"].fields.ManualStatus = "";
+  session.refresh("en:benefit");
+  session.refresh("en:banana");
+  expect(texts(highlights.target)).toEqual(["benefit"]);
+  expect(texts(highlights.unknown)).toEqual([]);
+  expect(lookup).toHaveBeenCalledTimes(1);
+  session.stop();
+});

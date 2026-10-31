@@ -172,3 +172,106 @@ it("refuses conflicting Keys without performing a write", async () => {
     cardContext(call, { key: "en:apple", action: "read" }, config),
   ).rejects.toThrow("多条笔记");
 });
+it("manual status patches only ManualStatus, reads back, and can be undone", async () => {
+  const fields: Record<string, string> = {
+    Key: "en:apple",
+    Word: "apple",
+    GlossNative: "User edited gloss",
+    Context1: "User edited context text.",
+    Source1: "Anki edit",
+    ManualStatus: "",
+    VokaMeta: '{"schema":1}',
+  };
+  const call = vi.fn(async (method: string, params: any = {}) => {
+    if (method === "notes.search") return { ids: ["1"] };
+    if (method === "notes.getMany")
+      return { items: [{ result: { id: "1", fields: { ...fields } } }] };
+    if (method === "notes.update") {
+      Object.assign(fields, params.patch.fields);
+      return {};
+    }
+    throw new Error(method);
+  });
+  const marked = await cardContext(
+    call,
+    { key: "en:apple", action: "manual", manual: "known" },
+    config,
+  );
+  expect(marked.fields.ManualStatus).toBe("known");
+  let writes = call.mock.calls.filter(([m]) => m === "notes.update");
+  expect(writes).toHaveLength(1);
+  expect(writes[0][1].patch.fields).toEqual({ ManualStatus: "known" });
+  expect(fields.GlossNative).toBe("User edited gloss");
+  expect(fields.Context1).toBe("User edited context text.");
+  const undone = await cardContext(
+    call,
+    { key: "en:apple", action: "manual", manual: "" },
+    config,
+  );
+  expect(undone.fields.ManualStatus).toBe("");
+  writes = call.mock.calls.filter(([m]) => m === "notes.update");
+  expect(writes).toHaveLength(2);
+  expect(writes[1][1].patch.fields).toEqual({ ManualStatus: "" });
+});
+it("manual unknown on a word without a note reuses note creation once", async () => {
+  let fields: Record<string, string> | undefined;
+  const call = vi.fn(async (method: string, params: any = {}) => {
+    if (method === "notes.search") return { ids: fields ? ["1"] : [] };
+    if (method === "notes.getMany")
+      return { items: [{ result: { id: "1", fields } }] };
+    if (method === "noteTypes.list")
+      return [{ name: "VOKA Vocabulary · English" }];
+    if (method === "noteTypes.get")
+      return { fields: CORE_FIELDS.map((name) => ({ name })) };
+    if (method === "decks.list") return [];
+    if (method === "decks.create") return {};
+    if (method === "notes.validateMany")
+      return { items: [{ result: { valid: true } }] };
+    if (method === "notes.createMany") {
+      fields = params.notes[0].fields;
+      return { items: [{ result: { id: "1" } }] };
+    }
+    throw new Error(method);
+  });
+  const result = await cardContext(
+    call,
+    { key: "en:cat", action: "manual", manual: "unknown" },
+    config,
+    async (key) => ({
+      lemma: key.slice(3),
+      level: "A1",
+      Reading: "",
+      GlossNative: "",
+      GlossTarget: "",
+    }),
+  );
+  const notes = call.mock.calls.find(([m]) => m === "notes.createMany")![1]
+    .notes;
+  expect(notes).toHaveLength(1);
+  expect(notes[0].deck.name).toBe("VOKA::English::A1");
+  expect(notes[0].tags).toContain("voka::level::A1");
+  expect(notes[0].fields.ManualStatus).toBe("unknown");
+  expect(notes[0].fields.Context1).toBe("");
+  expect(result.fields.ManualStatus).toBe("unknown");
+  expect(call.mock.calls.some(([m]) => m === "notes.update")).toBe(false);
+});
+it("rejects an invalid manual value and undo without a note", async () => {
+  const call = vi.fn(async (method: string) => {
+    if (method === "notes.search") return { ids: [] };
+    throw new Error(method);
+  });
+  await expect(
+    cardContext(
+      call,
+      { key: "en:cat", action: "manual", manual: "learning" as any },
+      config,
+    ),
+  ).rejects.toThrow("无效的人工标记");
+  await expect(
+    cardContext(
+      call,
+      { key: "en:cat", action: "manual", manual: "" },
+      config,
+    ),
+  ).rejects.toThrow("没有可撤销的标记");
+});
