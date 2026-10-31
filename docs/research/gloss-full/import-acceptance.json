@@ -1,0 +1,61 @@
+{
+  "port": 8766,
+  "dataVersion": "en-2026.10.1",
+  "pack": {
+    "entryCount": 35698,
+    "sourceLemmaCount": 74441,
+    "missingCount": 38743,
+    "model": "mixed: deepseek/deepseek-flash, gpt-6-luna (effort max)",
+    "promptSha256": "56cf4d1e5d64dc904dc4aab3ee42784a55da63cd365ec9581e22629ee0749a9b"
+  },
+  "target": {
+    "noteType": "VOKA Gloss Acceptance 1793454558070",
+    "deck": "VOKA::Gloss Acceptance 1793454558070::B1"
+  },
+  "confirmed": [
+    "en:abandon",
+    "en:able",
+    "en:abnormal",
+    "en:aboard",
+    "en:aborigine",
+    "en:absence",
+    "en:absent",
+    "en:absolute",
+    "en:absolutely",
+    "en:absorb",
+    "en:abstract",
+    "en:abundance"
+  ],
+  "rendered": [
+    {
+      "key": "en:abandon",
+      "glossNative": "n. 放纵; 激情 · v. 抛弃; 放弃",
+      "cardId": "1793454558398"
+    },
+    {
+      "key": "en:able",
+      "glossNative": "adj. 能够的; 有能力的",
+      "cardId": "1793454558399"
+    }
+  ],
+  "methods": [
+    "noteTypes.list",
+    "decks.list",
+    "noteTypes.create",
+    "noteTypes.get",
+    "decks.create",
+    "notes.validateMany",
+    "notes.createMany",
+    "notes.search",
+    "notes.getMany",
+    "cards.render"
+  ],
+  "note": "fresh synthetic target; no existing notes edited; no schedules or reviews changed",
+  "checks": [
+    "12 real-pack B1 notes in a new explicit throwaway target on 8766",
+    "GlossNative, GlossTarget, field order, tags and VokaMeta SHA-256 hashes read back",
+    "Two cards rendered; computed native and target visibility checked in Chrome",
+    "Both CSS fallbacks checked using rendered HTML with missing-field markers",
+    "Repeat import created zero notes and left all imported note fields unchanged"
+  ]
+}
