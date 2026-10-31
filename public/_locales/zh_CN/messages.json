@@ -139,5 +139,20 @@
   },
   "dictionaryMissing": {
     "message": "词典没有"
+  },
+  "rememberSiteButton": {
+    "message": "记住这个网站"
+  },
+  "rememberSiteDescription": {
+    "message": "是否记住 {host}？允许网站访问权限后，VOKA 会在刷新或再次访问时自动运行。禁用名单仍然生效。"
+  },
+  "rememberSiteClose": {
+    "message": "暂不记住 / 关闭"
+  },
+  "rememberSiteSaved": {
+    "message": "已记住。可以关闭此页并返回阅读。"
+  },
+  "rememberSiteDenied": {
+    "message": "未获得权限，网站尚未记住。可以重试。"
   }
 }

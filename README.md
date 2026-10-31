@@ -67,6 +67,8 @@ The pipeline verifies every download against `tools/data/sources.json` SHA-256 p
 
 ## Site scope
 
-Settings and wizard step 2 offer manual toolbar activation (default), remembered websites, and all HTTP(S) websites. Remembered mode requests website access on a toolbar click and registers a persistent automatic script after approval. All-sites mode explains Chrome's warning and requires an explicit grant button. Revoking access stops future automatic runs. An editable default deny list covers common mail, chat, and password-vault sites; it suppresses automatic runs while allowing manual toolbar activation.
+Settings and wizard step 2 offer manual toolbar activation (default), remembered websites, and all HTTP(S) websites. Remembered mode requests website access on a toolbar click and registers a persistent automatic script after approval. If the toolbar wakes a worker before settings are cached, a small extension tab offers “记住这个网站”; confirm there to grant access and remember the host. Already granted hosts are remembered without a prompt. All-sites mode explains Chrome's warning and requires an explicit grant button. Revoking access stops future automatic runs. An editable default deny list covers common mail, chat, and password-vault sites; it suppresses automatic runs while allowing manual toolbar activation.
 
 Run `npm run check:scope` after building for Chrome for Testing checks against isolated Anki 8766. See [site-scope acceptance and native-permission UI limits](docs/research/site-scope-acceptance.md).
+
+Run `npx tsx scripts/check-scope-cold-start.ts` for deterministic cold-cache browser coverage; see [cold-start evidence and limitations](docs/research/site-scope-cold-start.md).

@@ -139,5 +139,20 @@
   },
   "dictionaryMissing": {
     "message": "Not in dictionary"
+  },
+  "rememberSiteButton": {
+    "message": "Remember this website"
+  },
+  "rememberSiteDescription": {
+    "message": "Remember {host}? After you allow website access, VOKA runs automatically on reload or your next visit. The deny list still applies."
+  },
+  "rememberSiteClose": {
+    "message": "Close"
+  },
+  "rememberSiteSaved": {
+    "message": "Website remembered. Close this tab to return to reading."
+  },
+  "rememberSiteDenied": {
+    "message": "Access was not granted. The website was not remembered. You can retry."
   }
 }
