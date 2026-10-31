@@ -1,5 +1,7 @@
 /** Fresh 12-entry import from the real gloss pack into isolated Anki 8766. */
 import { strict as assert } from "node:assert";
+import puppeteer from "puppeteer";
+import { replaceGlossCss } from "../src/background/gloss.ts";
 import { readFile } from "node:fs/promises";
 import { createData, DATA_VERSION, type Entry } from "../src/data/index.ts";
 import {
@@ -75,6 +77,9 @@ const ids = [...matches.values()].flat();
 assert.equal(ids.length, 12);
 const notes: any = await call("notes.getMany", { ids });
 const rendered = [];
+const browser = await puppeteer.launch({ headless: true });
+try {
+const page = await browser.newPage();
 for (const item of notes.items) {
   assert(!item.error, JSON.stringify(item.error));
   const note = item.result;
@@ -96,8 +101,34 @@ for (const item of notes.items) {
     const cardId = note.cardIds[0];
     const card = await call("cards.render", { id: cardId });
     assert(card.answerHtml.includes(entry.GlossNative), "native gloss missing in card");
+    for (const mode of ["native", "target"] as const) {
+      await page.setContent(`${card.answerHtml}<style>${replaceGlossCss(card.css, mode)}</style>`);
+      const state = await page.evaluate(() => Object.fromEntries(
+        ["native", "target"].map((language) => {
+          const el = document.querySelector(`.gloss-${language}`)!;
+          return [language, { display: getComputedStyle(el).display, text: el.textContent }];
+        }),
+      ));
+      assert.equal(state[mode].display, "block");
+      assert.equal(state[mode === "native" ? "target" : "native"].display, "none");
+    }
+    // Exercise both missing-field fallbacks using the actual rendered template.
+    for (const missing of ["native", "target"] as const) {
+      await page.setContent(`${card.answerHtml}<style>${replaceGlossCss(card.css, missing)}</style>`);
+      await page.evaluate((language) => {
+        document.querySelector(`.gloss-${language}`)!.textContent = "";
+        const marker = document.createElement("span");
+        marker.className = `miss-${language}`;
+        document.querySelector(".gloss-native")!.before(marker);
+      }, missing);
+      const fallback = missing === "native" ? "target" : "native";
+      assert.equal(await page.$eval(`.gloss-${fallback}`, (el) => getComputedStyle(el).display), "block");
+    }
     rendered.push({ key: note.fields.Key, glossNative: entry.GlossNative, cardId });
   }
+}
+} finally {
+  await browser.close();
 }
 console.log(
   JSON.stringify(

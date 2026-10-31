@@ -478,6 +478,11 @@ def run_round(
         f"{workers} workers",
         flush=True,
     )
+    cached_count = sum(
+        (record := read_cache(round_no, sha256(request_for(PROMPT, batch)))) is not None
+        and not record.get("transport_error")
+        for batch in batches
+    )
     started = time.monotonic()
     lock = threading.Lock()
     done = 0
@@ -498,8 +503,8 @@ def run_round(
             if record.get("parse_error") or record.get("transport_error"):
                 failures += 1
             elapsed = time.monotonic() - started
-            rate = done / elapsed if elapsed else 0
-            remaining = len(batches) - done
+            rate = generated / elapsed if elapsed else 0
+            remaining = max(0, len(batches) - cached_count - generated)
             eta = remaining / rate if rate else 0
             print(
                 f"[round {round_no}] {done}/{len(batches)} "
@@ -715,6 +720,7 @@ def assemble(
         flush=True,
     )
     update_metadata(pack, len(raw), gzip_size)
+    processed = len(words) - (rounds[0].get("unprocessedWords", 0) if rounds else len(words))
     stats = {
         "model": label,
         "models": models,
@@ -727,6 +733,9 @@ def assemble(
         "missingCount": len(missing),
         "formatInvalidAfterRetries": rounds[-1].get("formatInvalidWords", 0) if rounds else 0,
         "unprocessedCount": rounds[-1].get("unprocessedWords", 0) if rounds else len(missing),
+        "processedCount": processed,
+        "formatValidRate": round(len(entries) / processed * 100, 4) if processed else 0,
+        "formatViolationRateAfterRetries": round((rounds[-1].get("formatInvalidWords", 0) if rounds else 0) / processed * 100, 4) if processed else 0,
         "coveragePercent": round(len(entries) / len(words) * 100, 4) if words else 0,
         "missingLemmas": missing,
         "generationSeconds": round(

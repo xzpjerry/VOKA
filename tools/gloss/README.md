@@ -55,7 +55,7 @@ python3 tools/gloss/generate.py --model deepseek/deepseek-flash --workers 4 --ba
   updates `public/data/sizes.json` and `public/data/attributions.json` so the
   Options About section shows the new source.
 * Writes `docs/research/gloss-full/progress.json`, `stats.json` and a
-  30-row-per-level `spot-check.csv` for human review.
+  30-row-per-level `spot-check.csv` for human review, plus exact missing-word reasons in `failures.json`. Coverage and format compliance among processed words are reported separately; unfinished batches are not counted as format violations.
 
 Useful partial commands:
 
@@ -71,3 +71,9 @@ python3 tools/gloss/generate.py --limit-batches 5
 `--assemble-only` is the inspection path; a normal run assembles at the end and
 uses the same cache. Batch membership is intentionally stable and deterministic, so
 the resume command is exactly the command above with the chosen model.
+
+Offline generator regression checks (no model calls):
+
+```sh
+python3 -m unittest discover -s tools/gloss -p 'test_*.py'
+```
