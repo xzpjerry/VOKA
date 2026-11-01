@@ -5,3 +5,5 @@ node_modules/
 dist/
 .browser-test/
 .cache/
+__pycache__/
+*.pyc

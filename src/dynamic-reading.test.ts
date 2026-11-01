@@ -4,7 +4,15 @@ import { DynamicReading } from "./dynamic-reading";
 import { readFileSync } from "node:fs";
 import { createData } from "./data";
 const data = createData(
-  ["cefrj", "octanove", "oewn", "readings", "oewn-readings", "morphology"].map(
+  [
+    "cefrj",
+    "octanove",
+    "oewn",
+    "readings",
+    "oewn-readings",
+    "morphology",
+    "gloss-zh",
+  ].map(
     (name) => JSON.parse(readFileSync(`public/data/${name}.json`, "utf8")),
   ),
 );

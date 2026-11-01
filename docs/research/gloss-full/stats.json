@@ -1,0 +1,132 @@
+{
+  "model": "mixed: deepseek/deepseek-flash, gpt-6-luna (effort max)",
+  "models": [
+    "deepseek/deepseek-flash",
+    "gpt-6-luna"
+  ],
+  "complete": true,
+  "promptSha256": "56cf4d1e5d64dc904dc4aab3ee42784a55da63cd365ec9581e22629ee0749a9b",
+  "generatedDate": "2026-10-31",
+  "dataVersion": "en-2026.10.1",
+  "sourceLemmaCount": 74441,
+  "entryCount": 74441,
+  "missingCount": 0,
+  "formatInvalidAfterRetries": 0,
+  "unprocessedCount": 0,
+  "processedCount": 74441,
+  "formatValidRate": 100.0,
+  "formatViolationRateAfterRetries": 0.0,
+  "coveragePercent": 100.0,
+  "missingLemmas": [],
+  "generationSeconds": 35518.953,
+  "wallSeconds": 0.868,
+  "batchesCached": 745,
+  "batchesTotal": 745,
+  "byModel": {
+    "deepseek/deepseek-flash": {
+      "batches": 342,
+      "lemmas": 34199
+    },
+    "gpt-6-luna": {
+      "batches": 403,
+      "lemmas": 40242
+    }
+  },
+  "byConfiguration": {
+    "gpt-6-luna (effort max)": {
+      "batches": 403,
+      "retryBatches": 1,
+      "lemmas": 40242
+    },
+    "deepseek/deepseek-flash": {
+      "batches": 342,
+      "retryBatches": 0,
+      "lemmas": 34199
+    }
+  },
+  "timingByConfiguration": {
+    "gpt-6-luna (effort max)": {
+      "callSeconds": 21036.072,
+      "elapsedEnvelopeSeconds": 5319.688
+    },
+    "deepseek/deepseek-flash": {
+      "callSeconds": 14482.881,
+      "elapsedEnvelopeSeconds": 2042.925
+    }
+  },
+  "rounds": [
+    {
+      "round": 0,
+      "words": 74441,
+      "valid": 74414,
+      "invalid": 27,
+      "batches": 745,
+      "missingBatches": 0,
+      "parseErrors": 0,
+      "formatInvalidWords": 27,
+      "unprocessedWords": 0,
+      "unexpectedLemmas": [
+        "mam mothermography",
+        "s sustentacular"
+      ],
+      "models": {
+        "deepseek/deepseek-flash": 342,
+        "gpt-6-luna": 403
+      },
+      "generationSeconds": 35493.725
+    },
+    {
+      "round": 1,
+      "words": 27,
+      "valid": 27,
+      "invalid": 0,
+      "batches": 1,
+      "missingBatches": 0,
+      "parseErrors": 0,
+      "formatInvalidWords": 0,
+      "unprocessedWords": 0,
+      "unexpectedLemmas": [],
+      "models": {
+        "gpt-6-luna": 1
+      },
+      "generationSeconds": 25.228
+    }
+  ],
+  "byLevel": {
+    "A1": {
+      "lemmas": 986,
+      "generated": 986,
+      "missing": 0
+    },
+    "A2": {
+      "lemmas": 1179,
+      "generated": 1179,
+      "missing": 0
+    },
+    "B1": {
+      "lemmas": 2055,
+      "generated": 2055,
+      "missing": 0
+    },
+    "B2": {
+      "lemmas": 2341,
+      "generated": 2341,
+      "missing": 0
+    },
+    "C1": {
+      "lemmas": 871,
+      "generated": 871,
+      "missing": 0
+    },
+    "C2": {
+      "lemmas": 802,
+      "generated": 802,
+      "missing": 0
+    },
+    "Unleveled": {
+      "lemmas": 66207,
+      "generated": 66207,
+      "missing": 0
+    }
+  }
+}

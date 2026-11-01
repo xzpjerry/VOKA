@@ -1,0 +1,49 @@
+{
+  "status": "complete",
+  "generatedAt": "2026-10-31T15:15:05.507441+00:00",
+  "models": [
+    "deepseek/deepseek-flash",
+    "gpt-6-luna"
+  ],
+  "batchSize": 100,
+  "batchesTotal": 745,
+  "batchesCached": 745,
+  "batchesRemaining": 0,
+  "lemmasTotal": 74441,
+  "lemmasDone": 74441,
+  "lemmasMissing": 0,
+  "byConfiguration": {
+    "gpt-6-luna (effort max)": {
+      "batches": 403,
+      "retryBatches": 1,
+      "lemmas": 40242
+    },
+    "deepseek/deepseek-flash": {
+      "batches": 342,
+      "retryBatches": 0,
+      "lemmas": 34199
+    }
+  },
+  "timingByConfiguration": {
+    "gpt-6-luna (effort max)": {
+      "callSeconds": 21036.072,
+      "elapsedEnvelopeSeconds": 5319.688
+    },
+    "deepseek/deepseek-flash": {
+      "callSeconds": 14482.881,
+      "elapsedEnvelopeSeconds": 2042.925
+    }
+  },
+  "byModel": {
+    "deepseek/deepseek-flash": {
+      "batches": 342,
+      "lemmas": 34199
+    },
+    "gpt-6-luna": {
+      "batches": 403,
+      "lemmas": 40242
+    }
+  },
+  "resumeCommand": "python3 tools/gloss/generate.py --model gpt-6-luna --effort max --timeout 1800 --workers 4 --batch-size 100",
+  "note": "Complete pack."
+}

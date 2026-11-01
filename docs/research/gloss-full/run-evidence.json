@@ -1,0 +1,44 @@
+{
+  "rounds": [
+    {
+      "batches": 745,
+      "generated": 403,
+      "generationSeconds": 35493.725,
+      "invalid": 27,
+      "issues": 0,
+      "missingBatches": 0,
+      "models": {
+        "deepseek/deepseek-flash": 342,
+        "gpt-6-luna": 403
+      },
+      "parseErrors": 0,
+      "round": 0,
+      "unexpectedLemmas": [
+        "mam mothermography",
+        "s sustentacular"
+      ],
+      "valid": 74414,
+      "wallSeconds": 5294.636,
+      "words": 74441
+    },
+    {
+      "batches": 1,
+      "generated": 1,
+      "generationSeconds": 25.228,
+      "invalid": 0,
+      "issues": 0,
+      "missingBatches": 0,
+      "models": {
+        "gpt-6-luna": 1
+      },
+      "parseErrors": 0,
+      "round": 1,
+      "unexpectedLemmas": [],
+      "valid": 27,
+      "wallSeconds": 25.247,
+      "words": 27
+    }
+  ],
+  "startedAt": "2026-10-31T13:45:34.454156+00:00",
+  "wallSeconds": 5319.912
+}

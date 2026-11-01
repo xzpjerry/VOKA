@@ -1,0 +1,24 @@
+
+> voka@0.1.0 check:data:browser
+> tsx scripts/check-data-browser.ts
+
+target abandon · v. 抛弃；放弃
+missing vokanonexistentlemma · Not in dictionary
+variant color · n. the appearance that things have from the way they reflect light
+unimported zymurgy · n. the branch of chemistry concerned with fermentation (as in making wine or brewing or distilling)
+native abandon · v. 抛弃；放弃
+native offline zymurgy Chinese gloss visible
+{
+  "browser": "Chrome/156.0.8078.47",
+  "highlights": {
+    "voka-target": [
+      "abandoning"
+    ],
+    "voka-learning": [],
+    "voka-unknown": [],
+    "voka-weak": []
+  },
+  "attributions": "all sources and complete notices present",
+  "anki": "8766; notes read-only, no imports; language settings may update marker CSS"
+}
+network: no requests to 8765
