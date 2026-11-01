@@ -17,10 +17,11 @@ type YouTubePlayer = HTMLElement & {
 
 type RequestMessage = {
   source: "voka-yt-req";
-  type: "tracks" | "enable" | "refetch" | "time";
+  type: "tracks" | "enable" | "refetch" | "time" | "seek";
   requestId?: string;
   languageCode?: string;
   kind?: string;
+  timeSeconds?: number;
 };
 
 type HookWindow = Window & {
@@ -212,6 +213,15 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
         postReply(message, { currentTime: video.currentTime });
         return;
       }
+      if (message.type === "seek") {
+        const video = document.querySelector("video");
+        if (!video) throw new Error("NoVideo");
+        if (!Number.isFinite(message.timeSeconds) || (message.timeSeconds ?? -1) < 0)
+          throw new Error("InvalidTime");
+        video.currentTime = message.timeSeconds!;
+        postReply(message, { currentTime: video.currentTime });
+        return;
+      }
       if (message.type === "enable") {
         if (!message.languageCode) throw new Error("MissingLanguage");
         const current = player();
@@ -252,7 +262,7 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
     if (
       !message ||
       message.source !== "voka-yt-req" ||
-      !["tracks", "enable", "refetch", "time"].includes(message.type ?? "")
+      !["tracks", "enable", "refetch", "time", "seek"].includes(message.type ?? "")
     )
       return;
     void handleRequest(message as RequestMessage);
