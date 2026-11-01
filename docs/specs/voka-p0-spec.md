@@ -127,12 +127,10 @@ Options 页（首次安装向导 + 设置页）
 - 每个数据包都带数据版本号（如 `en-2026.10`），供第 8 节的数据升级使用。分包和加载方式由实现决定；压缩后预估总量在 5MB 以内。
 - 构建脚本放在仓库里（例如 `tools/data/`），可以重复执行；扩展里的「关于」页列出全部署名。
 
-### 7.3 上架前门槛（不阻塞开发）
+### 7.3 上架前门槛（已确认，2026-11-01）
 
-1. 书面确认 CEFR-J「涉及监修/编辑需另行协商、可能收费」这句话是否适用于把词表内置进产品。
-2. 向 Octanove Labs 确认 C1/C2 的构建来源。
-
-任一确认失败 → 暂停公开上架，开发与自用照常；再根据回复在付费授权、去掉有问题的等级、更换数据来源之间做决定。
+1. **CEFR-J**：条款为 "CEFR-J vocabulary and grammar profile datasets can be used for research and commercial purposes with no charge, provided that you cite the dataset properly. The copyright belongs to Tono Laboratory at TUFS (Tokyo University of Foreign Studies)."，内置进产品免费可用，前提是正确引用；版权属 TUFS 投野研究室，数据不保证准确。`attributions.json` 与「关于」里的引用保持现有写法。
+2. **Octanove C1/C2**：按 CC BY-SA 4.0 使用。改编后的 `octanove.json` 作为单独文件继续以 CC BY-SA 4.0 发布，不影响其他数据包的许可。
 
 ## 8. 词条 Key 与匹配（ADR-0001）
 
@@ -356,10 +354,10 @@ Options 页（首次安装向导 + 设置页）
 
 ## 19. 已知风险与待验证
 
-- **数据许可**：CEFR-J 条款措辞、Octanove 构建来源，见 7.3。
+- **数据许可**：已确认，见 7.3。
 - **中文释义质量**：LLM 生成，靠试点门槛和抽查控制；释义升级流程是后续修正的通道。
 - **v1 行为**：第 6 节列出的几项要在实现初期用测试实例重新确认。
-- **AnkiDroid**：没测试过；模板已经避开 `:has()`，但仍建议找安卓设备验证一次。
+- **AnkiDroid**：不做设备验证（维护者决定，模板只用标准 Anki 卡片特性并避开 `:has()`）；上架说明里注明「AnkiDroid 未测试」。
 - **整级导入的高亮噪音**：导入后 B1 词都是 Anki 新卡，会一直高亮，直到复习间隔超过 21 天；「我认识，别再高亮」是主要出口。上线后关注用户反馈。
 - **Chrome Web Store 审核**：访问 localhost 与可选的 `<all_urls>` 的实际审核反馈要等提交后才知道。
 
