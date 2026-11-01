@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, it, vi } from "vitest";
 import { Window } from "happy-dom";
+import { check } from "./shared";
 
 vi.mock("./shared", () => ({
   check: vi.fn(async () => "ok"),
@@ -164,8 +165,13 @@ it("shares one session across an iframe DOM source and a text stream", async () 
   });
 
   try {
+    vi.mocked(check).mockClear();
     await session.start();
-
+    expect(check).toHaveBeenCalledTimes(1);
+    for (const listener of storageListeners)
+      listener({ "reader-position:test": { newValue: {} } }, "local");
+    await Promise.resolve();
+    expect(check).toHaveBeenCalledTimes(1);
     const host = document.getElementById("voka-drawer")!;
     const listText = host.shadowRoot!.querySelector(".drawer-list")!.textContent;
     expect(listText).toContain("achieve");
@@ -192,6 +198,10 @@ it("shares one session across an iframe DOM source and a text stream", async () 
         (range) => range.startContainer.ownerDocument === document,
       ),
     ).toBe(true);
+
+    for (const listener of storageListeners)
+      listener({ nativeLanguage: { oldValue: "zh", newValue: "en" } }, "local");
+    expect(check).toHaveBeenCalledTimes(2);
 
     session.stop();
     expect(iframeHighlights.size).toBe(0);

@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
-import { checkConnection, rpc, REQUIRED_METHODS } from "./gateway";
+import {
+  checkConnection,
+  createConnectionFailureTracker,
+  rpc,
+  REQUIRED_METHODS,
+} from "./gateway";
 const settings = { port: 8766, apiKey: "" };
 const description = {
   apiMajor: 1,
@@ -164,5 +169,118 @@ describe("v1 gateway", () => {
       ),
     ).rejects.toMatchObject({ status: "unreachable", outcome: "unknown" });
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+  it("retries a timed-out read-only RPC once and accepts the retry response", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetch = vi
+        .fn()
+        .mockImplementationOnce(
+          (_url, init) =>
+            new Promise<Response>((_resolve, reject) =>
+              init!.signal!.addEventListener(
+                "abort",
+                () => reject(new Error("timeout")),
+                { once: true },
+              ),
+            ),
+        )
+        .mockImplementationOnce(async (_url, init) =>
+          new Response(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              id: JSON.parse(init!.body as string).id,
+              result: "retried",
+            }),
+          ),
+        );
+      const request = rpc(settings, "notes.search", {}, { fetch });
+      await vi.advanceTimersByTimeAsync(5000);
+      await expect(request).resolves.toBe("retried");
+      expect(fetch).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it("gives the read-only retry 15 seconds before reporting unreachable", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetch = vi.fn(
+        (_url, init) =>
+          new Promise<Response>((_resolve, reject) =>
+            init!.signal!.addEventListener(
+              "abort",
+              () => reject(new Error("timeout")),
+              { once: true },
+            ),
+          ),
+      );
+      const request = rpc(settings, "notes.search", {}, { fetch });
+      const rejected = expect(request).rejects.toMatchObject({
+        status: "unreachable",
+        outcome: "failed",
+      });
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(fetch).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(14999);
+      expect(fetch).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(1);
+      await rejected;
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it("gives side-effecting RPCs 15 seconds and never retries their unknown outcome", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetch = vi.fn(
+        (_url, init) =>
+          new Promise<Response>((_resolve, reject) =>
+            init!.signal!.addEventListener(
+              "abort",
+              () => reject(new Error("timeout")),
+              { once: true },
+            ),
+          ),
+      );
+      const request = rpc(settings, "notes.update", {}, {
+        fetch,
+        sideEffecting: true,
+      });
+      const rejected = expect(request).rejects.toMatchObject({
+        status: "unreachable",
+        outcome: "unknown",
+      });
+      await vi.advanceTimersByTimeAsync(14999);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      await rejected;
+      expect(fetch).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it("keeps a known connection after one failed probe, then disconnects on the second", () => {
+    const tracker = createConnectionFailureTracker();
+    expect(tracker.observe("ok")).toEqual({ status: "ok", disconnect: false });
+    expect(tracker.observe("unreachable")).toEqual({
+      status: "ok",
+      disconnect: false,
+    });
+    expect(tracker.observe("unreachable")).toEqual({
+      status: "unreachable",
+      disconnect: true,
+    });
+    expect(tracker.observe("ok")).toEqual({ status: "ok", disconnect: false });
+    expect(tracker.observe("unreachable")).toEqual({
+      status: "ok",
+      disconnect: false,
+    });
+  });
+  it("does not start without a connection after the first failed probe", () => {
+    expect(createConnectionFailureTracker().observe("unreachable")).toEqual({
+      status: "unreachable",
+      disconnect: true,
+    });
   });
 });

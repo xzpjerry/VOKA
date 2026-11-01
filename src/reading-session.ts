@@ -108,6 +108,16 @@ export function createReadingSession(options: ReadingSessionOptions) {
       all.findIndex((candidate) => sameSource(source, candidate)) === index,
   );
   const sourceLabel = options.sourceLabel;
+  const refreshOnStorageKeys = new Set([
+    "port",
+    "apiKey",
+    "nativeLanguage",
+    "glossLanguage",
+    "targetLevel",
+    "showAdvanced",
+    "hoverScope",
+    "storeFullUrl",
+  ]);
 
   const host = uiDocument.createElement("div");
   host.id = "voka-drawer";
@@ -771,8 +781,13 @@ export function createReadingSession(options: ReadingSessionOptions) {
 
   uiDocument.addEventListener("voka-open-card", onOpenCard);
   retry.addEventListener("click", () => void refresh());
-  chrome.storage.onChanged.addListener((_changes, area) => {
-    if (area === "local" && !paused) void refresh();
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (
+      area === "local" &&
+      !paused &&
+      Object.keys(changes).some((key) => refreshOnStorageKeys.has(key))
+    )
+      void refresh();
   });
   chrome.runtime.onMessage.addListener(onRuntimeMessage);
   drawer.append(drawerUI.header, drawerUI.body);

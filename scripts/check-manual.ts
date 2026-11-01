@@ -1,10 +1,11 @@
 import puppeteer from "puppeteer";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { rpc } from "../src/background/gateway";
 import { lookup, DEFAULT_TARGET } from "../src/background/import";
+import { loadData } from "../src/data";
 
 // Writes go only to the isolated AnkiConnect instance.
 const call = (method: string, params = {}, write = false) =>
@@ -28,14 +29,30 @@ const changed = (before: Record<string, string>, after: Record<string, string>) 
 
 const target = "benefit"; // B1, target level, existing note
 const below = "banana"; // A1, below target B1, existing note
-// Pick the first below-target word with no note for the add-first path.
-let createdWord = "cat";
-for (const word of ["cat", "dog", "water", "book", "house", "tree"]) {
-  if (!(await readNote(word))) {
-    createdWord = word;
+// Pick an unused A1 entry from the local data pack for the add-first path.
+const data = await loadData(async (name) =>
+  JSON.parse(
+    await readFile(resolve(`public/data/${name}.json`), "utf8"),
+  ),
+);
+const candidates = [
+  ...new Set(
+    data.pack.entries
+      .filter((entry) => entry.level === "A1" && /^[a-z]{3,18}$/.test(entry.lemma))
+      .map((entry) => entry.lemma),
+  ),
+];
+let createdWord = "";
+for (let start = 0; start < candidates.length; start += 40) {
+  const batch = candidates.slice(start, start + 40);
+  const matches = await lookup(call, DEFAULT_TARGET, batch.map(keyOf));
+  const unused = batch.find((word) => !(matches.get(keyOf(word)) ?? []).length);
+  if (unused) {
+    createdWord = unused;
     break;
   }
 }
+assert(createdWord, "no unused A1 entry is available for the manual-add check");
 
 const beforeTarget = await readNote(target);
 const beforeBelow = await readNote(below);

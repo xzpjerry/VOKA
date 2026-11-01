@@ -1,3 +1,5 @@
+declare const __VOKA_RPC_LOG__: boolean;
+
 export type Settings = { port: number; apiKey: string };
 export type Status =
   "ok" | "unreachable" | "not-new-ankiconnect" | "forbidden" | "auth";
@@ -40,19 +42,39 @@ export class GatewayError extends Error {
     super(status);
   }
 }
-/** Exactly one attempt. A failed transport for a mutation has an unknown outcome. */
-export async function rpc(
+
+const RPC_LOG_ENABLED =
+  typeof __VOKA_RPC_LOG__ !== "undefined" && __VOKA_RPC_LOG__;
+
+class RpcTimeoutError extends GatewayError {
+  constructor(sideEffecting: boolean) {
+    super("unreachable", sideEffecting ? "unknown" : "failed");
+    this.name = "RpcTimeoutError";
+  }
+}
+
+function logAttempt(method: string, startedAt: number, outcome: string) {
+  if (!RPC_LOG_ENABLED) return;
+  console.info(
+    `[VOKA_RPC] ${JSON.stringify({
+      method,
+      startedAt: new Date(startedAt).toISOString(),
+      durationMs: Date.now() - startedAt,
+      outcome,
+    })}`,
+  );
+}
+
+async function rpcAttempt(
   settings: Settings,
   method: string,
-  params: Record<string, unknown> = {},
-  options: {
-    fetch?: typeof fetch;
-    timeoutMs?: number;
-    sideEffecting?: boolean;
-  } = {},
+  params: Record<string, unknown>,
+  options: RpcOptions,
+  timeoutMs: number,
 ): Promise<unknown> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 5000);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const startedAt = Date.now();
   const id = crypto.randomUUID();
   try {
     let response: Response;
@@ -72,6 +94,8 @@ export async function rpc(
         },
       );
     } catch {
+      if (controller.signal.aborted)
+        throw new RpcTimeoutError(!!options.sideEffecting);
       throw new GatewayError(
         "unreachable",
         options.sideEffecting ? "unknown" : "failed",
@@ -88,8 +112,10 @@ export async function rpc(
     try {
       data = await response.json();
     } catch {
+      if (controller.signal.aborted)
+        throw new RpcTimeoutError(!!options.sideEffecting);
       throw new GatewayError(
-        controller.signal.aborted ? "unreachable" : "not-new-ankiconnect",
+        "not-new-ankiconnect",
         options.sideEffecting ? "unknown" : "failed",
       );
     }
@@ -120,10 +146,75 @@ export async function rpc(
         error.code as number,
       );
     }
+    logAttempt(method, startedAt, "ok");
     return data.result;
+  } catch (error) {
+    logAttempt(
+      method,
+      startedAt,
+      error instanceof RpcTimeoutError
+        ? options.sideEffecting
+          ? "timeout-unknown"
+          : "timeout"
+        : error instanceof GatewayError
+          ? error.status
+          : "error",
+    );
+    throw error;
   } finally {
     clearTimeout(timer);
   }
+}
+
+type RpcOptions = {
+  fetch?: typeof fetch;
+  timeoutMs?: number;
+  sideEffecting?: boolean;
+};
+
+/** Read-only calls retry one timeout; mutation timeouts remain outcome-unknown. */
+export async function rpc(
+  settings: Settings,
+  method: string,
+  params: Record<string, unknown> = {},
+  options: RpcOptions = {},
+): Promise<unknown> {
+  const sideEffecting = !!options.sideEffecting;
+  try {
+    return await rpcAttempt(
+      settings,
+      method,
+      params,
+      options,
+      options.timeoutMs ?? (sideEffecting ? 15000 : 5000),
+    );
+  } catch (error) {
+    if (sideEffecting || !(error instanceof RpcTimeoutError)) throw error;
+    return rpcAttempt(settings, method, params, options, 15000);
+  }
+}
+
+export function createConnectionFailureTracker() {
+  let connected = false;
+  let consecutiveFailures = 0;
+
+  return {
+    observe(status: Status): { status: Status; disconnect: boolean } {
+      if (status === "ok") {
+        connected = true;
+        consecutiveFailures = 0;
+        return { status, disconnect: false };
+      }
+      if (status === "unreachable") {
+        consecutiveFailures += 1;
+        if (connected && consecutiveFailures < 2)
+          return { status: "ok", disconnect: false };
+        return { status, disconnect: true };
+      }
+      consecutiveFailures = 0;
+      return { status, disconnect: true };
+    },
+  };
 }
 export async function checkConnection(
   settings: Settings,
