@@ -206,6 +206,18 @@
   "reviewReturn": {
     "message": "返回列表"
   },
+  "practiceLabel": {
+    "message": "练习 · 不计入 Anki"
+  },
+  "practiceWord": {
+    "message": "练习这个词"
+  },
+  "practiceNoCard": {
+    "message": "这个词还没有加入 Anki"
+  },
+  "practiceReturn": {
+    "message": "返回"
+  },
   "drawerLearning": {
     "message": "学习语言"
   },

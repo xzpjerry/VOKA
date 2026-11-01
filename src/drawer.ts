@@ -62,6 +62,7 @@ export function createDrawer(
   onExpanded: () => void = () => {},
   onStartReview: (tokens: Token[]) => void = () => {},
   reviewView?: HTMLElement,
+  onStartPractice: (token: Token, cardId: string) => void = () => {},
 ) {
   const style = document.createElement("style");
   style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 8px 12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-due-summary{border:0;background:transparent;color:#285e9e;text-align:left;padding:8px 4px;white-space:nowrap}.drawer-due-summary:disabled{color:#566575;cursor:default}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-sort{display:flex;align-items:center;gap:8px;margin:8px 0}.drawer-start-review{margin:4px 0 8px}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
@@ -258,6 +259,14 @@ export function createDrawer(
     setReviewing(true);
     onStartReview(queue);
   }
+  root.addEventListener("voka-start-practice", (event) => {
+    const detail = (event as CustomEvent<{ token?: Token; cardId?: string }>)
+      .detail;
+    if (status !== "ok" || !detail?.token || !detail.cardId) return;
+    setExpanded(true);
+    setReviewing(true);
+    onStartPractice(detail.token, detail.cardId);
+  });
   dueSlot.onclick = () => {
     if (dueSlot.disabled) return;
     active = "due";

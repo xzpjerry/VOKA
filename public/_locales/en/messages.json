@@ -206,6 +206,18 @@
   "reviewReturn": {
     "message": "Return to list"
   },
+  "practiceLabel": {
+    "message": "Practice · not recorded in Anki"
+  },
+  "practiceWord": {
+    "message": "Practice this word"
+  },
+  "practiceNoCard": {
+    "message": "This word is not in Anki yet"
+  },
+  "practiceReturn": {
+    "message": "Back"
+  },
   "drawerLearning": {
     "message": "Learning language"
   },
