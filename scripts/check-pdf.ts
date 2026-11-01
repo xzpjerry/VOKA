@@ -12,7 +12,7 @@ import { normalizeKey } from "../src/key";
 import { answerHtml, css, questionHtml } from "../src/data/template";
 
 const PORT = 8766;
-const TEST_DECK = "VOKA Test::85";
+const TEST_DECK = "VOKA Test::86";
 const NOTE_TYPE = DEFAULT_TARGET.noteType;
 const TEST_PDF_TITLE = "VOKA PDF Test Document";
 const config = { port: PORT, apiKey: "" };
@@ -53,7 +53,7 @@ const candidateEntries = data.pack.entries.filter(
   (entry: Entry) => entry.level === "B1" && /^[a-z]{3,18}$/.test(entry.lemma),
 );
 
-function createTextPdf(dueWord: string, firstWord: string, thirdWord: string) {
+function createTextPdf(dueWords: string[], practiceWord: string, firstWord: string, thirdWord: string) {
   const pdf = PDFDocument.create();
   return pdf.then(async (document) => {
     document.setTitle(TEST_PDF_TITLE);
@@ -62,7 +62,7 @@ function createTextPdf(dueWord: string, firstWord: string, thirdWord: string) {
     const pageOne = document.addPage([612, 792]);
     pageOne.drawText("A Garden Reading", { x: 60, y: 710, size: 24, font });
     pageOne.drawText(
-      `This ${firstWord} appears in a useful example for English readers.`,
+      `This ${firstWord} and ${dueWords[0]} appear in a useful example for English readers.`,
       { x: 60, y: 650, size: 16, font },
     );
     pageOne.drawText("A clear plan helps a neighbor understand a new idea.", {
@@ -77,6 +77,7 @@ function createTextPdf(dueWord: string, firstWord: string, thirdWord: string) {
     const size = 16;
     const y = 650;
     const left = "The clear example shows ";
+    const dueWord = dueWords[1];
     const firstPart = dueWord.slice(0, Math.ceil(dueWord.length / 2));
     const secondPart = dueWord.slice(firstPart.length);
     pageTwo.drawText(left, { x: 60, y, size, font });
@@ -97,9 +98,27 @@ function createTextPdf(dueWord: string, firstWord: string, thirdWord: string) {
       size,
       font,
     });
+    pageTwo.drawText(`A second example includes ${dueWords[2]} for learners.`, {
+      x: 60,
+      y: 578,
+      size,
+      font,
+    });
 
     const pageThree = document.addPage([612, 792]);
     pageThree.drawText("A Final Page", { x: 60, y: 710, size: 24, font });
+    pageThree.drawText(`The practice word ${practiceWord} starts near the top of page three.`, {
+      x: 60,
+      y: 670,
+      size: 16,
+      font,
+    });
+    pageThree.drawText(`The due word ${dueWords[3]} appears on this page.`, {
+      x: 60,
+      y: 630,
+      size: 16,
+      font,
+    });
     pageThree.drawText(
       `The word ${thirdWord} appears on the final page of this local reader fixture.`,
       { x: 60, y: 650, size: 16, font },
@@ -110,6 +129,7 @@ function createTextPdf(dueWord: string, firstWord: string, thirdWord: string) {
 
 async function unusedB1Entries(count: number) {
   const unusedEntries: Entry[] = [];
+  const seenKeys = new Set<string>();
   for (let start = 0; start < candidateEntries.length; start += 100) {
     const batch = candidateEntries.slice(start, start + 100);
     const found = await lookup(
@@ -118,7 +138,9 @@ async function unusedB1Entries(count: number) {
       batch.map((entry: Entry) => normalizeKey(entry.lemma)),
     );
     for (const entry of batch as Entry[]) {
-      if ((found.get(normalizeKey(entry.lemma)) ?? []).length) continue;
+      const key = normalizeKey(entry.lemma);
+      if (seenKeys.has(key) || (found.get(key) ?? []).length) continue;
+      seenKeys.add(key);
       unusedEntries.push(entry);
       if (unusedEntries.length === count) return unusedEntries;
     }
@@ -126,7 +148,7 @@ async function unusedB1Entries(count: number) {
   throw new Error(`Fewer than ${count} unused B1 words are available for the PDF fixture`);
 }
 
-async function createDueCard(candidates: Entry[]) {
+async function createTestCards(candidates: Entry[]) {
   const decks = await call("decks.list");
   assert(
     !decks.some((deck: any) => deck.name === TEST_DECK),
@@ -151,6 +173,7 @@ async function createDueCard(candidates: Entry[]) {
     );
   }
 
+  const cards: { entry: Entry; noteId: string; cardId: string }[] = [];
   for (const entry of candidates) {
     const fields = Object.fromEntries(CORE_FIELDS.map((name) => [name, ""]));
     Object.assign(fields, {
@@ -183,9 +206,10 @@ async function createDueCard(candidates: Entry[]) {
     assert(!noteResult.items[0]?.error && noteResult.items[0]?.result, "PDF test note could not be read");
     const cardId = String(noteResult.items[0].result.cardIds?.[0] ?? "");
     assert(cardId, "PDF test note has no generated card");
-    return { entry, noteId, cardId };
+    cards.push({ entry, noteId, cardId });
   }
-  throw new Error("No unused B1 entry passed Anki's duplicate validation for the PDF test note");
+  assert.equal(cards.length, candidates.length, "all PDF test cards must be created");
+  return cards;
 }
 
 async function answer(cardId: string, rating: string) {
@@ -210,6 +234,15 @@ async function makeDue(cardId: string) {
   await call("scheduling.setDueDate", { cardIds: [cardId], days: "0" }, true);
   const due = await call("scheduling.getDue", { cardId });
   assert.equal(due.dueNow, true, "PDF test card must be due now");
+}
+
+async function makeFuture(cardId: string) {
+  let scheduled = await answer(cardId, "easy");
+  for (let attempt = 0; scheduled.type !== "review" && attempt < 20; attempt++)
+    scheduled = await answer(cardId, "easy");
+  assert.equal(scheduled.type, "review", "PDF practice card must graduate to Review");
+  await call("scheduling.setDueDate", { cardIds: [cardId], days: "10" }, true);
+  assert.equal((await call("scheduling.getDue", { cardId })).dueNow, false, "PDF practice card must not be due today");
 }
 
 async function searchTestNotes() {
@@ -266,25 +299,42 @@ let server: ReturnType<typeof createServer> | undefined;
 let deckWasAbsent = false;
 let deckCreateAttempted = false;
 let testError: unknown;
-let testCardId = "";
-let baselineReviewId: unknown;
 let dueEntry: Entry | undefined;
+let dueEntries: Entry[] = [];
+let practiceEntry: Entry | undefined;
 let firstEntry: Entry | undefined;
 let thirdEntry: Entry | undefined;
+let testCards: { entry: Entry; noteId: string; cardId: string }[] = [];
+let baselineReviewIds: unknown[] = [];
 
 try {
   await mkdir(cacheRoot, { recursive: true });
   const candidates = await unusedB1Entries(20);
-  const created = await createDueCard(candidates);
-  dueEntry = created.entry;
-  [firstEntry, thirdEntry] = candidates.filter((entry) => entry.lemma !== dueEntry!.lemma).slice(0, 2);
-  assert(firstEntry && thirdEntry, "PDF fixture needs two additional B1 entries");
-  testCardId = created.cardId;
-  await makeDue(testCardId);
-  baselineReviewId = (await call("reviews.getLatestId", { cardIds: [testCardId] })).id;
+  dueEntries = candidates.slice(0, 4);
+  practiceEntry = candidates[4];
+  firstEntry = candidates[5];
+  thirdEntry = candidates[6];
+  dueEntry = dueEntries[1];
+  assert(practiceEntry && firstEntry && thirdEntry, "PDF fixture needs four due entries, one practice entry, and two target entries");
+  testCards = await createTestCards([...dueEntries, practiceEntry]);
+  for (const card of testCards.slice(0, 4)) await makeDue(card.cardId);
+  await makeFuture(testCards[4].cardId);
+  const dueCards = testCards.slice(0, 4);
+  baselineReviewIds = await Promise.all(
+    dueCards.map(async (card) =>
+      (await call("reviews.getLatestId", { cardIds: [card.cardId] })).id,
+    ),
+  );
+  const baselineDueStates = await Promise.all(
+    dueCards.map((card) => call("scheduling.get", { cardId: card.cardId })),
+  );
+  const baselinePracticeReviewId = (
+    await call("reviews.getLatestId", { cardIds: [testCards[4].cardId] })
+  ).id;
+  const baselinePracticeState = await call("scheduling.get", { cardId: testCards[4].cardId });
   await writeFile(
     textPdfPath,
-    await createTextPdf(dueEntry.lemma, firstEntry.lemma, thirdEntry.lemma),
+    await createTextPdf(dueEntries.map((entry) => entry.lemma), practiceEntry.lemma, firstEntry.lemma, thirdEntry.lemma),
   );
 
   const fixtureHtml = await readFile(resolve("scripts/fixtures/pdf-reader.html"), "utf8");
@@ -475,7 +525,7 @@ try {
     (document.getElementById("voka-drawer")!.shadowRoot!.querySelector("#voka-save-context") as HTMLButtonElement).click(),
   );
 
-  const noteId = created.noteId;
+  const noteId = testCards[1].noteId;
   let savedNote: any;
   const saveDeadline = Date.now() + 30000;
   while (Date.now() < saveDeadline) {
@@ -490,6 +540,101 @@ try {
     "saved example source must contain the PDF title, page 2, and date",
   );
   await reader.keyboard.press("Escape");
+
+  await reader.waitForFunction(() => document.querySelectorAll(".pdf-text-layer").length >= 3);
+  await reader.evaluate(() => {
+    const container = document.querySelector<HTMLElement>("#pdf-reader")!;
+    const pages = [...document.querySelectorAll<HTMLElement>(".pdf-page")];
+    const pageTwo = pages[1]!;
+    container.scrollTop = pageTwo.offsetTop + pageTwo.offsetHeight - 100;
+    container.dispatchEvent(new Event("scroll"));
+  });
+  await reader.waitForFunction(() => document.querySelector<HTMLInputElement>("#pdf-page-number")?.value === "2");
+  const currentPageDuringExampleSave = await reader.$eval(
+    "#pdf-page-number",
+    (input) => input.value,
+  );
+  assert.equal(currentPageDuringExampleSave, "2", "page 2 must remain the current PDF page during the page 3 example save");
+  const practiceRect = await reader.evaluate((word) => {
+    const range = ["voka-target", "voka-learning", "voka-unknown", "voka-weak"]
+      .flatMap((name) => [...(CSS.highlights.get(name) ?? [])])
+      .find((candidate: any) => candidate.toString() === word) as Range | undefined;
+    const rect = range?.getClientRects()[0];
+    return rect ? { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 } : null;
+  }, practiceEntry.lemma);
+  assert(practiceRect, "page 3 practice word must be visible while page 2 is current");
+  await reader.mouse.click(practiceRect.x, practiceRect.y);
+  await reader.waitForFunction((word) => {
+    const card = document.getElementById("voka-drawer")?.shadowRoot?.querySelector<HTMLElement>("#voka-card");
+    return !!card && !card.hidden && card.querySelector("h2")?.textContent === word;
+  }, { timeout: 30000 }, practiceEntry.lemma);
+  await reader.waitForFunction(() => {
+    const button = document.getElementById("voka-drawer")?.shadowRoot?.querySelector<HTMLButtonElement>("#voka-save-context");
+    return !!button && !button.disabled;
+  });
+  await reader.evaluate(() =>
+    (document.getElementById("voka-drawer")!.shadowRoot!.querySelector("#voka-save-context") as HTMLButtonElement).click(),
+  );
+  let practiceNote: any;
+  const practiceSaveDeadline = Date.now() + 30000;
+  while (Date.now() < practiceSaveDeadline) {
+    practiceNote = await call("notes.getMany", { ids: [testCards[4].noteId] });
+    if (practiceNote.items[0]?.result?.fields?.Source1) break;
+    await new Promise((resolveWait) => setTimeout(resolveWait, 300));
+  }
+  const pageThreeSource = String(practiceNote?.items[0]?.result?.fields?.Source1 ?? "");
+  assert.match(
+    pageThreeSource,
+    new RegExp(`^${TEST_PDF_TITLE} · (第 3 页|Page 3) · \\d{4}-\\d{2}-\\d{2}$`),
+    "#106 example source must use the localized label for the token's page 3 while page 2 is current",
+  );
+  await reader.waitForFunction(() =>
+    !!document.getElementById("voka-drawer")?.shadowRoot?.querySelector("#voka-practice-word"),
+  { timeout: 30000 });
+  const practiceBefore = {
+    latestReviewId: (await call("reviews.getLatestId", { cardIds: [testCards[4].cardId] })).id,
+    scheduling: await call("scheduling.get", { cardId: testCards[4].cardId }),
+  };
+  assert.equal(practiceBefore.latestReviewId, baselinePracticeReviewId);
+  assert.deepEqual(practiceBefore.scheduling, baselinePracticeState);
+  await reader.evaluate(() =>
+    (document.getElementById("voka-drawer")!.shadowRoot!.querySelector("#voka-practice-word") as HTMLButtonElement).click(),
+  );
+  await reader.waitForFunction((word) => {
+    const root = document.getElementById("voka-drawer")?.shadowRoot;
+    const view = root?.querySelector<HTMLElement>("#voka-review-ui");
+    return !!view && !view.hidden && /练习 · 不计入 Anki|Practice · not recorded in Anki/i.test(view.querySelector(".practice-label")?.textContent ?? "") &&
+      root?.querySelector("#voka-review-question")?.textContent?.toLowerCase().includes(word.toLowerCase()) === true &&
+      view.querySelectorAll("[data-review-rating]").length === 0;
+  }, { timeout: 30000 }, practiceEntry.lemma);
+  await reader.evaluate(() =>
+    (document.getElementById("voka-drawer")!.shadowRoot!.querySelector('[data-practice-action="show-answer"]') as HTMLButtonElement).click(),
+  );
+  await reader.waitForFunction(() => {
+    const root = document.getElementById("voka-drawer")?.shadowRoot;
+    const view = root?.querySelector<HTMLElement>("#voka-review-ui");
+    return !!root?.querySelector("#voka-review-answer") &&
+      !!view?.querySelector('[data-practice-action="next"]') &&
+      view.querySelectorAll("[data-review-rating]").length === 0;
+  }, { timeout: 30000 });
+  await reader.evaluate(() =>
+    (document.getElementById("voka-drawer")!.shadowRoot!.querySelector('[data-practice-action="next"]') as HTMLButtonElement).click(),
+  );
+  await reader.waitForFunction(() =>
+    document.getElementById("voka-drawer")?.shadowRoot?.querySelector<HTMLElement>("#voka-review-ui")?.hidden === true,
+  { timeout: 30000 });
+  assert.deepEqual(
+    {
+      latestReviewId: (await call("reviews.getLatestId", { cardIds: [testCards[4].cardId] })).id,
+      scheduling: await call("scheduling.get", { cardId: testCards[4].cardId }),
+    },
+    practiceBefore,
+    "PDF practice must not change its review id or scheduling state",
+  );
+  await reader.waitForFunction(() => {
+    const text = document.getElementById("voka-drawer")?.shadowRoot?.querySelector('[data-slot="due-summary"]')?.textContent ?? "";
+    return /4\s+张今日到期|4 due today/i.test(text);
+  }, { timeout: 30000 });
 
   await reader.evaluate(() => {
     const container = document.querySelector<HTMLElement>("#pdf-reader")!;
@@ -524,43 +669,108 @@ try {
     { timeout: 30000 },
   );
 
+  await reader.$eval("#pdf-page-number", (input: HTMLInputElement) => {
+    input.value = "2";
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await reader.waitForFunction(() => document.querySelector<HTMLInputElement>("#pdf-page-number")?.value === "2");
   await reader.waitForFunction(() => {
     const root = document.getElementById("voka-drawer")?.shadowRoot;
-    return /1\s+张今日到期|1 due today/i.test(root?.querySelector('[data-slot="due-summary"]')?.textContent ?? "");
+    return /4\s+张今日到期|4 due today/i.test(root?.querySelector('[data-slot="due-summary"]')?.textContent ?? "");
   }, { timeout: 30000 });
   await reader.evaluate(() => {
     const root = document.getElementById("voka-drawer")!.shadowRoot!;
     (root.querySelector(".drawer-toggle") as HTMLElement).click();
     (root.querySelector('[data-filter="due"]') as HTMLElement).click();
-    (root.querySelector(".drawer-start-review") as HTMLElement).click();
   });
+  const dueListCount = await reader.$eval(
+    "#voka-drawer",
+    (host) => host.shadowRoot!.querySelectorAll(".drawer-list li").length,
+  );
+  assert.equal(dueListCount, 4, "PDF due filter must list all four due words across pages 1–3");
+  await reader.evaluate(() =>
+    (document.getElementById("voka-drawer")!.shadowRoot!.querySelector('[data-slot="review-button"]') as HTMLButtonElement).click(),
+  );
   await reader.waitForFunction((word) => {
     const review = document.getElementById("voka-drawer")?.shadowRoot?.querySelector("#voka-review-question");
     return !!review && review.textContent?.toLowerCase().includes(word.toLowerCase());
-  }, { timeout: 30000 }, dueEntry.lemma);
-  await reader.evaluate(() => {
-    const root = document.getElementById("voka-drawer")!.shadowRoot!;
-    (root.querySelector("#voka-review-ui .review-actions button") as HTMLButtonElement).click();
-  });
-  await reader.waitForFunction(() => !!document.getElementById("voka-drawer")?.shadowRoot?.querySelector('[data-review-rating="good"]'), { timeout: 30000 });
-  await reader.evaluate(() => {
-    const root = document.getElementById("voka-drawer")!.shadowRoot!;
-    (root.querySelector('[data-review-rating="good"]') as HTMLButtonElement).click();
-  });
+  }, { timeout: 30000 }, dueEntries[0].lemma);
+  const ratings = ["again", "hard", "good", "easy"] as const;
+  for (let index = 0; index < 4; index++) {
+    const current = testCards[index];
+    const rating = ratings[index];
+    await reader.waitForFunction((word) => {
+      const root = document.getElementById("voka-drawer")?.shadowRoot;
+      const view = root?.querySelector<HTMLElement>("#voka-review-ui");
+      return root?.querySelector("#voka-review-question")?.textContent?.toLowerCase().includes(word.toLowerCase()) === true &&
+        !!view?.querySelector(".review-actions button:not([data-review-rating])");
+    }, { timeout: 30000 }, current.entry.lemma);
+    await reader.evaluate(() => {
+      const root = document.getElementById("voka-drawer")!.shadowRoot!;
+      (root.querySelector("#voka-review-ui .review-actions button:not([data-review-rating])") as HTMLButtonElement).click();
+    });
+    await reader.waitForFunction((value) =>
+      !!document.getElementById("voka-drawer")?.shadowRoot?.querySelector("#voka-review-answer") &&
+      !!document.getElementById("voka-drawer")?.shadowRoot?.querySelector(`[data-review-rating="${value}"]`),
+    { timeout: 30000 }, rating);
+    await reader.evaluate((value) => {
+      const root = document.getElementById("voka-drawer")!.shadowRoot!;
+      (root.querySelector(`[data-review-rating="${value}"]`) as HTMLButtonElement).click();
+    }, rating);
+    const remaining = 3 - index;
+    await reader.waitForFunction((expected) => {
+      const text = document.getElementById("voka-drawer")?.shadowRoot?.querySelector('[data-slot="due-summary"]')?.textContent ?? "";
+      if (expected === 0) return /本页没有今日到期的词|Nothing due today/i.test(text);
+      const count = Number(text.match(/(\d+)\s*(?:张今日到期|due today)/i)?.[1]);
+      return count === expected;
+    }, { timeout: 30000 }, remaining);
+    await reader.waitForFunction((word, finished) => {
+      const root = document.getElementById("voka-drawer")?.shadowRoot;
+      const heading = root?.querySelector("#voka-review-ui h3")?.textContent ?? "";
+      const question = root?.querySelector("#voka-review-question")?.textContent ?? "";
+      return finished
+        ? /复习完了|finished/i.test(heading)
+        : question.toLowerCase().includes(word.toLowerCase());
+    }, { timeout: 30000 }, testCards[index + 1]?.entry.lemma ?? "", index === 3);
+    const records = await call("reviews.list", {
+      cardIds: [current.cardId],
+      afterId: baselineReviewIds[index],
+      limit: 20,
+    });
+    const matching = records.items.filter(
+      (item: any) => String(item.cardId) === current.cardId && item.rating === rating,
+    );
+    assert.equal(matching.length, 1, `PDF review must record exactly one ${rating} rating for ${current.entry.lemma}`);
+    assert.equal(records.items.length, 1, `PDF review must create only one record for ${current.entry.lemma}`);
+    assert.notDeepEqual(
+      await call("scheduling.get", { cardId: current.cardId }),
+      baselineDueStates[index],
+      `PDF ${rating} review must update scheduling for ${current.entry.lemma}`,
+    );
+  }
   await reader.waitForFunction(() => {
-    const heading = document.getElementById("voka-drawer")?.shadowRoot?.querySelector("#voka-review-ui h3")?.textContent ?? "";
-    return /finished|完了/.test(heading.toLowerCase());
+    const root = document.getElementById("voka-drawer")?.shadowRoot;
+    const button = root?.querySelector<HTMLButtonElement>('[data-slot="review-button"]');
+    const dueSummary = root?.querySelector('[data-slot="due-summary"]')?.textContent ?? "";
+    return !!button && !button.hidden && /本页没有今日到期的词|Nothing due today/i.test(dueSummary);
   }, { timeout: 30000 });
-  const reviews = await call("reviews.list", {
-    cardIds: [testCardId],
-    afterId: baselineReviewId,
-    limit: 20,
-  });
-  const matching = reviews.items.filter(
-    (item: any) => String(item.cardId) === testCardId && item.rating === "good",
+  await reader.evaluate(() =>
+    (document.getElementById("voka-drawer")!.shadowRoot!.querySelector('[data-slot="review-button"]') as HTMLButtonElement).click(),
   );
-  assert.equal(matching.length, 1, "PDF drawer review must create exactly one Good rating");
-  assert.equal(reviews.items.length, 1, "PDF drawer review must create only one review record after the baseline");
+  await reader.waitForFunction(() => {
+    const text = document.getElementById("voka-drawer")?.shadowRoot?.querySelector<HTMLElement>(".drawer-review-message")?.textContent ?? "";
+    return text === "本页没有今日到期的词，可以点词卡练习" ||
+      text === "Nothing on this page is due today. You can practice any word from its card.";
+  }, { timeout: 30000 });
+  const emptyReviewMessage = await reader.$eval(
+    "#voka-drawer",
+    (host) => host.shadowRoot!.querySelector<HTMLElement>(".drawer-review-message")?.textContent,
+  );
+  assert(
+    emptyReviewMessage === "本页没有今日到期的词，可以点词卡练习" ||
+      emptyReviewMessage === "Nothing on this page is due today. You can practice any word from its card.",
+    `Review button showed an unexpected empty-due message: ${emptyReviewMessage}`,
+  );
 
   const scannedInput = await reader.$("#file-input");
   assert(scannedInput, "reader file input missing before scanned PDF check");
@@ -585,17 +795,22 @@ try {
     port: PORT,
     testDeck: TEST_DECK,
     dueWord: dueEntry.lemma,
+    practiceWord: practiceEntry.lemma,
     splitAcrossTextNodes: highlightState.dueWordSplitAcrossNodes,
     savedSource: source,
+    savedPageThreeSource: pageThreeSource,
     savedPosition,
     checks: [
       "three-page generated text PDF renders through the local PDF.js worker",
       "target highlight and due underline ranges belong to the PDF text layers",
       "hover tooltip and full card work, and the saved sentence spans split text nodes",
-      "Anki source uses the PDF title and page 2",
+      "Anki source uses the PDF title and page 2 for a page 2 word",
+      "a top-of-page-3 word uses page 3 in its source while page 2 is current",
       "previous/next page navigation works",
       "SHA-256 page and normalized offset restore after reopening (T-24b)",
-      "drawer review records exactly one Good review on the isolated test instance",
+      "the future-review practice word shows no ratings and leaves review id and scheduling unchanged",
+      "drawer due filter lists four words and Review submits Again, Hard, Good, and Easy once each",
+      "Review button shows the no-due practice message after all four reviews",
       "generated image-only PDF shows the file-level unsupported message",
       "the reader page makes no non-extension network requests",
     ],

@@ -26,6 +26,13 @@ export function isPdfFileTextless(
     firstPageCharacterCounts.slice(0, sampleCount).every((count) => count === 0);
 }
 
+export function pdfPageNumberFromSourceId(sourceId: string) {
+  const match = /^pdf-page-([1-9]\d*)$/.exec(sourceId);
+  if (!match) return undefined;
+  const pageNumber = Number(match[1]);
+  return Number.isSafeInteger(pageNumber) ? pageNumber : undefined;
+}
+
 export type PdfStreamSession = {
   addSource(source: ReadingSource): void;
   removeSource(source: ReadingSource): void;

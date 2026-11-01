@@ -51,6 +51,7 @@ export type ReadingSessionOptions = {
   sourceLabelForToken?: (
     token: Token,
     storeFullUrl: boolean,
+    source?: ReadingSource,
   ) => { site: string; title: string } | undefined;
   sentenceForToken?: (token: Token) => ReadingSentence | undefined;
   drawerNote?: () => string | undefined;
@@ -651,7 +652,11 @@ export function createReadingSession(options: ReadingSessionOptions) {
       tooltip.hidden = true;
     },
     (token) =>
-      options.sourceLabelForToken?.(token, config?.storeFullUrl === true) ??
+      options.sourceLabelForToken?.(
+        token,
+        config?.storeFullUrl === true,
+        sourceForToken(token),
+      ) ??
       sourceLabel?.(),
     (token) => options.sentenceForToken?.(token),
     (token) => sourceForToken(token)?.listed !== false,
