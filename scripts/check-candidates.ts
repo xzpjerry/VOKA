@@ -31,9 +31,20 @@ try {
   };
   const open = async (id: string) => {
     await page.click("#"+id,{count:2});
-    await page.waitForFunction(()=>!document.getElementById("voka-drawer")!.shadowRoot!.querySelector<HTMLButtonElement>("#voka-manual-status")?.disabled);
+    await page.waitForFunction(() => {
+      const root = document.getElementById("voka-drawer")?.shadowRoot;
+      const card = root?.querySelector<HTMLElement>("#voka-card");
+      const manual = root?.querySelector<HTMLButtonElement>("#voka-manual-status");
+      return !!card && !card.hidden && !!manual && !manual.disabled;
+    });
   };
-  const title = () => page.evaluate(()=>document.getElementById("voka-drawer")!.shadowRoot!.querySelector("#voka-card h2")!.textContent);
+  const title = () => page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")?.shadowRoot;
+    const card = root?.querySelector<HTMLElement>("#voka-card");
+    const heading = card?.querySelector("h2");
+    if (!card || card.hidden || !heading) throw new Error("full card is not open");
+    return heading.textContent;
+  });
   const click = async (selector: string) => {
     await page.evaluate(selector=>document.getElementById("voka-drawer")!.shadowRoot!.querySelector<HTMLButtonElement>(selector)!.click(),selector);
     if (selector.startsWith("[data-slot"))

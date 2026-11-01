@@ -44,6 +44,12 @@ console.log(
 );
 const missing = data.pack.entries.find(
   (e) => data.lookupEntry(e.lemma).dictionaryStatus === "missing",
-)!;
-console.log("T-11", missing.lemma, data.lookupEntry(missing.lemma).message);
+);
+if (missing) {
+  console.log("T-11", missing.lemma, data.lookupEntry(missing.lemma).message);
+} else {
+  console.log(
+    `T-11: no level word without a dictionary entry in ${data.pack.version}; the unlisted-word missing-dictionary UI is covered by check-contexts.ts.`,
+  );
+}
 console.log("B1 preview only; no writes, imports, sync, or review operations.");
