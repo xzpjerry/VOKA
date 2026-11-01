@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc --noEmit && vite build && vite build --config vite.content.config.ts && vite build --config vite.content.config.ts --mode auto",
     "test": "vitest run",
+    "probe:youtube": "vite build --config prototypes/youtube-probe/vite.config.ts",
     "check:anki": "tsx scripts/check-anki.ts",
     "check:import": "tsx scripts/check-import.ts",
     "check:level-import": "tsx scripts/check-level-import.ts",

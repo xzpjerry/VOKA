@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOKA YouTube Probe</title>
+    <style>
+      :root { color-scheme: light; font-family: system-ui, sans-serif; }
+      body { margin: 0; padding: 18px; width: 620px; max-width: 100vw; color: #18212f; background: #f5f7fb; }
+      h1 { margin: 0 0 6px; font-size: 20px; }
+      h2 { margin: 20px 0 8px; font-size: 15px; }
+      p { margin: 4px 0 10px; color: #506078; font-size: 12px; }
+      .actions { display: flex; gap: 8px; margin: 14px 0; }
+      button { border: 0; border-radius: 6px; padding: 8px 11px; background: #244b8f; color: white; font-weight: 650; cursor: pointer; }
+      button.secondary { background: #5b6678; }
+      #notice { min-height: 18px; color: #385b8f; font-size: 12px; }
+      table { width: 100%; border-collapse: collapse; background: white; font-size: 11px; }
+      th, td { border: 1px solid #d9e0ea; padding: 6px; text-align: left; vertical-align: top; }
+      th { background: #eaf0f8; }
+      .checklist { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+      .checklist li, .card { background: white; border: 1px solid #d9e0ea; border-radius: 6px; padding: 8px; font-size: 12px; }
+      .ok { color: #13703a; }
+      .pending { color: #9a5b00; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .card strong { display: block; margin-bottom: 3px; }
+      #videos { display: grid; gap: 6px; }
+      .small { font-size: 11px; color: #58677b; overflow-wrap: anywhere; }
+      @media (max-width: 560px) { body { width: auto; } .checklist, .grid { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <h1>VOKA YouTube 字幕测量</h1>
+    <p>本页只显示匿名计数和状态，不读取或复制视频 ID、标题、链接或字幕文本。</p>
+    <div class="actions">
+      <button id="copy">复制汇总 JSON</button>
+      <button id="clear" class="secondary">清空</button>
+    </div>
+    <div id="notice" aria-live="polite"></div>
+    <h2>样本清单</h2>
+    <ul class="checklist" id="checklist"></ul>
+    <h2>字幕方式 × 类型</h2>
+    <table>
+      <thead><tr><th>类型</th><th>方法</th><th>成功</th><th>失败</th><th>待测</th><th>失败原因</th><th>HTTP 状态</th><th>cue/时序摘要</th></tr></thead>
+      <tbody id="methods"></tbody>
+    </table>
+    <h2>播放器、导航、悬停与显示模式</h2>
+    <div class="grid" id="controls"></div>
+    <h2>匿名视频记录</h2>
+    <div id="videos"></div>
+    <script type="module" src="./summary.ts"></script>
+  </body>
+</html>
