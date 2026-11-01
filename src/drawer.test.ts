@@ -8,6 +8,7 @@ import {
   sortPageWords,
   matchesFilter,
 } from "./drawer";
+import { createReviewUI } from "./review-ui";
 import { readFileSync } from "node:fs";
 import { createData } from "./data";
 import type { Token } from "./reading";
@@ -239,4 +240,114 @@ it("shows the no-due message without starting review or messaging the background
   expect(root.querySelector(".drawer-toggle")?.getAttribute("aria-expanded")).toBe(
     "true",
   );
+});
+
+it("restores due and all filters with refreshed counts after the final review returns to the list", async () => {
+  const token = dueToken(true);
+  const config = {
+    nativeLanguage: "zh",
+    glossLanguage: "native",
+    targetLevel: "B1",
+    showAdvanced: false,
+    hoverScope: "highlighted",
+  } as const;
+  const sendMessage = vi.fn(async (message: { type: string }) => {
+    if (message.type === "review-render")
+      return { data: { questionHtml: "<p>question</p>", answerHtml: "<p>answer</p>" } };
+    if (message.type === "review-prepare")
+      return {
+        data: {
+          latestReviewId: "1",
+          predict: {
+            stateToken: "state",
+            answers: [{ rating: "good", label: "Good", interval: null }],
+          },
+        },
+      };
+    if (message.type === "review-submit")
+      return { data: { outcome: "submitted" } };
+    return { data: {} };
+  });
+  vi.stubGlobal("chrome", {
+    i18n: { getMessage: (key: string) => drawerMessages[key] ?? key },
+    runtime: {
+      getURL: () => "chrome-extension://test/options.html",
+      sendMessage,
+      onMessage: { addListener: vi.fn() },
+    },
+    storage: { local: { set: vi.fn() } },
+  });
+
+  const root = document.createElement("div").attachShadow({ mode: "open" });
+  const summary = document.createElement("span");
+  const retry = document.createElement("button");
+  let drawer: ReturnType<typeof createDrawer>;
+  const reviewUI = createReviewUI(
+    root,
+    () => config,
+    () => drawer.showList(),
+    () => {
+      // Match the refresh issued after the final rating.
+      drawer.update([], config, "checking");
+      token.state!.cards[0].dueToday = false;
+      drawer.update([token], config, "ok");
+    },
+  );
+  drawer = createDrawer(
+    root,
+    summary,
+    retry,
+    vi.fn(),
+    vi.fn(),
+    (tokens) => reviewUI.start(tokens),
+    reviewUI.element,
+  );
+  const section = document.createElement("section");
+  section.append(drawer.header, drawer.body);
+  root.append(section);
+  drawer.update([token], config, "ok");
+
+  const allBeforeReview = root.querySelector<HTMLButtonElement>(
+    '[data-filter="all"]',
+  )!;
+  allBeforeReview.click();
+  expect(allBeforeReview.textContent).toBe("全部 1");
+  const keysBeforeReview = Array.from(
+    root.querySelectorAll<HTMLButtonElement>(".drawer-list button"),
+    (button) => button.dataset.key,
+  );
+
+  root.querySelector<HTMLButtonElement>('[data-slot="review-button"]')!.click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  root.querySelector<HTMLButtonElement>("#voka-review-ui .review-actions button")!.click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  root.querySelector<HTMLButtonElement>('[data-review-rating="good"]')!.click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  expect(root.querySelector("#voka-review-ui h3")?.textContent).toBe(
+    "reviewFinished",
+  );
+  root.querySelector<HTMLButtonElement>("#voka-review-ui .review-actions button")!.click();
+
+  const dueFilter = root.querySelector<HTMLButtonElement>(
+    '[data-filter="due"]',
+  );
+  const allFilter = root.querySelector<HTMLButtonElement>(
+    '[data-filter="all"]',
+  );
+  expect(reviewUI.element.hidden).toBe(true);
+  expect(dueFilter).not.toBeNull();
+  expect(allFilter).not.toBeNull();
+  expect(dueFilter?.textContent).toBe("今日到期 0");
+  expect(allFilter?.textContent).toBe("全部 1");
+
+  dueFilter!.click();
+  expect(root.querySelectorAll(".drawer-list li")).toHaveLength(0);
+  allFilter!.click();
+  expect(
+    Array.from(
+      root.querySelectorAll<HTMLButtonElement>(".drawer-list button"),
+      (button) => button.dataset.key,
+    ),
+  ).toEqual(keysBeforeReview);
 });

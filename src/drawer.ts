@@ -243,9 +243,7 @@ export function createDrawer(
     scopeNote.hidden = !note;
     buttons.forEach((button, index) => {
       const filter = filters[index];
-      if (filter === "due" && dueCount === 0)
-        button.removeAttribute("data-filter");
-      else button.dataset.filter = filter;
+      button.dataset.filter = filter;
       button.textContent =
         t("drawerFilter_" + filter) +
         " " +

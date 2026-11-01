@@ -928,6 +928,7 @@ async function runChecks() {
       const issues: string[] = [];
       const seen = new Set<number>();
       const conflictRetries: { word: string; noReviewWasWritten: boolean }[] = [];
+      const wordFromHeading = (heading: string) => heading.split(" · ", 1)[0];
       for (let offset = 0; offset < ratings.length; offset++) {
         try {
           const heading = await currentReviewHeading();
@@ -936,7 +937,7 @@ async function runChecks() {
             break;
           }
           const index = reviewIndices.find((candidate) =>
-            heading.startsWith(testWords[candidate].lemma),
+            wordFromHeading(heading) === testWords[candidate].lemma,
           );
           if (index === undefined) {
             issues.push(`unexpected review queue heading: ${heading}`);
@@ -1030,7 +1031,7 @@ async function runChecks() {
         } catch (error) {
           const heading = await currentReviewHeading();
           const failedIndex = reviewIndices.find((candidate) =>
-            heading.startsWith(testWords[candidate].lemma),
+            wordFromHeading(heading) === testWords[candidate].lemma,
           );
           const diagnostic = failedIndex === undefined
             ? undefined

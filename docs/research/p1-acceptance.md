@@ -13,7 +13,7 @@ Run date: 2026-11-01. The automated checks used only the isolated Anki instance 
 | T-15 | Opened a future Review card in VOKA, graded it directly through Anki's API before submitting in the page, then clicked the page's rating. | VOKA reports it was already completed and skips a duplicate review. | The page showed “Already completed in Anki; skipping”; review history contained one new Good record only. | PASS |
 | T-16 | Submitted through the timeout-after-forward wrapper, which accepts the answer then simulates a lost response. | The answer is confirmed through review history without forwarding `scheduling.answer` twice. | `submitReview` returned `confirmed`; the wrapper forwarded `scheduling.answer` once and `reviews.list` found exactly one Easy record. | PASS |
 | T-17 | Practiced two New cards and one Review card due in the future through front → Show answer → Next. Compared scheduling and review history before and after. | No rating buttons; no review-history or scheduling changes. | All three practice flows had zero rating buttons; `reviews.getLatestId` and `scheduling.get` were unchanged. | PASS |
-| T-18 | Made the mature card due, graded it Good in VOKA, then clicked Return to list and checked the due and all filters. | Due underline disappears, due count drops to zero, and list filters recalculate. | Rating succeeded: underline disappeared, due summary went from 1 to 0, and Anki reported the card was no longer due. After Return to list, the review panel hid but the due/all filter controls did not return within 30 seconds, so list counts could not be verified. | FAIL |
+| T-18 | Made the mature card due, graded it Good in VOKA, then clicked Return to list and checked the due and all filters. | Due underline disappears, due count drops to zero, and list filters recalculate. | Rating succeeded: underline disappeared, due summary went from 1 to 0, and Anki reported the card was no longer due. After Return to list, the due filter showed 0 rows; the all filter retained its count of 4 and the same four keys as before review. | PASS |
 
 ## Overdue-card finding
 
@@ -26,9 +26,9 @@ The run graduated a test card to Review, answered it once to create review histo
 
 The card was reset to ten days and the run continued. A real overdue state is **not verified**; it was not simulated or inferred from a failed write.
 
-## Failed item: T-18
+## Resolved item: T-18
 
-On `127.0.0.1:8766`, make the mature Review fixture card due, open it from the due summary, reveal the answer, and grade it Good. The due underline disappears and the due summary changes from 1 to 0. At the finished screen click **Return to list**; the review panel becomes hidden, but the Shadow DOM has no `[data-filter="due"]` control (and no `[data-filter="all"]` control), including after waiting 30 seconds. The automated run records the immediate state as `reviewHidden=true, dueFilterPresent=false` and exits non-zero. Product code was left unchanged; the due/all list count check is **not verified** because the filters do not return.
+On `127.0.0.1:8766`, make the mature Review fixture card due, open it from the due summary, reveal the answer, and grade it Good. The due underline disappears and the due summary changes from 1 to 0. The root cause was in `createDrawer`'s `render()`: when the refreshed `dueCount` became zero, it removed `data-filter` from the due button. The refresh did not replace the drawer or Shadow DOM host, and the all filter remained present; the missing due selector made the acceptance check wait until timeout. The fix keeps the due filter selector at zero and renders its recomputed count. The passing rerun reported `reviewHidden=true`, due count and rows `0`, all count `4`, and the same four all-filter keys before and after review; cleanup completed.
 
 ## Page-state request count
 
@@ -43,8 +43,10 @@ The final fixture load made **8 HTTP requests** to the AnkiConnect v1 endpoint: 
 - Node.js: `v26.9.0`
 - Test endpoint/deck: `127.0.0.1:8766`, `VOKA Test::P1`
 - `npm run build` — passed
-- `npm test` — passed, 30 files / 207 tests
-- `npm run check:p1` — exited 1 because of T-18 above; T-12 through T-17 passed and cleanup printed `CLEANUP OK`
+- `npm test` — passed, 30 files / 208 tests
+- `npm run check:p1` — passed, T-12 through T-18; cleanup printed `CLEANUP OK`
+- `npm run check:review` — passed on 8766 with `VOKA Test::99`; cleanup printed `CLEANUP OK`
+- `npm run check:practice` — passed on 8766 with `VOKA Test::81`; cleanup printed `CLEANUP OK`
 
 ## 人工检查清单（维护者）
 
