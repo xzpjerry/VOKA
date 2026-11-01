@@ -43,7 +43,7 @@ The initial fixture page-state read made **8 HTTP requests** to the AnkiConnect 
 - Node.js: `v26.9.0`
 - Test endpoint/deck: `127.0.0.1:8766`, `VOKA Test::P1`
 - `npm run build` — passed
-- `npm test` — passed, 28 files / 196 tests
+- `npm test` — passed, 29 files / 202 tests
 - `npm run check:p1` — exited 1 because of T-18 above; T-12 through T-17 passed and cleanup printed `CLEANUP OK`
 
 ## 人工检查清单（维护者）
