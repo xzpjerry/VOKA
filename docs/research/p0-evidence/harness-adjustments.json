@@ -1,0 +1,37 @@
+{
+  "scope": "Verification-only changes; no product source changes.",
+  "adjustments": [
+    {
+      "check": "highlight / level import",
+      "reason": "Range/count and import-count DOM can precede completion callbacks; wait for completed drawer/Finish state."
+    },
+    {
+      "check": "onboarding",
+      "reason": "Current UI moved target details from importStatus into importTarget."
+    },
+    {
+      "check": "manual status",
+      "reason": "Bring the word page to front and use stable trusted locator clicks."
+    },
+    {
+      "check": "Gmail-host fixture",
+      "reason": "Gmail is HSTS-preloaded; fulfil its HTTPS URL from local fixture HTML with CDP, pre-authorize optional host, and foreground the fixture before rAF polling.",
+      "diagnosticObservedViaCDP": {
+        "visibilityState": "hidden",
+        "readyState": "complete",
+        "voka-target": [
+          "benefit"
+        ],
+        "drawer": "Anki connected, 1 target word; rAF wait did not advance on hidden tab."
+      }
+    },
+    {
+      "check": "lifecycle",
+      "reason": "Use a fresh Chrome profile independent of optional-host preparation and interception."
+    },
+    {
+      "check": "snapshot / renderer",
+      "reason": "Include WAL, explicitly remove destination SHM, raise stdout buffer for grown test state, and use pinned Puppeteer Chrome for Testing."
+    }
+  ]
+}

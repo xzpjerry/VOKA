@@ -1,0 +1,89 @@
+{
+  "files": [
+    {
+      "harness": "level",
+      "path": "docs/research/p0-evidence/level/chrome-netlog-1.json.gz",
+      "eventCount": 62026,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "highlight",
+      "path": "docs/research/p0-evidence/highlight/chrome-netlog-1.json.gz",
+      "eventCount": 16404,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "dynamic",
+      "path": "docs/research/p0-evidence/dynamic/chrome-netlog-1.json.gz",
+      "eventCount": 11513,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "contexts",
+      "path": "docs/research/p0-evidence/contexts/chrome-netlog-1.json.gz",
+      "eventCount": 134778,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "gloss",
+      "path": "docs/research/p0-evidence/gloss/chrome-netlog-1.json.gz",
+      "eventCount": 1173,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "candidates",
+      "path": "docs/research/p0-evidence/candidates/chrome-netlog-1.json.gz",
+      "eventCount": 32865,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "upgrade",
+      "path": "docs/research/p0-evidence/upgrade/chrome-netlog-1.json.gz",
+      "eventCount": 174904,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "onboarding",
+      "path": "docs/research/p0-evidence/onboarding/chrome-netlog-1.json.gz",
+      "eventCount": 13431,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "scope",
+      "path": "docs/research/p0-evidence/scope/chrome-netlog-1.json.gz",
+      "eventCount": 32151,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "cold",
+      "path": "docs/research/p0-evidence/cold/chrome-netlog-1.json.gz",
+      "eventCount": 3339,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "permission",
+      "path": "docs/research/p0-evidence/permission/chrome-netlog-1.json.gz",
+      "eventCount": 2616,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "manual",
+      "path": "docs/research/p0-evidence/manual/chrome-netlog-1.json.gz",
+      "eventCount": 69535,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "lifecycle",
+      "path": "docs/research/p0-evidence/lifecycle/chrome-netlog-1.json.gz",
+      "eventCount": 4614,
+      "forbiddenEvents": 0
+    },
+    {
+      "harness": "final",
+      "path": "docs/research/p0-evidence/final/chrome-netlog-1.json.gz",
+      "eventCount": 100332,
+      "forbiddenEvents": 0
+    }
+  ],
+  "forbiddenLoopbackRequests": 0
+}

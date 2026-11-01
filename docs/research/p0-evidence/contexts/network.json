@@ -1,0 +1,32 @@
+[
+  {
+    "browser": "Chrome/156.0.8078.47",
+    "netlog": "chrome-netlog-1.json.gz",
+    "urls": [
+      "https://www.google.com/",
+      "http://clients2.google.com/time/1/current?cup2key=ML-DSA-44-10:uS-9uPGXp3F4eD8Y46myK_wbixy1BTH-CQzyVmm7TWk&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard&laf=b64bin",
+      "https://www.google.com/async/folae?async=_fmt:pb&udm=50&client_locale=en-US&client_country=tw",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:cTw8kTPzZnY5fVrCXZp0lw9la5P0vtsoEw1V3xZZRmY&cup2hreq=11aff72edc1b5d3ecdfa5b7dd14185c46eb9ab52e4aed315a80c2d419f1c849f",
+      "http://127.0.0.1:8766/api/v1",
+      "http://127.0.0.1:52981/1",
+      "http://127.0.0.1:52981/",
+      "http://127.0.0.1:52981/favicon.ico",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:9sI6dgaBT7sN8ue6p8szsrQCyMGSZ_joTu1Qk8xJ-m0&cup2hreq=aaee3435c5255d43f9928327577193be691f650f1cd492813a6b8d8879c58c5e",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:v1jQf4exZLk99BQBHyj7JiuhubXFiWR4SB8PSe6a1g4&cup2hreq=0eb94fb0e81f7cb0398431357febc5285a7ef900301809b78eb60645782add80",
+      "http://127.0.0.1:52981/2",
+      "http://127.0.0.1:52981/3",
+      "http://127.0.0.1:52981/4",
+      "http://127.0.0.1:52981/short",
+      "http://127.0.0.1:52981/long",
+      "http://127.0.0.1:52981/footnote",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:psImbNo5Oa_zlQbw7-GbDug6IQlPoQvW7fCYZklGQPI&cup2hreq=a5a9fa90f20842e87ccb928c13cd7f0746454cb053d884167db2be0ec8f510ce",
+      "http://127.0.0.1:52981/unknown",
+      "http://edgedl.me.gvt1.com/edgedl/diffgen-puffin/gcmjkmgdlgnkkcocmoeiminaijmmjnii/6bf09eb90ed9ee14632b09da0ea3f8e6b941d8487be4669375b1db3b727ca3dd",
+      "https://update.googleapis.com/service/update2/json",
+      "http://edgedl.me.gvt1.com/edgedl/diffgen-puffin/hfnkpimlhhgieaddgfemjhofmfblmnib/7a93c4d72b31cfcdc69b7fe988953e0bb5dbdc0f7463c816ad3c7b880bb89b53",
+      "http://127.0.0.1:52981/manual"
+    ],
+    "forbidden": []
+  }
+]

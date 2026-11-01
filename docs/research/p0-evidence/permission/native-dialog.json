@@ -1,0 +1,57 @@
+{
+  "id": "a883780a-e884-4b7d-b4e2-120317c658c3",
+  "ok": true,
+  "result": {
+    "screenshot": {
+      "height": 414,
+      "width": 1322,
+      "scale": 2,
+      "format": "png",
+      "path": "/var/folders/yk/2lljgrk579j5rnps181xvyfc0000gn/T/orca-computer-use/a883780a-e884-4b7d-b4e2-120317c658c3-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-02T03:47:31.917Z"
+    },
+    "snapshot": {
+      "focusedElementId": 4,
+      "app": {
+        "name": "Anki",
+        "bundleId": "net.ankiweb.anki",
+        "pid": 4371
+      },
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      },
+      "treeText": "App=net.ankiweb.anki (pid 4371)\nWindow: \"\", App: Anki.\n\n0 dialog\n\t1 image\n\t2 text \"chrome-extension://igncmcjhladfelojdclfmpmfkjklohmh\" requests permission to use Anki through AnkiConnect. Do you want to give it access?\n\t3 button Yes\n\t4 button No\n\t5 text By granting permission, you'll allow the website to modify your collection on your behalf, including the execution of destructive actions such as deck deletion.\n\t6 checkbox Ignore further requests from \"chrome-extension://igncmcjhladfelojdclfmpmfkjklohmh\", Value: 0\n\t7 close button\n\t8 zoom button (disabled)\n\t9 minimize button (disabled)\n\t10 text\n\nThe focused UI element is 4 button No.",
+      "elementCount": 11,
+      "coordinateSpace": "window",
+      "id": "6A76AC99-2698-452D-9EBF-D59AB83EBB1D",
+      "window": {
+        "x": 0,
+        "height": 207,
+        "isOffscreen": false,
+        "platform": {
+          "layer": 0
+        },
+        "isMinimized": false,
+        "screenIndex": 0,
+        "title": "",
+        "width": 661,
+        "id": 83462,
+        "y": 222
+      }
+    },
+    "screenshotStatus": {
+      "metadata": {
+        "engine": "screenCaptureKit",
+        "windowId": 83462
+      },
+      "state": "captured"
+    }
+  },
+  "_meta": {
+    "runtimeId": "525a3d10-7c7e-4f56-8b7f-10f49fab0876"
+  }
+}

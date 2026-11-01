@@ -142,7 +142,7 @@ async function snapshotTarget(target: { noteType: string; deck: string }) {
 function sqliteSnapshot() {
   return JSON.parse(
     execFileSync("python3", ["scripts/anki-snapshot.py"], {
-      encoding: "utf8",
+      encoding: "utf8", maxBuffer: 64 * 1024 * 1024,
     }),
   );
 }
@@ -299,10 +299,9 @@ try {
     (element) => element.textContent!,
   );
   assert.match(doneText, /已完成：本次新建 2,085 条/);
-  assert.equal(
-    await page.$eval("#finish", (e: HTMLButtonElement) => e.disabled),
-    false,
-  );
+  // Counts render before the asynchronous upgrade summary settles the preview.
+  await page.waitForFunction(() => !(document.querySelector("#finish") as HTMLButtonElement).disabled);
+  assert.equal(await page.$eval("#finish", (e: HTMLButtonElement) => e.disabled), false);
   await page.screenshot({ path: `${evidenceDir}/done.png`, fullPage: true });
 
   // T-03/T-04 real counts, tags, and repeated import.

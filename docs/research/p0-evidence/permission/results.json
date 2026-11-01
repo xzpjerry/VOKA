@@ -1,0 +1,43 @@
+{
+  "started": "2026-11-01T03:47:27.805Z",
+  "endpoint": "127.0.0.1:8766",
+  "nativePermission": "actual Anki dialog accepted through accessibility",
+  "noWritesBeforeAllow": true,
+  "pid": 4371,
+  "origin": "chrome-extension://igncmcjhladfelojdclfmpmfkjklohmh",
+  "beforeAllow": "forbidden, no import possible",
+  "result": "PASS",
+  "afterAllow": {
+    "connected": true,
+    "writes": 1,
+    "target": {
+      "noteType": "VOKA P0 Permission 1793504852628",
+      "deck": "VOKA::P0 Permission 1793504852628::B1"
+    },
+    "readback": {
+      "items": [
+        {
+          "index": 0,
+          "result": {
+            "id": "1793504852794",
+            "noteType": {
+              "id": "1793504852647",
+              "name": "VOKA P0 Permission 1793504852628"
+            },
+            "fields": {
+              "Key": "en:permission-fixture",
+              "Word": "permission fixture"
+            },
+            "tags": [],
+            "cardIds": [
+              "1793504852794"
+            ],
+            "modifiedAt": "2026-11-01T03:47:32.000Z"
+          }
+        }
+      ]
+    },
+    "existingReviewsUnchanged": true
+  },
+  "originalConfigRestored": true
+}

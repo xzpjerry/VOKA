@@ -1,0 +1,47 @@
+Command: git fetch origin && git rebase origin/main && npm run build && npm test
+Current branch p0/final-acceptance is up to date.
+
+> voka@0.1.0 build
+> tsc --noEmit && vite build && vite build --config vite.content.config.ts && vite build --config vite.content.config.ts --mode auto
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 24 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/remember.html                               0.85 kB │ gzip:  0.48 kB
+dist/options.html                                6.78 kB │ gzip:  2.35 kB
+dist/assets/modulepreload-polyfill-B5Qt9EMX.js   0.71 kB │ gzip:  0.40 kB
+dist/remember.js                                 0.96 kB │ gzip:  0.48 kB
+dist/assets/sites-BO8I2w9m.js                    1.73 kB │ gzip:  0.77 kB
+dist/assets/index-DrWFkjbM.js                    2.66 kB │ gzip:  1.46 kB
+dist/assets/shared-BKXpY1t0.js                   3.46 kB │ gzip:  1.55 kB
+dist/options.js                                 19.46 kB │ gzip:  7.24 kB
+dist/background.js                              27.76 kB │ gzip: 10.15 kB
+✓ built in 142ms
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 12 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/content.js  27.10 kB │ gzip: 10.11 kB
+✓ built in 61ms
+vite v7.3.7 building client environment for auto...
+transforming...
+✓ 12 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/content-auto.js  27.25 kB │ gzip: 10.17 kB
+✓ built in 58ms
+
+> voka@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 /Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance
+
+
+ Test Files  17 passed (17)
+      Tests  136 passed (136)
+   Start at  11:59:01
+   Duration  1.50s (tests 51%, import 23%, environment 22%, transform 3%, worker 1%)

@@ -1,0 +1,17 @@
+[
+  {
+    "browser": "Chrome/156.0.8078.47",
+    "netlog": "chrome-netlog-1.json.gz",
+    "urls": [
+      "https://www.google.com/",
+      "http://clients2.google.com/time/1/current?cup2key=ML-DSA-44-10:YjqegSAqfaOR6aHDgXsmB26vNKLun92OQLsHiggh7Co&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard&laf=b64bin",
+      "https://www.google.com/async/folae?async=_fmt:pb&udm=50&client_locale=en-US&client_country=tw",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:9b9NjtmcNnKVdwcAK7S-U02kMm3wXAc_j0aKICwVlYE&cup2hreq=048c174886fb849878195e591eae33cecda66faa52c8bd0015b4fe1c860d5b9a",
+      "http://127.0.0.1:8766/api/v1",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:gNuQsbR7vsgzpiWTdHUNyS_EXUH4NmWrXX4UI5WkLWQ&cup2hreq=55fefc564f0b76c33ab9fdecf5c92af91f472b593a13bd4be55aad1141032bbc",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:blAzBIlYVPc3WlvKX07z0LOoavdZm9Zl2j91u7KUmRY&cup2hreq=b4eb0bbd5611f444687a1498657bcbc2a2bebc24eaeb9f9a5f02b0f0d26013f8"
+    ],
+    "forbidden": []
+  }
+]

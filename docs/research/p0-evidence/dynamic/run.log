@@ -1,0 +1,14 @@
+Chrome Chrome/156.0.8078.47
+{
+  "browser": "Chrome/156.0.8078.47",
+  "paragraphs": 2000,
+  "initialMs": 914.9382089999999,
+  "initialLongTasks": [],
+  "scroll": {
+    "longTasks": [],
+    "frames": 180,
+    "maxFrameMs": 17.600000000000023,
+    "framesOver50ms": 0
+  },
+  "checks": "React append/replace/remove; 8000 initial ranges; unchanged initial HTML/layout; retained unaffected Range identity; no detached/empty ranges; no duplicate processing"
+}

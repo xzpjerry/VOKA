@@ -96,6 +96,8 @@ try {
       ),
     );
   await page.waitForFunction(() => CSS.highlights.get("voka-target")?.size);
+  // Ranges are committed before the asynchronous drawer notification.
+  await page.waitForFunction(() => Number(document.getElementById("voka-drawer")?.shadowRoot?.querySelector('[data-filter="all"]')?.textContent?.match(/\d+$/)?.[0]) > 0);
   const first = await snapshot();
   assert.deepEqual(
     await page.$eval("#words", (el) => ({

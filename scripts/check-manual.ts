@@ -104,10 +104,9 @@ try {
     );
   };
   const clickWord = async (id: string, count = 1) => {
-    const box = (await (await page.$("#" + id))!.boundingBox())!;
-    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, {
-      count,
-    });
+    await page.bringToFront();
+    // Locator waits for a stable visible word before dispatching trusted clicks.
+    await page.locator("#" + id).click({ count });
   };
   const cardText = () =>
     page.evaluate(

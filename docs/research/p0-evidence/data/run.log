@@ -1,0 +1,22 @@
+{
+  "target": {
+    "noteType": "VOKA Vocabulary · English",
+    "deck": "VOKA::English::B1"
+  },
+  "counts": {
+    "new": 2080,
+    "existing": 5,
+    "conflict": 0,
+    "skipped": 6410
+  },
+  "version": "en-2026.10.1",
+  "methods": [
+    "noteTypes.list",
+    "decks.list",
+    "noteTypes.get",
+    "notes.search",
+    "notes.getMany"
+  ]
+}
+T-11 'm 词典没有
+B1 preview only; no writes, imports, sync, or review operations.

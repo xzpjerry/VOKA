@@ -1,0 +1,20 @@
+target {
+  noteType: 'VOKA Import Acceptance 1793504356528',
+  deck: 'VOKA::Import Acceptance 1793504356528::B1'
+} first preview { new: 12, existing: 0, conflict: 0, skipped: 2 } typeExists false deckExists false
+import SCM 1793504349850 → 1793504349850 all pre-existing card scheduling, notes, and review history preserved
+existing-type repeat SCM 1793504349850 → 1793504349850 all cards and revlog unchanged; revlog rows 12
+second preview { new: 0, existing: 12, conflict: 0, skipped: 2 } confirm disabled: true card count 12 unchanged after repeat
+Card state checked read-only; no reviews driven. Scheduling/card payload unchanged.
+created notes 12 methods [
+  'noteTypes.list',
+  'decks.list',
+  'noteTypes.create',
+  'noteTypes.get',
+  'decks.create',
+  'notes.validateMany',
+  'notes.createMany',
+  'notes.search',
+  'notes.getMany',
+  'cards.getMany'
+]

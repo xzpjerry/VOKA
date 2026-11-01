@@ -1,0 +1,22 @@
+[
+  {
+    "browser": "Chrome/156.0.8078.47",
+    "netlog": "chrome-netlog-1.json.gz",
+    "urls": [
+      "https://www.google.com/",
+      "http://clients2.google.com/time/1/current?cup2key=ML-DSA-44-10:HAP__ddhDKYZdKxMoHJ_mN5eD7K8m2pcpAXKfjDSs4k&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard&laf=b64bin",
+      "https://www.google.com/async/folae?async=_fmt:pb&udm=50&client_locale=en-US&client_country=tw",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:-_aE4uo9C6cO4QVmIghoxKDgFBchTEBUO4CtmwEOHHw&cup2hreq=b939638a3cf474671de9b7b63a4d2c4d8ed56142f60a119ecbb0117c3d190187",
+      "http://127.0.0.1:52314/",
+      "https://content-autofill.googleapis.com/v1/pages/ChRDaHJvbWUvMTU2LjAuODA3OC40NxJCCQqHes7wruV8EgsNkWGVTioEGAEgAhILDTWGVBwqBBgCIAcSCQ0G7bv_KgIYByGkGZgSggq7NymkGZgSggq7NzIA?alt=proto",
+      "http://127.0.0.1:52314/favicon.ico",
+      "http://127.0.0.1:8766/api/v1",
+      "https://content-autofill.googleapis.com/v1/pages/ChRDaHJvbWUvMTU2LjAuODA3OC40NxJgCcOpiTmjDzP8EgsNkWGVTioEGAEgAhILDTWGVBwqBBgCIAcSCQ0G7bv_KgIYBxINDShe7TMqBhAGGAUgARINDWlunmkqBhAFGAUgACHW1zApz8ffJCnW1zApz8ffJDIA?alt=proto",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:ah_LlAoymKjF8OF2s3_AfMrRr-KkR7RSZHq-lGwUWOM&cup2hreq=b672a87104e4a6ee04a5fae534eaf7838071e5b748ca607d33956bab55975115",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:4_J7k8vLhjya18tglMVgt83fh9DZzwUr9RVp-ms4BU4&cup2hreq=ee9b9d1f0a9bf6483f48f254d45d5b713e16ddfcc6583657c0523820c8ea689b",
+      "http://127.0.0.1:52462/api/v1"
+    ],
+    "forbidden": []
+  }
+]

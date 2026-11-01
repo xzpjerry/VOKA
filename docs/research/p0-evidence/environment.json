@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-01",
+  "isolatedDirectory": "~/VOKA-anki-test",
+  "port": 8766,
+  "dailyInstancePortContacted": false,
+  "syncIncident": "First SIGTERM of isolated Anki opened automatic-sync schema-conflict sheets because User 1 autoSync was true; cancelled through native Cancel, never chose Upload/Download, never invoked collection.sync.",
+  "syncPrevention": "After the isolated process exited, changed only User 1 autoSync in the test prefs21.db from true to false; left false to prevent future accidental automatic sync during acceptance restarts.",
+  "ankiWebAccount": "No credentials read; no account login, upload, download or manual sync performed."
+}

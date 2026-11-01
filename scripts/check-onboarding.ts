@@ -167,11 +167,11 @@ try {
   await wizard.click("#nextLearning");
   await wizard.waitForFunction(() =>
     document
-      .querySelector("#importStatus")
+      .querySelector("#importTarget")
       ?.textContent?.includes("VOKA::English::A2"),
   );
   assert.match(
-    await wizard.$eval("#importStatus", (e) => e.textContent!),
+    await wizard.$eval("#importTarget", (e) => e.textContent!),
     /新建|已存在/,
   );
   await mkdir("docs/research/onboarding-evidence", { recursive: true });

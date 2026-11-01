@@ -3,6 +3,7 @@ import json, pathlib, shutil, sqlite3, tempfile
 source = pathlib.Path.home() / 'VOKA-anki-test/User 1/collection.anki2'
 with tempfile.TemporaryDirectory(prefix='voka-import-snapshot-') as directory:
     dest = pathlib.Path(directory) / 'collection.anki2'
+    pathlib.Path(str(dest) + '-shm').unlink(missing_ok=True)
     shutil.copy2(source, dest)
     wal = pathlib.Path(str(source) + '-wal')
     if wal.exists():

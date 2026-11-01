@@ -1,0 +1,116 @@
+Chrome Chrome/156.0.8078.47
+{
+  "browser": "Chrome/156.0.8078.47",
+  "port": 8766,
+  "target": {
+    "key": "en:benefit",
+    "before": {
+      "Key": "en:benefit",
+      "Word": "benefit",
+      "Variants": "",
+      "Reading": "/ˈbɛnəfɪt/",
+      "GlossNative": "益处",
+      "GlossTarget": "something that helps you",
+      "Context1": "",
+      "Source1": "",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"test-2026.10\",\"hashes\":{\"GlossNative\":\"dd7268a4df533d28acd6b618da62313d3e46bb018905fa48997bf95d86fce8d6\",\"GlossTarget\":\"967eee79a7eb4b88d912bf3f78cdcd485c05929e812d3e1089cbe1fa5d9a4b46\",\"Reading\":\"b4ef1b0529ef12ae8684530cb4ad212399c062ee87dc8686c737e3f04750401f\"}}"
+    },
+    "afterManualKnown": {
+      "Key": "en:benefit",
+      "Word": "benefit",
+      "Variants": "",
+      "Reading": "/ˈbɛnəfɪt/",
+      "GlossNative": "益处",
+      "GlossTarget": "something that helps you",
+      "Context1": "",
+      "Source1": "",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "known",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"test-2026.10\",\"hashes\":{\"GlossNative\":\"dd7268a4df533d28acd6b618da62313d3e46bb018905fa48997bf95d86fce8d6\",\"GlossTarget\":\"967eee79a7eb4b88d912bf3f78cdcd485c05929e812d3e1089cbe1fa5d9a4b46\",\"Reading\":\"b4ef1b0529ef12ae8684530cb4ad212399c062ee87dc8686c737e3f04750401f\"}}"
+    },
+    "changedFields": [
+      "ManualStatus"
+    ]
+  },
+  "below": {
+    "key": "en:banana",
+    "before": {
+      "Key": "en:banana",
+      "Word": "banana",
+      "Variants": "",
+      "Reading": "/bənˈænə/",
+      "GlossNative": "",
+      "GlossTarget": "n. any of several tropical and subtropical treelike herbs of the genus Musa having a terminal crown of large entire leaves and usually bearing hanging clusters of elongated fruits; elongated crescent-shaped yellow fruit with soft sweet flesh",
+      "Context1": "People enjoy the <b>banana</b> after lunch.",
+      "Source1": "127.0.0.1 · Context /manual · 2026-10-31",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"en-2026.10\",\"hashes\":{\"GlossNative\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"GlossTarget\":\"5756839b2e0b3ab534c23818021c89a109ae6fd2a66775bda58708c5cbb6e777\",\"Reading\":\"c52c01480c174df88335df8a7db62d2127813c4dd474ea403e7b4ca504630e7c\"},\"pinnedContext\":null,\"contextOrder\":[\"97675ccec7dcec1dd3eadc8a46edbfccec816b5077a91eeec3709d8d08187ee6\"]}"
+    },
+    "afterManualUnknown": {
+      "Key": "en:banana",
+      "Word": "banana",
+      "Variants": "",
+      "Reading": "/bənˈænə/",
+      "GlossNative": "",
+      "GlossTarget": "n. any of several tropical and subtropical treelike herbs of the genus Musa having a terminal crown of large entire leaves and usually bearing hanging clusters of elongated fruits; elongated crescent-shaped yellow fruit with soft sweet flesh",
+      "Context1": "People enjoy the <b>banana</b> after lunch.",
+      "Source1": "127.0.0.1 · Context /manual · 2026-10-31",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "unknown",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"en-2026.10\",\"hashes\":{\"GlossNative\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"GlossTarget\":\"5756839b2e0b3ab534c23818021c89a109ae6fd2a66775bda58708c5cbb6e777\",\"Reading\":\"c52c01480c174df88335df8a7db62d2127813c4dd474ea403e7b4ca504630e7c\"},\"pinnedContext\":null,\"contextOrder\":[\"97675ccec7dcec1dd3eadc8a46edbfccec816b5077a91eeec3709d8d08187ee6\"]}"
+    },
+    "changedFields": [
+      "ManualStatus"
+    ]
+  },
+  "absent": {
+    "key": "en:book",
+    "existedBefore": false,
+    "createdNoteId": "1793504931501",
+    "fieldsAfterManualUnknown": {
+      "Key": "en:book",
+      "Word": "book",
+      "Variants": "",
+      "Reading": "/bˈʊk/",
+      "GlossNative": "n. 圣经; 书籍 · v. 预约演出; 预订",
+      "GlossTarget": "n. the sacred writings of the Christian religions; a written work or composition that has been published (printed on pages bound together) · v. engage for a performance; arrange for and reserve (something for someone else) in advance",
+      "Context1": "",
+      "Source1": "",
+      "Context2": "",
+      "Source2": "",
+      "Context3": "",
+      "Source3": "",
+      "ManualStatus": "unknown",
+      "Audio": "",
+      "VokaMeta": "{\"schema\":1,\"data\":\"en-2026.10.1\",\"hashes\":{\"GlossNative\":\"5f402ec574c6a4fabdd13e7ac95e19f8413214c6a2b2be3948a5909a8f6f1395\",\"GlossTarget\":\"0ac44b2cf41eb72a2b1556aca79e0b03560fae83343bfc0db05784c7ddce9c7c\",\"Reading\":\"c755f660831465b7072f7fc3308957ae4c02d1d655a83018cae456e152c946e6\"},\"pinnedContext\":null,\"contextOrder\":[]}"
+    }
+  },
+  "checks": [
+    "target word known removes its highlight and lowers the drawer target count",
+    "below-target word unknown becomes red regardless of level and raises the target count",
+    "undo restores the automatic rule for both words",
+    "known and unknown both survive a page reload",
+    "only ManualStatus differs in Anki for existing notes",
+    "unknown on a word without a note creates it in its level deck with ManualStatus=unknown",
+    "no manual learning option"
+  ]
+}

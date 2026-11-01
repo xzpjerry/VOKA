@@ -1,0 +1,54 @@
+Chrome Chrome/156.0.8078.47
+{
+  "browser": "Chrome/156.0.8078.47",
+  "initialHighlights": {
+    "voka-target": [
+      {
+        "text": "achieved",
+        "parent": "achieve",
+        "tag": "B"
+      },
+      {
+        "text": "improve",
+        "parent": "improve",
+        "tag": "B"
+      },
+      {
+        "text": "encourage",
+        "parent": "wrap",
+        "tag": "P"
+      },
+      {
+        "text": "encourage",
+        "parent": "wrap",
+        "tag": "P"
+      }
+    ],
+    "voka-learning": [],
+    "voka-unknown": [
+      {
+        "text": "afford",
+        "parent": "afford",
+        "tag": "B"
+      }
+    ],
+    "voka-weak": []
+  },
+  "drawer": {
+    "summary": "4 target words on this page",
+    "counts": [
+      "Target 4",
+      "Learning 0",
+      "Not in dictionary 1",
+      "All 10"
+    ],
+    "words": [
+      "en:achieve",
+      "en:afford",
+      "en:improve",
+      "en:encourage"
+    ]
+  },
+  "summary": "VOKA is not running: please check Anki",
+  "checks": "exclusions; unchanged text/HTML/layout; small imported fixture + real A2/B1 target; manual known/unknown; hover scope; advanced inflection; dynamic text + exclusion; disconnect clears all; reconnect; single host"
+}
