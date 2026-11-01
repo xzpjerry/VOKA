@@ -1,0 +1,68 @@
+{
+  "id": "6cb871d8-7685-487d-ae90-d16da8c4e4e2",
+  "ok": true,
+  "result": {
+    "action": {
+      "delivery": "background",
+      "targetWindowId": 83443,
+      "fallbackReason": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "window_changed"
+      },
+      "actionName": "AXPress",
+      "path": "accessibility"
+    },
+    "screenshot": {
+      "scale": 2,
+      "height": 1196,
+      "format": "png",
+      "width": 1334,
+      "path": "/var/folders/yk/2lljgrk579j5rnps181xvyfc0000gn/T/orca-computer-use/6cb871d8-7685-487d-ae90-d16da8c4e4e2-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-02T03:47:32.533Z"
+    },
+    "screenshotStatus": {
+      "state": "captured",
+      "metadata": {
+        "windowId": 83443,
+        "engine": "screenCaptureKit"
+      }
+    },
+    "snapshot": {
+      "app": {
+        "bundleId": "net.ankiweb.anki",
+        "name": "Anki",
+        "pid": 4371
+      },
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepthReached": false,
+        "maxDepth": 64
+      },
+      "treeText": "App=net.ankiweb.anki (pid 4371)\nWindow: \"User 1 - Anki\", App: Anki.\n\n0 standard window User 1 - Anki\n\t1 container top toolbar\n\t\t2 container, Text: Decks Shortcut key: ⁨D⁩ Add Shortcut key: ⁨A⁩ Browse Shortcut key: ⁨B⁩ Stats Shortcut key: ⁨T⁩\n\t3 container main webview\n\t\t4 table\n\t\t\t5 row\n\t\t\t\t6 cell Deck\n\t\t\t\t7 cell New\n\t\t\t\t8 cell Learn\n\t\t\t\t9 cell Due\n\t\t\t\t10 cell\n\t\t\t11 row\n\t\t\t\t12 cell\n\t\t\t\t13 axunknown (disabled)\n\t\t\t\t14 axunknown (disabled)\n\t\t\t\t15 axunknown (disabled)\n\t\t\t\t16 axunknown (disabled)\n\t\t\t17 row\n\t\t\t\t18 cell + VOKA\n\t\t\t\t19 cell 14\n\t\t\t\t20 cell 6\n\t\t\t\t21 cell 0\n\t\t\t\t22 cell\n\t\t\t23 row\n\t\t\t\t24 cell VOKA-PROTO\n\t\t\t\t25 cell 0\n\t\t\t\t26 cell 0\n\t\t\t\t27 cell 3\n\t\t\t\t28 cell\n\t\t\t29 row\n\t\t\t\t30 cell + VOKA2\n\t\t\t\t31 cell 2\n\t\t\t\t32 cell 0\n\t\t\t\t33 cell 0\n\t\t\t\t34 cell\n\t\t35 splitter\n\t\t36 text Studied ⁨6⁩ cards ⁨in ⁨1.53⁩ seconds⁩ today (⁨0.26⁩s/card)\n\t37 container bottom toolbar\n\t\t38 container Get Shared Create Deck Import File\n\t\t\t39 button Get Shared\n\t\t\t40 button Create Deck\n\t\t\t41 button Import File, Description: Shortcut key: ⁨Command+Shift+I⁩\n\t42 close button\n\t43 full screen button, Secondary Actions: zoom the window\n\t44 minimize button\n\t45 text User 1 - Anki\n\nThe focused UI element is 1 container top toolbar.",
+      "elementCount": 46,
+      "coordinateSpace": "window",
+      "focusedElementId": 1,
+      "window": {
+        "id": 83443,
+        "isOffscreen": false,
+        "platform": {
+          "layer": 0
+        },
+        "x": 0,
+        "y": 38,
+        "title": "User 1 - Anki",
+        "isMinimized": false,
+        "width": 667,
+        "height": 598,
+        "screenIndex": 0
+      },
+      "id": "154C176B-7DFA-4F0D-9787-458CB9917033"
+    }
+  },
+  "_meta": {
+    "runtimeId": "525a3d10-7c7e-4f56-8b7f-10f49fab0876"
+  }
+}

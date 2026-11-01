@@ -1,0 +1,19 @@
+[
+  {
+    "browser": "Chrome/156.0.8078.47",
+    "netlog": "chrome-netlog-1.json.gz",
+    "urls": [
+      "https://www.google.com/",
+      "http://clients2.google.com/time/1/current?cup2key=ML-DSA-44-10:1_7YySyBm4vNxbjZJew2EY6y1tDL9f0AmYi4dJyR1Vo&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard&laf=b64bin",
+      "https://www.google.com/async/folae?async=_fmt:pb&udm=50&client_locale=en-US&client_country=tw",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:4zkv-Gy0IWrV-Et-2J1V8ILJwI6Bf0_LKTPMorHCxwM&cup2hreq=77a47bd4ea34e5ecc18dc8e913254be4d9ea18e3a16fd455c7d561e2af769b38",
+      "http://127.0.0.1:8766/api/v1",
+      "http://127.0.0.1:57432/api/v1",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:2MFhjU4QEw-1EFYM6GpXvSsM_lkFijKd0vibvoCn5SQ&cup2hreq=709b1feb18d3ae37a79ecad2831f9408a0ac96bf35879dc8bd185f0e7955660e",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:CNJCcFhi_RVQdisgOn4QSHybFo6PWVllTwC2YZkRYN4&cup2hreq=dc70987d9db454a4afe3e9b05a5c2223435e8cfd326711b81d76a82fa042f617",
+      "http://127.0.0.1:57425/api/v1"
+    ],
+    "forbidden": []
+  }
+]

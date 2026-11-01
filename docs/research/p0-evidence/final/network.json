@@ -1,0 +1,29 @@
+[
+  {
+    "browser": "Chrome/156.0.8078.47",
+    "netlog": "chrome-netlog-1.json.gz",
+    "urls": [
+      "https://www.google.com/",
+      "http://clients2.google.com/time/1/current?cup2key=ML-DSA-44-10:tsUuJrVZZEZSY0ALNYpXTALwpcKQMIaNLK7dNdiHJJ8&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard&laf=b64bin",
+      "https://www.google.com/async/folae?async=_fmt:pb&udm=50&client_locale=en-US&client_country=tw",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:bpr-16sEmGbJXIq26rV1CfTw-OLzEVbYMiFcwC8kw7I&cup2hreq=fd283e972588e86e39b9b35b131c31e471c0d122bce15550d2c0098c50ecf983",
+      "http://127.0.0.1:8766/api/v1",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:Yx4pwSyre3Fv2K2eiMprQgxYJfdTPWfmDH2kUHAcdSY&cup2hreq=a65fc1da29c3ee5e383adc1f462f7b31c377e7399e15eab8f2b3cb14a8db70a5",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:KYw_IlmJMuCkUMyh4LaiQ5XgimUILbasRcNcbF6Ecwc&cup2hreq=c1d414e5d492ba02ec5e36b88d0bb5c1cf63ef563971f94deadb5a025172ddc5",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:zxuY95mDgmPTmElTQ-UUUWWY6TYL731Bmwupm5XTsfU&cup2hreq=7c36e125e0c7d0807d3e7f6e0a204ac31825c3ad65c954582ada1fa50ea2f3dc",
+      "http://edgedl.me.gvt1.com/edgedl/diffgen-puffin/gcmjkmgdlgnkkcocmoeiminaijmmjnii/6bf09eb90ed9ee14632b09da0ea3f8e6b941d8487be4669375b1db3b727ca3dd",
+      "https://update.googleapis.com/service/update2/json",
+      "http://edgedl.me.gvt1.com/edgedl/diffgen-puffin/hfnkpimlhhgieaddgfemjhofmfblmnib/7a93c4d72b31cfcdc69b7fe988953e0bb5dbdc0f7463c816ad3c7b880bb89b53",
+      "http://127.0.0.1:49542/",
+      "https://content-autofill.googleapis.com/v1/pages/ChRDaHJvbWUvMTU2LjAuODA3OC40NxI5CQxGkIAhxOK3Eg0NgVEugioGCAAYASAAEgsNDvppmSoECAcYByGEM4y51DcAfSmEM4y51DcAfTIA?alt=proto",
+      "http://127.0.0.1:49542/favicon.ico",
+      "https://content-autofill.googleapis.com/v1/pages/ChRDaHJvbWUvMTU2LjAuODA3OC40NxJXCWzDMjELbapEEg0NgVEugioGCAAYASAAEgsNDvppmSoECAcYBxINDShe7TMqBhAGGAUgARINDWlunmkqBhAFGAUgACFoEUoS9kL9NCloEUoS9kL9NDIA?alt=proto",
+      "https://mail.google.com:49542/",
+      "https://content-autofill.googleapis.com/v1/pages/ChRDaHJvbWUvMTU2LjAuODA3OC40NxI5CRLBZ8zOZGceEg0NgVEugioGCAAYASAAEgsNDvppmSoECAcYByGYGidFXB6AoimYGidFXB6AojIA?alt=proto",
+      "https://mail.google.com:49542/favicon.ico",
+      "https://content-autofill.googleapis.com/v1/pages/ChRDaHJvbWUvMTU2LjAuODA3OC40NxJXCd2DBeYJ1uUzEg0NgVEugioGCAAYASAAEgsNDvppmSoECAcYBxINDShe7TMqBhAGGAUgARINDWlunmkqBhAFGAUgACF8d3W3wM_XhCl8d3W3wM_XhDIA?alt=proto"
+    ],
+    "forbidden": []
+  }
+]

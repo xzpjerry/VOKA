@@ -1,0 +1,9 @@
+Fixture and collection snapshot ready 9951 9951
+Chrome Chrome/156.0.8078.47
+Browser worker ready
+Options connected
+Import summary checked
+PASS T-29 {
+  noteType: 'VOKA Gloss Upgrade Test 1793504597225',
+  deck: 'VOKA::Gloss Upgrade Test 1793504597225::B1'
+} [ '1793504597550', '1793504597552' ] all collection notes/cards compared

@@ -11,7 +11,7 @@ const call = (method: string, params = {}, write = false): Promise<any> =>
   rpc(config, method, params, { sideEffecting: write });
 const snapshot = () =>
   JSON.parse(
-    execFileSync("python3", ["scripts/anki-snapshot.py"], { encoding: "utf8" }),
+    execFileSync("python3", ["scripts/anki-snapshot.py"], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }),
   );
 const noteType = { name: DEFAULT_TARGET.noteType };
 if (!(await call("noteTypes.list")).some((t: any) => t.name === noteType.name))
@@ -78,16 +78,9 @@ try {
     { notes, atomic: false },
     true,
   );
-  const { chromium } = await import(
-    process.env.VOKA_PLAYWRIGHT ??
-      "/Users/xzpjerry/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs"
-  );
-  const browser = await chromium.launch({
-    executablePath:
-      process.env.VOKA_CHROME ??
-      `${process.env.HOME}/Library/Caches/ms-playwright/chromium-1217/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`,
-    headless: true,
-  });
+  // Use the same pinned Chrome for Testing / Puppeteer as whole-product acceptance.
+  const { default: puppeteer } = await import("puppeteer");
+  const browser = await puppeteer.launch({ headless: true });
   result.browser = await browser.version();
   result.fallbacks = [];
   try {
@@ -101,8 +94,7 @@ try {
       assert(!render.css.includes(":has("));
       await page.setContent(`<style>${render.css}</style>${render.answerHtml}`);
       const shown = await page
-        .locator(i === 0 ? ".gloss-target" : ".gloss-native")
-        .evaluate((el: Element) => ({
+        .$eval(i === 0 ? ".gloss-target" : ".gloss-native", (el: Element) => ({
           text: el.textContent,
           display: getComputedStyle(el).display,
         }));

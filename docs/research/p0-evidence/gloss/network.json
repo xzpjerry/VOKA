@@ -1,0 +1,14 @@
+[
+  {
+    "browser": "Chrome/156.0.8078.47",
+    "netlog": "chrome-netlog-1.json.gz",
+    "urls": [
+      "https://www.google.com/",
+      "http://clients2.google.com/time/1/current?cup2key=ML-DSA-44-10:3Fz2uvaiO8mL4XcSSdY1uB2ebi2A5mjQ8B_ZsLflJa4&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard&laf=b64bin",
+      "https://www.google.com/async/folae?async=_fmt:pb&udm=50&client_locale=en-US&client_country=tw",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:9_Ts3N6rlJNvrl-57E9dC-whG3OvWuvKS-1lOMT9kP4&cup2hreq=7375cba915541e8ed626c241056931dd4d7991d0b0a300db9f2fa2fedd3dec95"
+    ],
+    "forbidden": []
+  }
+]

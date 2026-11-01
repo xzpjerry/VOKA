@@ -1,0 +1,213 @@
+{
+  "endpoint": "http://127.0.0.1:8766/api/v1",
+  "purpose": "Remove only named fixtures from preliminary harness debugging; canonical prototype state and reviewer test fixtures retained.",
+  "removed": [
+    {
+      "type": {
+        "id": "1793503494549",
+        "name": "VOKA Level Import Acceptance A 1793503413315"
+      },
+      "notes": 2085,
+      "decks": [
+        {
+          "id": "1793503494649",
+          "name": "VOKA::Level Import Acceptance A 1793503413315",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793503494650",
+          "name": "VOKA::Level Import Acceptance A 1793503413315::B1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    },
+    {
+      "type": {
+        "id": "1793503607597",
+        "name": "VOKA Level Import Acceptance A 1793503541700"
+      },
+      "notes": 2085,
+      "decks": [
+        {
+          "id": "1793503607697",
+          "name": "VOKA::Level Import Acceptance A 1793503541700",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793503607698",
+          "name": "VOKA::Level Import Acceptance A 1793503541700::B1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    },
+    {
+      "type": {
+        "id": "1793503826347",
+        "name": "VOKA Level Import Acceptance A 1793503816812"
+      },
+      "notes": 2085,
+      "decks": [
+        {
+          "id": "1793503826449",
+          "name": "VOKA::Level Import Acceptance A 1793503816812",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793503826450",
+          "name": "VOKA::Level Import Acceptance A 1793503816812::B1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    },
+    {
+      "type": {
+        "id": "1793503892497",
+        "name": "VOKA Level Import Acceptance B 1793503816812"
+      },
+      "notes": 2085,
+      "decks": [
+        {
+          "id": "1793503892598",
+          "name": "VOKA::Level Import Acceptance B 1793503816812",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793503892599",
+          "name": "VOKA::Level Import Acceptance B 1793503816812::B1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    },
+    {
+      "type": {
+        "id": "1793503869676",
+        "name": "VOKA Level Import Acceptance C 1793503816812"
+      },
+      "notes": 1050,
+      "decks": [
+        {
+          "id": "1793503869819",
+          "name": "VOKA::Level Import Acceptance C 1793503816812",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793503869820",
+          "name": "VOKA::Level Import Acceptance C 1793503816812::A1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    },
+    {
+      "type": {
+        "id": "1793503761771",
+        "name": "VOKA P0 Final 1793503753928"
+      },
+      "notes": 3285,
+      "decks": [
+        {
+          "id": "1793503798298",
+          "name": "VOKA::P0 Final 1793503753928",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793503788727",
+          "name": "VOKA::P0 Final 1793503753928::A2",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793503761871",
+          "name": "VOKA::P0 Final 1793503753928::B1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    },
+    {
+      "type": {
+        "id": "1793503938875",
+        "name": "VOKA P0 Final 1793503927156"
+      },
+      "notes": 2085,
+      "decks": [
+        {
+          "id": "1793503967373",
+          "name": "VOKA::P0 Final 1793503927156",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793503938971",
+          "name": "VOKA::P0 Final 1793503927156::B1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    },
+    {
+      "type": {
+        "id": "1793504126673",
+        "name": "VOKA P0 Final 1793504112825"
+      },
+      "notes": 3285,
+      "decks": [
+        {
+          "id": "1793504173723",
+          "name": "VOKA::P0 Final 1793504112825",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793504160321",
+          "name": "VOKA::P0 Final 1793504112825::A2",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793504126774",
+          "name": "VOKA::P0 Final 1793504112825::B1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    },
+    {
+      "type": {
+        "id": "1793504225598",
+        "name": "VOKA P0 Final 1793504209965"
+      },
+      "notes": 3285,
+      "decks": [
+        {
+          "id": "1793504276170",
+          "name": "VOKA::P0 Final 1793504209965",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793504260774",
+          "name": "VOKA::P0 Final 1793504209965::A2",
+          "kind": "normal",
+          "presetId": "1"
+        },
+        {
+          "id": "1793504225696",
+          "name": "VOKA::P0 Final 1793504209965::B1",
+          "kind": "normal",
+          "presetId": "1"
+        }
+      ]
+    }
+  ]
+}

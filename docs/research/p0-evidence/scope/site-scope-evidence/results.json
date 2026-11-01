@@ -1,0 +1,92 @@
+{
+  "chrome": "Chrome/156.0.8078.47",
+  "fixture": "*.localhost:57564",
+  "t31": {
+    "denyListed": {
+      "remembered": true,
+      "granted": true,
+      "autoRun": false,
+      "manualInjection": true,
+      "manualPath": "chrome.scripting.executeScript with content.js, the same call the toolbar handler makes after its click; the toolbar icon click itself is not automatable in Puppeteer."
+    },
+    "remembered": {
+      "autoRun": true,
+      "onlyNonDeniedOriginRegistered": true
+    },
+    "revoked": {
+      "permissionRevoked": true,
+      "registrationRemoved": true,
+      "autoRunAfterReload": false
+    },
+    "allSites": {
+      "grant": "*://*/* (all HTTP(S) sites)",
+      "registeredMatches": [
+        "*://*/*"
+      ],
+      "autoRunOnUnrememberedSite": true,
+      "denyListSuppressesAutoRun": true
+    },
+    "denyListedApplyToAll": {
+      "autoRun": false
+    },
+    "revokeAll": {
+      "permissionRevoked": true,
+      "registrationRemoved": true,
+      "autoRunAfterReload": false
+    }
+  },
+  "limitations": [
+    "The native Chrome extension permission bubble (Allow/Deny) cannot be clicked by Puppeteer; tests pre-authorize through Chrome's own extensions site-access backend and then exercise chrome.permissions.request from a trusted click.",
+    "The toolbar icon click cannot be synthesized by Puppeteer. The manual path is verified by calling the same chrome.scripting.executeScript({files:['content.js']}) injection that the action handler performs.",
+    "Install-time host-prompt text and the All-sites warning text were checked in the settings/wizard DOM and manifest, not in Chrome's native install prompt.",
+    "T-31 was verified on local *.localhost fixtures with the built-in deny list extended by deny.localhost; real Gmail/Outlook/WhatsApp accounts were not opened."
+  ],
+  "extensionId": "lapkepjabkpcoenckabopajdginmnkkd",
+  "defaultInstall": {
+    "origins": [
+      "http://127.0.0.1/*"
+    ],
+    "permissions": [
+      "activeTab",
+      "storage",
+      "scripting"
+    ],
+    "hostPermissions": [
+      "http://127.0.0.1/*"
+    ],
+    "optionalHostPermissions": [
+      "*://*/*"
+    ],
+    "note": "No optional origin is granted at install; the only host origin is the declared loopback Anki host. Chrome's install-time prompt text is not observable from automation."
+  },
+  "wizard": {
+    "scopes": [
+      "activeTab",
+      "remembered",
+      "all"
+    ],
+    "default": "activeTab",
+    "denyListHidden": true
+  },
+  "settings": {
+    "siteScope": "remembered",
+    "denyListSaved": 19,
+    "denyListIncludesDefaults": true,
+    "denyListEditable": true
+  },
+  "permissionHarness": {
+    "grantedOrigins": [
+      "*://allow.localhost/*",
+      "*://deny.localhost/*"
+    ],
+    "note": "Exact origins were pre-authorized through Chrome's site-access backend, then chrome.permissions.request was invoked from a trusted click. The native Allow/Deny bubble was not automated."
+  },
+  "remembered": {
+    "registeredMatches": [
+      "*://allow.localhost/*"
+    ],
+    "autoScript": [
+      "content-auto.js"
+    ]
+  }
+}

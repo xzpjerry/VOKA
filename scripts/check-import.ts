@@ -27,7 +27,7 @@ const target = process.argv.includes("--default")
     };
 const snapshot = () =>
   JSON.parse(
-    execFileSync("python3", ["scripts/anki-snapshot.py"], { encoding: "utf8" }),
+    execFileSync("python3", ["scripts/anki-snapshot.py"], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }),
   );
 if (process.argv.includes("--existing-type"))
   await call(

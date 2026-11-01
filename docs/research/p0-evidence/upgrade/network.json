@@ -1,0 +1,23 @@
+[
+  {
+    "browser": "Chrome/156.0.8078.47",
+    "netlog": "chrome-netlog-1.json.gz",
+    "urls": [
+      "https://www.google.com/",
+      "http://clients2.google.com/time/1/current?cup2key=ML-DSA-44-10:DEc-BTZ5AKTdbp4Qp-oLPcgePsmQqvP7PZ4-Mqo_JNg&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard&laf=b64bin",
+      "https://www.google.com/async/folae?async=_fmt:pb&udm=50&client_locale=en-US&client_country=tw",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:r0sWyg4PRsDv9ONf2uQOiXjRttQcLRA5zuN6-FO0Fwo&cup2hreq=83f05cd27a73f8fb44b171b616bfd3d72da4fa21022d2c136c4ccabbbaf8ab6f",
+      "http://127.0.0.1:8766/api/v1",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:_RefflL6JFj7OpzfWNN6HetOaXBI43ea7HerwVb-GM0&cup2hreq=b9b1d5a087766d815f1c4ff488356df04280692badec23227aec68b9ee94033f",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:jCbarrrNluvjFuj2K6BB-xN5RZsLHF_NPuhAwJkDXRg&cup2hreq=77818a38e2cecc46e22ff4a532358f7811825fead77df030115eab17e60b3d40",
+      "http://127.0.0.1:55088/",
+      "http://127.0.0.1:55088/favicon.ico",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:VjmL912bwcQUkJQHAu_b4oqrGDepYXZGpCUMJGrLDxw&cup2hreq=9da9e57ae11390df8724f6f994aca3af744f4ea24e9b287bdaccbad063a29c11",
+      "http://edgedl.me.gvt1.com/edgedl/diffgen-puffin/gcmjkmgdlgnkkcocmoeiminaijmmjnii/6bf09eb90ed9ee14632b09da0ea3f8e6b941d8487be4669375b1db3b727ca3dd",
+      "https://update.googleapis.com/service/update2/json",
+      "http://edgedl.me.gvt1.com/edgedl/diffgen-puffin/hfnkpimlhhgieaddgfemjhofmfblmnib/7a93c4d72b31cfcdc69b7fe988953e0bb5dbdc0f7463c816ad3c7b880bb89b53"
+    ],
+    "forbidden": []
+  }
+]

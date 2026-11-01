@@ -1,0 +1,182 @@
+{
+  "date": "2026-11-01T03:45:35.532Z",
+  "checks": {
+    "T-03": {
+      "count": 2085,
+      "specEstimate": 2088,
+      "difference": -3,
+      "target": {
+        "noteType": "VOKA P0 Acceptance 1793504735533",
+        "deck": "VOKA::P0 Acceptance 1793504735533::B1"
+      }
+    },
+    "T-05": {
+      "reviewed": [
+        {
+          "id": "1793504736035",
+          "noteId": "1793504736035",
+          "deck": {
+            "id": "1793504735749",
+            "name": "VOKA::P0 Acceptance 1793504735533::B1"
+          },
+          "homeDeck": null,
+          "templateIndex": 0,
+          "flags": 0,
+          "modifiedAt": "2026-11-01T03:45:36.000Z",
+          "scheduling": {
+            "type": "new",
+            "queue": "new",
+            "due": {
+              "kind": "position",
+              "position": 46951
+            },
+            "intervalDays": 0,
+            "learningIntervalSeconds": null,
+            "remainingSteps": 0,
+            "repetitions": 0,
+            "lapses": 0,
+            "sm2EasePermille": 0,
+            "fsrsMemory": null,
+            "desiredRetention": null
+          }
+        },
+        {
+          "id": "1793504736036",
+          "noteId": "1793504736036",
+          "deck": {
+            "id": "1793504735749",
+            "name": "VOKA::P0 Acceptance 1793504735533::B1"
+          },
+          "homeDeck": null,
+          "templateIndex": 0,
+          "flags": 0,
+          "modifiedAt": "2026-11-01T03:45:36.000Z",
+          "scheduling": {
+            "type": "new",
+            "queue": "new",
+            "due": {
+              "kind": "position",
+              "position": 46952
+            },
+            "intervalDays": 0,
+            "learningIntervalSeconds": null,
+            "remainingSteps": 0,
+            "repetitions": 0,
+            "lapses": 0,
+            "sm2EasePermille": 0,
+            "fsrsMemory": null,
+            "desiredRetention": null
+          }
+        },
+        {
+          "id": "1793504736037",
+          "noteId": "1793504736037",
+          "deck": {
+            "id": "1793504735749",
+            "name": "VOKA::P0 Acceptance 1793504735533::B1"
+          },
+          "homeDeck": null,
+          "templateIndex": 0,
+          "flags": 0,
+          "modifiedAt": "2026-11-01T03:45:36.000Z",
+          "scheduling": {
+            "type": "new",
+            "queue": "new",
+            "due": {
+              "kind": "position",
+              "position": 46953
+            },
+            "intervalDays": 0,
+            "learningIntervalSeconds": null,
+            "remainingSteps": 0,
+            "repetitions": 0,
+            "lapses": 0,
+            "sm2EasePermille": 0,
+            "fsrsMemory": null,
+            "desiredRetention": null
+          }
+        }
+      ],
+      "revlogRows": 15,
+      "adjacentCreated": 2383,
+      "allPriorCardsAndRevlogUnchanged": true,
+      "reviewedFieldsUnchanged": true,
+      "sync": "not called"
+    },
+    "T-33": {
+      "caseSensitive": true,
+      "stripsHtml": true,
+      "defaultAcrossDecks": true,
+      "deckScope": true,
+      "nonAtomic": {
+        "items": [
+          {
+            "index": 0,
+            "result": {
+              "noteId": "1793504761074",
+              "cardIds": [
+                "1793504761074"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "error": {
+              "code": 1002,
+              "message": "Note cannot be created.",
+              "data": {
+                "type": "validationFailed",
+                "details": {
+                  "valid": false,
+                  "issues": [
+                    {
+                      "type": "duplicate",
+                      "message": "A matching note exists."
+                    }
+                  ],
+                  "duplicateNoteIds": [
+                    "1793504760524"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "index": 2,
+            "result": {
+              "noteId": "1793504761076",
+              "cardIds": [
+                "1793504761076"
+              ]
+            }
+          }
+        ]
+      },
+      "atomicError": "Error: not-new-ankiconnect",
+      "atomicWroteZero": true,
+      "mergePreservesFields": true,
+      "defaultSeparateNoteTypes": true,
+      "acrossNoteTypes": true,
+      "invalidScope": {
+        "code": -32602,
+        "message": "{'notes': [{'noteType': {'name': 'VOKA P0 v1 1793504735533'}, 'deck': {'name': 'VOKA::P0 v1 1793504735533'}, 'fields': {'Key': 'en:seed', 'Word': 'original', 'Keep': 'preserved'}, 'duplicates': {'scope': 'invalid'}}]} is not valid under any of the given schemas",
+        "data": {
+          "type": "invalidParams",
+          "details": {
+            "path": "/"
+          }
+        }
+      },
+      "type": {
+        "name": "VOKA P0 v1 1793504735533"
+      },
+      "deck": {
+        "name": "VOKA::P0 v1 1793504735533"
+      }
+    }
+  },
+  "target": {
+    "noteType": "VOKA P0 Acceptance 1793504735533",
+    "deck": "VOKA::P0 Acceptance 1793504735533::B1"
+  }
+}

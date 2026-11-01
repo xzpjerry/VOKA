@@ -1,0 +1,173 @@
+{
+  "started": "2026-11-01T03:56:50.980Z",
+  "checks": {
+    "T-03": {
+      "count": 2085,
+      "cards": 2085,
+      "estimateInSpec": 2088,
+      "defaultTarget": {
+        "noteType": "VOKA Vocabulary · English",
+        "deck": "VOKA::English::B1"
+      },
+      "allKeysUnique": true,
+      "allTagsPresent": true
+    },
+    "T-04": {
+      "created": 0,
+      "allCardsAndReviewHistoryUnchanged": true
+    },
+    "T-06": {
+      "key": "en:ability",
+      "newBefore": 1199,
+      "existingBefore": 1,
+      "importCreated": 1199,
+      "matchingNotes": [
+        "1793505468642"
+      ],
+      "deck": "VOKA::English::A2"
+    },
+    "T-07": {
+      "switches": [
+        {
+          "level": "B1",
+          "ranges": [
+            "benefit"
+          ]
+        },
+        {
+          "level": "B2",
+          "ranges": [
+            "abolish"
+          ]
+        },
+        {
+          "level": "B1",
+          "ranges": [
+            "benefit"
+          ]
+        }
+      ],
+      "allCardsAndRevlogUnchanged": true,
+      "benefitFieldsUnchanged": true
+    },
+    "T-30": {
+      "regions": [
+        "input",
+        "textarea",
+        "contenteditable",
+        "code",
+        "nav"
+      ],
+      "highlights": [],
+      "contextCardOpened": false
+    },
+    "T-11": {
+      "gradedMissing": {
+        "lemma": "'m",
+        "level": "A1",
+        "Variants": "",
+        "Reading": "/əm/",
+        "GlossNative": "",
+        "GlossTarget": "",
+        "dictionaryStatus": "missing",
+        "message": "词典没有"
+      },
+      "ungradedFound": {
+        "lemma": "aardvark",
+        "level": "",
+        "Variants": "",
+        "Reading": "/ˈɑɹdvˌɑɹk/",
+        "GlossNative": "n. 土豚",
+        "GlossTarget": "n. nocturnal burrowing mammal of the grasslands of Africa that feeds on termites; sole extant representative of the order Tubulidentata",
+        "dictionaryStatus": "found",
+        "message": ""
+      },
+      "ungradedCard": "×aardvark/ˈɑɹdvˌɑɹk/ · 未分级 · 未加入 Ankin. 土豚展开另一种释义n. nocturnal burrowing mammal of the grasslands of Africa that feeds on termites; sole extant representative of the order Tubulidentata我不认识，高亮它They are 'm and aardvark in this fixture.加入 Anki（含这句例句）"
+    },
+    "T-26": {
+      "modes": [
+        {
+          "mode": "target",
+          "scm": 1793504349850,
+          "visible": {
+            "native": "none",
+            "target": "block"
+          }
+        },
+        {
+          "mode": "native",
+          "scm": 1793504349850,
+          "visible": {
+            "native": "block",
+            "target": "none"
+          }
+        }
+      ],
+      "outsideCssPreserved": true,
+      "scmBefore": 1793504349850,
+      "scmAfter": 1793504349850,
+      "optionsControlsUsed": true
+    },
+    "T-27": {
+      "fallbacks": [
+        {
+          "mode": "native",
+          "text": "target fallback",
+          "display": "block"
+        },
+        {
+          "mode": "target",
+          "text": "母语回退",
+          "display": "block"
+        }
+      ],
+      "noHas": true,
+      "browser": "Chrome/156.0.8078.47"
+    },
+    "T-31": {
+      "host": "mail.google.com",
+      "localFixture": true,
+      "fixtureDelivery": "CDP interception of HTTPS URL with HTML from local server",
+      "realGmail": false,
+      "autoRun": false,
+      "manualInjection": true,
+      "builtinDenyList": true,
+      "manualTargetHighlight": "benefit"
+    }
+  },
+  "limitations": [
+    "Real Gmail was not used; mail.google.com is mapped to a local HTTP fixture.",
+    "Manual injection uses scripting.executeScript, not a physical toolbar click."
+  ],
+  "prior": {
+    "type": {
+      "id": "1793432258157",
+      "name": "VOKA Vocabulary · English"
+    },
+    "decks": [
+      {
+        "id": "1793438005186",
+        "name": "VOKA::English::A1",
+        "kind": "normal",
+        "presetId": "1"
+      },
+      {
+        "id": "1793437493725",
+        "name": "VOKA::English::A2",
+        "kind": "normal",
+        "presetId": "1"
+      },
+      {
+        "id": "1793428929325",
+        "name": "VOKA::English::B1",
+        "kind": "normal",
+        "presetId": "1"
+      }
+    ]
+  },
+  "retained": {
+    "noteType": "VOKA P0 Final 1793505410980",
+    "deckPrefix": "VOKA::P0 Final 1793505410980",
+    "priorCanonicalNamesRestored": true
+  }
+}

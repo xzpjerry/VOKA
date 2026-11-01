@@ -1,0 +1,36 @@
+{
+  "stamp": 1793504358827,
+  "targets": [
+    {
+      "noteType": "VOKA Level Import Acceptance A 1793504358827",
+      "deckPrefix": "VOKA::Level Import Acceptance A 1793504358827",
+      "levels": [
+        "B1"
+      ],
+      "purpose": "T-03/T-04/T-07 UI"
+    },
+    {
+      "noteType": "VOKA Level Import Acceptance B 1793504358827",
+      "deckPrefix": "VOKA::Level Import Acceptance B 1793504358827",
+      "levels": [
+        "B1"
+      ],
+      "purpose": "interrupt/resume"
+    },
+    {
+      "noteType": "VOKA Level Import Acceptance C 1793504358827",
+      "deckPrefix": "VOKA::Level Import Acceptance C 1793504358827",
+      "levels": [
+        "A1"
+      ],
+      "purpose": "UI cancel/resume"
+    }
+  ],
+  "manualNotes": [
+    "1793504416798"
+  ],
+  "manualDeck": {
+    "name": "VOKA::English::A2",
+    "createdByTest": false
+  }
+}

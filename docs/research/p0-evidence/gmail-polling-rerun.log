@@ -1,0 +1,21 @@
+
+> voka@0.1.0 check:p0
+> tsx scripts/check-p0-acceptance.ts --only=final
+
+START final T-03,T-04,T-06,T-07,T-11,T-26,T-27,T-30,T-31
+Chrome Chrome/156.0.8078.47
+/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/common/WaitTask.ts:77
+      this.#timeoutError = new TimeoutError(
+                           ^
+
+TimeoutError: Waiting failed: 30000ms exceeded
+    at new WaitTask (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/common/WaitTask.ts:77:28)
+    at IsolatedWorld.waitForFunction (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/api/Realm.ts:170:22)
+    at CdpFrame.waitForFunction (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/api/Frame.ts:813:36)
+    at CdpFrame.<anonymous> (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/util/decorators.ts:63:21)
+    at CdpPage.waitForFunction (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/api/Page.ts:3445:29)
+    at finalChecks (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/scripts/check-p0-acceptance.ts:1256:18)
+    at async <anonymous> (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/scripts/check-p0-acceptance.ts:229:33)
+
+Node.js v26.9.0
+END final 1

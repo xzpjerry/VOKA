@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-01T03:53:05.396Z",
+  "port": 8766,
+  "freshProfile": true,
+  "result": "PASS",
+  "terminatedPid": 4697,
+  "isolatedProcessOnly": true,
+  "afterRefreshRanges": 0,
+  "promptShown": true,
+  "realRestart": true,
+  "retryRestoredHighlights": true
+}

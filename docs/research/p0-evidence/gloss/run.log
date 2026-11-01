@@ -1,0 +1,39 @@
+Chrome Chrome/156.0.8078.47
+{
+  "port": 8766,
+  "modes": [
+    {
+      "mode": "target",
+      "scmBefore": 1793504349850,
+      "scmAfter": 1793504349850,
+      "outsideCssPreserved": true,
+      "notesAndSchedulingUnchanged": true
+    },
+    {
+      "mode": "native",
+      "scmBefore": 1793504349850,
+      "scmAfter": 1793504349850,
+      "outsideCssPreserved": true,
+      "notesAndSchedulingUnchanged": true
+    }
+  ],
+  "browser": "Chrome/156.0.8078.47",
+  "fallbacks": [
+    {
+      "mode": "native",
+      "missing": "native",
+      "cardId": "1793504578349",
+      "text": "target fallback",
+      "display": "block",
+      "noHas": true
+    },
+    {
+      "mode": "target",
+      "missing": "target",
+      "cardId": "1793504578350",
+      "text": "母语回退",
+      "display": "block",
+      "noHas": true
+    }
+  ]
+}

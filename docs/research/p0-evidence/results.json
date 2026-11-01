@@ -1,0 +1,450 @@
+{
+  "started": "2026-11-01T03:39:15.994Z",
+  "productCommit": "4e63cb48cc48e1cf1b2a4edff6a60c938a675afe",
+  "reruns": [
+    {
+      "at": "2026-11-01T03:48:13.644Z",
+      "selected": [
+        "manual",
+        "final"
+      ]
+    },
+    {
+      "at": "2026-11-01T03:51:58.028Z",
+      "selected": [
+        "final",
+        "lifecycle"
+      ]
+    },
+    {
+      "at": "2026-11-01T03:54:52.532Z",
+      "selected": [
+        "final"
+      ]
+    },
+    {
+      "at": "2026-11-01T03:56:50.610Z",
+      "selected": [
+        "final"
+      ]
+    }
+  ],
+  "replacedSteps": [
+    {
+      "name": "manual",
+      "tests": [
+        "T-08"
+      ],
+      "exitCode": 1,
+      "result": "FAIL",
+      "elapsedMs": 46937,
+      "evidence": "docs/research/p0-evidence/manual"
+    },
+    {
+      "name": "final",
+      "tests": [
+        "T-01",
+        "T-03",
+        "T-04",
+        "T-06",
+        "T-07",
+        "T-11",
+        "T-26",
+        "T-27",
+        "T-30",
+        "T-31"
+      ],
+      "exitCode": 1,
+      "result": "FAIL",
+      "elapsedMs": 86004,
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "name": "final",
+      "tests": [
+        "T-01",
+        "T-03",
+        "T-04",
+        "T-06",
+        "T-07",
+        "T-11",
+        "T-26",
+        "T-27",
+        "T-30",
+        "T-31"
+      ],
+      "exitCode": 1,
+      "result": "FAIL",
+      "startedAt": "2026-11-01T03:48:52.978Z",
+      "elapsedMs": 92759,
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "name": "final",
+      "tests": [
+        "T-03",
+        "T-04",
+        "T-06",
+        "T-07",
+        "T-11",
+        "T-26",
+        "T-27",
+        "T-30",
+        "T-31"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "startedAt": "2026-11-01T03:51:58.044Z",
+      "elapsedMs": 66635,
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "name": "final",
+      "tests": [
+        "T-03",
+        "T-04",
+        "T-06",
+        "T-07",
+        "T-11",
+        "T-26",
+        "T-27",
+        "T-30",
+        "T-31"
+      ],
+      "exitCode": 1,
+      "result": "FAIL",
+      "startedAt": "2026-11-01T03:54:52.544Z",
+      "elapsedMs": 101697,
+      "evidence": "docs/research/p0-evidence/final"
+    }
+  ],
+  "commit": "4e63cb48cc48e1cf1b2a4edff6a60c938a675afe",
+  "endpoint": "http://127.0.0.1:8766/api/v1",
+  "steps": [
+    {
+      "name": "anki",
+      "tests": [
+        "T-01"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 306,
+      "evidence": "docs/research/p0-evidence/anki"
+    },
+    {
+      "name": "import",
+      "tests": [
+        "T-04",
+        "T-05"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 2099,
+      "evidence": "docs/research/p0-evidence/import"
+    },
+    {
+      "name": "level",
+      "tests": [
+        "T-03",
+        "T-04",
+        "T-06",
+        "T-07"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 86758,
+      "evidence": "docs/research/p0-evidence/level"
+    },
+    {
+      "name": "highlight",
+      "tests": [
+        "T-01",
+        "T-30"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 7459,
+      "evidence": "docs/research/p0-evidence/highlight"
+    },
+    {
+      "name": "dynamic",
+      "tests": [
+        "T-09"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 6631,
+      "evidence": "docs/research/p0-evidence/dynamic"
+    },
+    {
+      "name": "contexts",
+      "tests": [
+        "T-10",
+        "T-11",
+        "T-32"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 69078,
+      "evidence": "docs/research/p0-evidence/contexts"
+    },
+    {
+      "name": "data",
+      "tests": [
+        "T-03",
+        "T-11"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 1825,
+      "evidence": "docs/research/p0-evidence/data"
+    },
+    {
+      "name": "gloss",
+      "tests": [
+        "T-26",
+        "T-27"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 2122,
+      "evidence": "docs/research/p0-evidence/gloss"
+    },
+    {
+      "name": "candidates",
+      "tests": [
+        "T-28"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 17695,
+      "evidence": "docs/research/p0-evidence/candidates"
+    },
+    {
+      "name": "upgrade",
+      "tests": [
+        "T-29"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 112189,
+      "evidence": "docs/research/p0-evidence/upgrade"
+    },
+    {
+      "name": "onboarding",
+      "tests": [
+        "T-02"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 7741,
+      "evidence": "docs/research/p0-evidence/onboarding"
+    },
+    {
+      "name": "scope",
+      "tests": [
+        "T-31"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 16508,
+      "evidence": "docs/research/p0-evidence/scope"
+    },
+    {
+      "name": "cold",
+      "tests": [
+        "T-31"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 1892,
+      "evidence": "docs/research/p0-evidence/cold"
+    },
+    {
+      "name": "supplemental",
+      "tests": [
+        "T-03",
+        "T-05",
+        "T-33"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 26326,
+      "evidence": "docs/research/p0-evidence/supplemental"
+    },
+    {
+      "name": "permission",
+      "tests": [
+        "T-02"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "elapsedMs": 6897,
+      "evidence": "docs/research/p0-evidence/permission"
+    },
+    {
+      "name": "manual",
+      "tests": [
+        "T-08"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "startedAt": "2026-11-01T03:48:13.655Z",
+      "elapsedMs": 39322,
+      "evidence": "docs/research/p0-evidence/manual"
+    },
+    {
+      "name": "lifecycle",
+      "tests": [
+        "T-01"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "startedAt": "2026-11-01T03:53:04.680Z",
+      "elapsedMs": 3966,
+      "evidence": "docs/research/p0-evidence/lifecycle"
+    },
+    {
+      "name": "final",
+      "tests": [
+        "T-03",
+        "T-04",
+        "T-06",
+        "T-07",
+        "T-11",
+        "T-26",
+        "T-27",
+        "T-30",
+        "T-31"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "startedAt": "2026-11-01T03:56:50.627Z",
+      "elapsedMs": 75064,
+      "evidence": "docs/research/p0-evidence/final"
+    }
+  ],
+  "tests": [
+    {
+      "id": "T-01",
+      "result": "PASS",
+      "primaryHarness": "lifecycle",
+      "evidence": "docs/research/p0-evidence/lifecycle"
+    },
+    {
+      "id": "T-02",
+      "result": "PASS",
+      "primaryHarness": "permission",
+      "evidence": "docs/research/p0-evidence/permission"
+    },
+    {
+      "id": "T-03",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-04",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-05",
+      "result": "PASS",
+      "primaryHarness": "supplemental",
+      "evidence": "docs/research/p0-evidence/supplemental"
+    },
+    {
+      "id": "T-06",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-07",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-08",
+      "result": "PASS",
+      "primaryHarness": "manual",
+      "evidence": "docs/research/p0-evidence/manual"
+    },
+    {
+      "id": "T-09",
+      "result": "PASS",
+      "primaryHarness": "dynamic",
+      "evidence": "docs/research/p0-evidence/dynamic"
+    },
+    {
+      "id": "T-10",
+      "result": "PASS",
+      "primaryHarness": "contexts",
+      "evidence": "docs/research/p0-evidence/contexts"
+    },
+    {
+      "id": "T-11",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-26",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-27",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-28",
+      "result": "PASS",
+      "primaryHarness": "candidates",
+      "evidence": "docs/research/p0-evidence/candidates"
+    },
+    {
+      "id": "T-29",
+      "result": "PASS",
+      "primaryHarness": "upgrade",
+      "evidence": "docs/research/p0-evidence/upgrade"
+    },
+    {
+      "id": "T-30",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-31",
+      "result": "PASS",
+      "primaryHarness": "final",
+      "evidence": "docs/research/p0-evidence/final"
+    },
+    {
+      "id": "T-32",
+      "result": "PASS",
+      "primaryHarness": "contexts",
+      "evidence": "docs/research/p0-evidence/contexts"
+    },
+    {
+      "id": "T-33",
+      "result": "PASS",
+      "primaryHarness": "supplemental",
+      "evidence": "docs/research/p0-evidence/supplemental"
+    }
+  ],
+  "counts": {
+    "PASS": 19,
+    "FAIL": 0,
+    "PARTIAL": 0,
+    "NOT RUN": 0
+  },
+  "finished": "2026-11-01T03:58:06.440Z"
+}

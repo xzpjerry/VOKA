@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-01T03:39:18.827Z",
+  "anki": {
+    "version": "26.09.3",
+    "apiMajor": 1
+  },
+  "data": {
+    "version": "en-2026.10.1",
+    "source": "CEFR-J Wordlist 1.6 (Tono Laboratory, TUFS); Octanove C1/C2 1.0; Open English WordNet 2025; CMUdict",
+    "counts": {
+      "A1": 1050,
+      "A2": 1200,
+      "B1": 2085,
+      "B2": 2383,
+      "C1": 909,
+      "C2": 868
+    }
+  },
+  "ui": {
+    "preview": "数据包 8,495 词 · 本次 B1 2,085 词：新建 2,085 / 已存在 0 / 冲突 0 / 跳过 6,410（其他等级）; deck and type 新建; promises and version visible",
+    "t03Ms": 13984,
+    "progressSamples": 136,
+    "t04Ms": 3774,
+    "t04": "preview new 0; confirm disabled; execute created 0 and called no validate/create/deck/type writes",
+    "t07": "B1→B2→B1 kept targetLevel/importLevel in sync, showed the no-delete hint, and every B1 note/card payload was byte-identical",
+    "cancel": {
+      "ms": 10825,
+      "createdBeforeCancel": 400,
+      "summary": "已取消：本次新建 400 条，剩余 650 条。可点「继续导入」只补剩下的。",
+      "keptNotes": 400,
+      "resumeMs": 5257,
+      "finalNotes": 1050
+    }
+  },
+  "t06": {
+    "key": "en:abroad",
+    "deck": "VOKA::English::A2",
+    "deckCreatedByTest": false,
+    "previewBefore": {
+      "new": 1191,
+      "existing": 9,
+      "conflict": 0,
+      "skipped": 7295
+    },
+    "previewAfter": {
+      "new": 1190,
+      "existing": 10,
+      "conflict": 0,
+      "skipped": 7295
+    },
+    "noteIds": [
+      "1793504416798"
+    ],
+    "single note": true
+  },
+  "interruption": {
+    "closedPort": 51866,
+    "firstRunMs": 908,
+    "firstRunCreated": 200,
+    "firstRunProcessed": 400,
+    "firstRunFailures": 200,
+    "firstFailure": {
+      "key": "en:bless",
+      "reason": "预检连接中断，未写入：Error: unreachable"
+    },
+    "previewAfterInterruption": {
+      "new": 1885,
+      "existing": 200,
+      "conflict": 0,
+      "skipped": 6410
+    },
+    "resumeMs": 8627,
+    "resumeCreated": 1885,
+    "finalPreview": {
+      "new": 0,
+      "existing": 2085,
+      "conflict": 0,
+      "skipped": 6410
+    },
+    "partialNotesUnchanged": 200
+  },
+  "finalCounts": {
+    "A": 2085,
+    "B": 2085,
+    "C": 1050
+  },
+  "scm": {
+    "before": 1793504349850,
+    "after": 1793504349850,
+    "revlogRows": 12
+  },
+  "totalMs": 85682
+}

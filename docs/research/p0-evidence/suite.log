@@ -1,0 +1,562 @@
+
+> voka@0.1.0 check:p0
+> tsx scripts/check-p0-acceptance.ts
+
+START anki T-01
+127.0.0.1:8766: ok
+decks.list [{"id":"1","name":"Default","kind":"normal","presetId":"1"},{"id":"1793428929324","name":"VOKA","kind":"normal","presetId":"1"},{"id":"1793428929323","name":"VOKA::English","kind":"normal","presetId":"1"},{"id":"1793438005186","name":"VOKA::English::A1","kind":"normal","presetId":"1"},{"id":"1793437493725","name":"VOKA::English::A2","kind":"normal","presetId":"1"},{"id":"1793428929325","name":"VOKA::English::B1","kind":"normal","presetId":"1"},{"id":"1793436788980","name":"VOKA::Gloss Acceptance 1793436788955","kind":"normal","presetId":"1"},{"id":"1793445754274","name":"VOKA::Gloss Acceptance 1793445754055","kind":"normal","presetId":"1"},{"id":"1793445754275","name":"VOKA::Gloss Acceptance 1793445754055::B1","kind":"normal","presetId":"1"},{"id":"1793454339443","name":"VOKA::Gloss Acceptance 1793454339221","kind":"normal","presetId":"1"},{"id":"1793454339444","name":"VOKA::Gloss Acceptance 1793454339221::B1","kind":"normal","presetId":"1"},{"id":"1793454418068","name":"VOKA::Gloss Acceptance 1793454417843","kind":"normal","presetId":"1"},{"id":"1793454418069","name":"VOKA::Gloss Acceptance 1793454417843::B1","kind":"normal","presetId":"1"},{"id":"1793454444391","name":"VOKA::Gloss Acceptance 1793454444168","kind":"normal","presetId":"1"},{"id":"1793454444392","name":"VOKA::Gloss Acceptance 1793454444168::B1","kind":"normal","presetId":"1"},{"id":"1793454558289","name":"VOKA::Gloss Acceptance 1793454558070","kind":"normal","presetId":"1"},{"id":"1793454558290","name":"VOKA::Gloss Acceptance 1793454558070::B1","kind":"normal","presetId":"1"},{"id":"1793502089858","name":"VOKA::Gloss Acceptance 1793502089635","kind":"normal","presetId":"1"},{"id":"1793502089859","name":"VOKA::Gloss Acceptance 1793502089635::B1","kind":"normal","presetId":"1"},{"id":"1793503434449","name":"VOKA::Gloss Acceptance 1793503434422","kind":"normal","presetId":"1"},{"id":"1793502558483","name":"VOKA::Gloss Upgrade Test 1793502558259","kind":"normal","presetId":"1"},{"id":"1793502558484","name":"VOKA::Gloss Upgrade Test 1793502558259::B1","kind":"normal","presetId":"1"},{"id":"1793502603832","name":"VOKA::Gloss Upgrade Test 1793502603610","kind":"normal","presetId":"1"},{"id":"1793502603833","name":"VOKA::Gloss Upgrade Test 1793502603610::B1","kind":"normal","presetId":"1"},{"id":"1793502708232","name":"VOKA::Gloss Upgrade Test 1793502708008","kind":"normal","presetId":"1"},{"id":"1793502708233","name":"VOKA::Gloss Upgrade Test 1793502708008::B1","kind":"normal","presetId":"1"},{"id":"1793502724003","name":"VOKA::Gloss Upgrade Test 1793502723783","kind":"normal","presetId":"1"},{"id":"1793502724004","name":"VOKA::Gloss Upgrade Test 1793502723783::B1","kind":"normal","presetId":"1"},{"id":"1793502788830","name":"VOKA::Gloss Upgrade Test 1793502788610","kind":"normal","presetId":"1"},{"id":"1793502788831","name":"VOKA::Gloss Upgrade Test 1793502788610::B1","kind":"normal","presetId":"1"},{"id":"1793503098783","name":"VOKA::Gloss Upgrade Test 1793503098560","kind":"normal","presetId":"1"},{"id":"1793503098784","name":"VOKA::Gloss Upgrade Test 1793503098560::B1","kind":"normal","presetId":"1"},{"id":"1793503137083","name":"VOKA::Gloss Upgrade Test 1793503136858","kind":"normal","presetId":"1"},{"id":"1793503137084","name":"VOKA::Gloss Upgrade Test 1793503136858::B1","kind":"normal","presetId":"1"},{"id":"1793503443723","name":"VOKA::Gloss Upgrade Test 1793503443504","kind":"normal","presetId":"1"},{"id":"1793503443724","name":"VOKA::Gloss Upgrade Test 1793503443504::B1","kind":"normal","presetId":"1"},{"id":"1793436393884","name":"VOKA::Import Acceptance 1793436393566","kind":"normal","presetId":"1"},{"id":"1793436393885","name":"VOKA::Import Acceptance 1793436393566::B1","kind":"normal","presetId":"1"},{"id":"1793436411260","name":"VOKA::Import Acceptance 1793436410939","kind":"normal","presetId":"1"},{"id":"1793436411261","name":"VOKA::Import Acceptance 1793436410939::B1","kind":"normal","presetId":"1"},{"id":"1793436430084","name":"VOKA::Import Acceptance 1793436429736","kind":"normal","presetId":"1"},{"id":"1793436430085","name":"VOKA::Import Acceptance 1793436429736::B1","kind":"normal","presetId":"1"},{"id":"1793436447909","name":"VOKA::Import Acceptance 1793436447338","kind":"normal","presetId":"1"},{"id":"1793436447910","name":"VOKA::Import Acceptance 1793436447338::B1","kind":"normal","presetId":"1"},{"id":"1793436495010","name":"VOKA::Import Acceptance 1793436494637","kind":"normal","presetId":"1"},{"id":"1793436495011","name":"VOKA::Import Acceptance 1793436494637::B1","kind":"normal","presetId":"1"},{"id":"1793436497133","name":"VOKA::Import Acceptance 1793436496538","kind":"normal","presetId":"1"},{"id":"1793436497134","name":"VOKA::Import Acceptance 1793436496538::B1","kind":"normal","presetId":"1"},{"id":"1793437094929","name":"VOKA::Import Acceptance 1793437094581","kind":"normal","presetId":"1"},{"id":"1793437094930","name":"VOKA::Import Acceptance 1793437094581::B1","kind":"normal","presetId":"1"},{"id":"1793437276226","name":"VOKA::Import Acceptance 1793437275854","kind":"normal","presetId":"1"},{"id":"1793437276227","name":"VOKA::Import Acceptance 1793437275854::B1","kind":"normal","presetId":"1"},{"id":"1793441872210","name":"VOKA::Import Acceptance 1793441871788","kind":"normal","presetId":"1"},{"id":"1793441872211","name":"VOKA::Import Acceptance 1793441871788::B1","kind":"normal","presetId":"1"},{"id":"1793503347899","name":"VOKA::Import Acceptance 1793503347505","kind":"normal","presetId":"1"},{"id":"1793503347900","name":"VOKA::Import Acceptance 1793503347505::B1","kind":"normal","presetId":"1"},{"id":"1793503504679","name":"VOKA::P0 Acceptance 1793503504362","kind":"normal","presetId":"1"},{"id":"1793503504680","name":"VOKA::P0 Acceptance 1793503504362::B1","kind":"normal","presetId":"1"},{"id":"1793503518774","name":"VOKA::P0 Acceptance 1793503504362::B2","kind":"normal","presetId":"1"},{"id":"1793504179050","name":"VOKA::P0 Permission 1793504178976","kind":"normal","presetId":"1"},{"id":"1793504179051","name":"VOKA::P0 Permission 1793504178976::B1","kind":"normal","presetId":"1"},{"id":"1793503754100","name":"VOKA::P0 Prior 1793503753928","kind":"normal","presetId":"1"},{"id":"1793503927323","name":"VOKA::P0 Prior 1793503927156","kind":"normal","presetId":"1"},{"id":"1793504112998","name":"VOKA::P0 Prior 1793504112825","kind":"normal","presetId":"1"},{"id":"1793504210123","name":"VOKA::P0 Prior 1793504209965","kind":"normal","presetId":"1"},{"id":"1793503528550","name":"VOKA::P0 v1 1793503504362","kind":"normal","presetId":"1"},{"id":"1793503528598","name":"VOKA::P0 v1 1793503504362 other","kind":"normal","presetId":"1"},{"id":"1793431158095","name":"VOKA-PROTO","kind":"normal","presetId":"1"},{"id":"1793428953850","name":"VOKA2","kind":"normal","presetId":"1"},{"id":"1793428953849","name":"VOKA2::English","kind":"normal","presetId":"1"},{"id":"1793428953851","name":"VOKA2::English::B1","kind":"normal","presetId":"1"}]
+noteTypes.list [{"id":"1793428752989","name":"Basic"},{"id":"1793428752990","name":"Basic (and reversed card)"},{"id":"1793428752991","name":"Basic (optional reversed card)"},{"id":"1793428752992","name":"Basic (type in the answer)"},{"id":"1793428752993","name":"Cloze"},{"id":"1793428752994","name":"Image Occlusion"},{"id":"1793445754182","name":"VOKA Gloss Acceptance 1793445754055"},{"id":"1793454339353","name":"VOKA Gloss Acceptance 1793454339221"},{"id":"1793454417966","name":"VOKA Gloss Acceptance 1793454417843"},{"id":"1793454444291","name":"VOKA Gloss Acceptance 1793454444168"},{"id":"1793454558189","name":"VOKA Gloss Acceptance 1793454558070"},{"id":"1793502089764","name":"VOKA Gloss Acceptance 1793502089635"},{"id":"1793502558382","name":"VOKA Gloss Upgrade Test 1793502558259"},{"id":"1793502603735","name":"VOKA Gloss Upgrade Test 1793502603610"},{"id":"1793502708133","name":"VOKA Gloss Upgrade Test 1793502708008"},{"id":"1793502723907","name":"VOKA Gloss Upgrade Test 1793502723783"},{"id":"1793502788729","name":"VOKA Gloss Upgrade Test 1793502788610"},{"id":"1793503098681","name":"VOKA Gloss Upgrade Test 1793503098560"},{"id":"1793503136983","name":"VOKA Gloss Upgrade Test 1793503136858"},{"id":"1793503443623","name":"VOKA Gloss Upgrade Test 1793503443504"},{"id":"1793436393788","name":"VOKA Import Acceptance 1793436393566"},{"id":"1793436411161","name":"VOKA Import Acceptance 1793436410939"},{"id":"1793436429982","name":"VOKA Import Acceptance 1793436429736"},{"id":"1793436447359","name":"VOKA Import Acceptance 1793436447338"},{"id":"1793436494910","name":"VOKA Import Acceptance 1793436494637"},{"id":"1793436496558","name":"VOKA Import Acceptance 1793436496538"},{"id":"1793437094830","name":"VOKA Import Acceptance 1793437094581"},{"id":"1793437276126","name":"VOKA Import Acceptance 1793437275854"},{"id":"1793441872109","name":"VOKA Import Acceptance 1793441871788"},{"id":"1793503347801","name":"VOKA Import Acceptance 1793503347505"},{"id":"1793503504526","name":"VOKA P0 Acceptance 1793503504362"},{"id":"1793504179001","name":"VOKA P0 Permission 1793504178976"},{"id":"1793503528496","name":"VOKA P0 v1 1793503504362"},{"id":"1793431158047","name":"VOKA Proto"},{"id":"1793428929025","name":"VOKA Vocabulary TEST"},{"id":"1793428949949","name":"VOKA Vocabulary TEST2"},{"id":"1793432258157","name":"VOKA Vocabulary · English"}]
+127.0.0.1:50761: unreachable
+END anki 0
+START import T-04,T-05
+target {
+  noteType: 'VOKA Import Acceptance 1793504356528',
+  deck: 'VOKA::Import Acceptance 1793504356528::B1'
+} first preview { new: 12, existing: 0, conflict: 0, skipped: 2 } typeExists false deckExists false
+import SCM 1793504349850 → 1793504349850 all pre-existing card scheduling, notes, and review history preserved
+existing-type repeat SCM 1793504349850 → 1793504349850 all cards and revlog unchanged; revlog rows 12
+second preview { new: 0, existing: 12, conflict: 0, skipped: 2 } confirm disabled: true card count 12 unchanged after repeat
+Card state checked read-only; no reviews driven. Scheduling/card payload unchanged.
+created notes 12 methods [
+  'noteTypes.list',
+  'decks.list',
+  'noteTypes.create',
+  'noteTypes.get',
+  'decks.create',
+  'notes.validateMany',
+  'notes.createMany',
+  'notes.search',
+  'notes.getMany',
+  'cards.getMany'
+]
+END import 0
+START level T-03,T-04,T-06,T-07
+Chrome Chrome/156.0.8078.47
+{
+  "date": "2026-11-01T03:39:18.827Z",
+  "anki": {
+    "version": "26.09.3",
+    "apiMajor": 1
+  },
+  "data": {
+    "version": "en-2026.10.1",
+    "source": "CEFR-J Wordlist 1.6 (Tono Laboratory, TUFS); Octanove C1/C2 1.0; Open English WordNet 2025; CMUdict",
+    "counts": {
+      "A1": 1050,
+      "A2": 1200,
+      "B1": 2085,
+      "B2": 2383,
+      "C1": 909,
+      "C2": 868
+    }
+  },
+  "ui": {
+    "preview": "数据包 8,495 词 · 本次 B1 2,085 词：新建 2,085 / 已存在 0 / 冲突 0 / 跳过 6,410（其他等级）; deck and type 新建; promises and version visible",
+    "t03Ms": 13984,
+    "progressSamples": 136,
+    "t04Ms": 3774,
+    "t04": "preview new 0; confirm disabled; execute created 0 and called no validate/create/deck/type writes",
+    "t07": "B1→B2→B1 kept targetLevel/importLevel in sync, showed the no-delete hint, and every B1 note/card payload was byte-identical",
+    "cancel": {
+      "ms": 10825,
+      "createdBeforeCancel": 400,
+      "summary": "已取消：本次新建 400 条，剩余 650 条。可点「继续导入」只补剩下的。",
+      "keptNotes": 400,
+      "resumeMs": 5257,
+      "finalNotes": 1050
+    }
+  },
+  "t06": {
+    "key": "en:abroad",
+    "deck": "VOKA::English::A2",
+    "deckCreatedByTest": false,
+    "previewBefore": {
+      "new": 1191,
+      "existing": 9,
+      "conflict": 0,
+      "skipped": 7295
+    },
+    "previewAfter": {
+      "new": 1190,
+      "existing": 10,
+      "conflict": 0,
+      "skipped": 7295
+    },
+    "noteIds": [
+      "1793504416798"
+    ],
+    "single note": true
+  },
+  "interruption": {
+    "closedPort": 51866,
+    "firstRunMs": 908,
+    "firstRunCreated": 200,
+    "firstRunProcessed": 400,
+    "firstRunFailures": 200,
+    "firstFailure": {
+      "key": "en:bless",
+      "reason": "预检连接中断，未写入：Error: unreachable"
+    },
+    "previewAfterInterruption": {
+      "new": 1885,
+      "existing": 200,
+      "conflict": 0,
+      "skipped": 6410
+    },
+    "resumeMs": 8627,
+    "resumeCreated": 1885,
+    "finalPreview": {
+      "new": 0,
+      "existing": 2085,
+      "conflict": 0,
+      "skipped": 6410
+    },
+    "partialNotesUnchanged": 200
+  },
+  "finalCounts": {
+    "A": 2085,
+    "B": 2085,
+    "C": 1050
+  },
+  "scm": {
+    "before": 1793504349850,
+    "after": 1793504349850,
+    "revlogRows": 12
+  },
+  "totalMs": 85682
+}
+END level 0
+START highlight T-01,T-30
+Chrome Chrome/156.0.8078.47
+{
+  "browser": "Chrome/156.0.8078.47",
+  "initialHighlights": {
+    "voka-target": [
+      {
+        "text": "achieved",
+        "parent": "achieve",
+        "tag": "B"
+      },
+      {
+        "text": "improve",
+        "parent": "improve",
+        "tag": "B"
+      },
+      {
+        "text": "encourage",
+        "parent": "wrap",
+        "tag": "P"
+      },
+      {
+        "text": "encourage",
+        "parent": "wrap",
+        "tag": "P"
+      }
+    ],
+    "voka-learning": [],
+    "voka-unknown": [
+      {
+        "text": "afford",
+        "parent": "afford",
+        "tag": "B"
+      }
+    ],
+    "voka-weak": []
+  },
+  "drawer": {
+    "summary": "4 target words on this page",
+    "counts": [
+      "Target 4",
+      "Learning 0",
+      "Not in dictionary 1",
+      "All 10"
+    ],
+    "words": [
+      "en:achieve",
+      "en:afford",
+      "en:improve",
+      "en:encourage"
+    ]
+  },
+  "summary": "VOKA is not running: please check Anki",
+  "checks": "exclusions; unchanged text/HTML/layout; small imported fixture + real A2/B1 target; manual known/unknown; hover scope; advanced inflection; dynamic text + exclusion; disconnect clears all; reconnect; single host"
+}
+END highlight 0
+START manual T-08
+Chrome Chrome/156.0.8078.47
+/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/common/WaitTask.ts:77
+      this.#timeoutError = new TimeoutError(
+                           ^
+
+TimeoutError: Waiting failed: 30000ms exceeded
+    at new WaitTask (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/common/WaitTask.ts:77:28)
+    at IsolatedWorld.waitForFunction (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/api/Realm.ts:170:22)
+    at CdpFrame.waitForFunction (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/api/Frame.ts:813:36)
+    at CdpFrame.<anonymous> (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/util/decorators.ts:63:21)
+    at CdpPage.waitForFunction (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/api/Page.ts:3445:29)
+    at waitCard (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/scripts/check-manual.ts:145:10)
+    at <anonymous> (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/scripts/check-manual.ts:241:9)
+
+Node.js v26.9.0
+END manual 1
+START dynamic T-09
+Chrome Chrome/156.0.8078.47
+{
+  "browser": "Chrome/156.0.8078.47",
+  "paragraphs": 2000,
+  "initialMs": 914.9382089999999,
+  "initialLongTasks": [],
+  "scroll": {
+    "longTasks": [],
+    "frames": 180,
+    "maxFrameMs": 17.600000000000023,
+    "framesOver50ms": 0
+  },
+  "checks": "React append/replace/remove; 8000 initial ranges; unchanged initial HTML/layout; retained unaffected Range identity; no detached/empty ranges; no duplicate processing"
+}
+END dynamic 0
+START contexts T-10,T-11,T-32
+Chrome Chrome/156.0.8078.47
+{
+  "createdManual": false,
+  "manualKey": "en:banana",
+  "manualLevel": "A1",
+  "dataVersion": "en-2026.10.1",
+  "browser": "Chrome/156.0.8078.47",
+  "port": 8766,
+  "createdApple": false,
+  "noteId": "1793437493827",
+  "replacement": [
+    {
+      "checked": false,
+      "text": "They baked an apple into a delicious pie. 127.0.0.1 · Context /3 · 2026-11-01☆"
+    },
+    {
+      "checked": false,
+      "text": "She picked an apple from the tall tree. 127.0.0.1 · Context /2 · 2026-11-01☆"
+    },
+    {
+      "checked": true,
+      "text": "We shared a fresh apple after lunch, edited in Anki. 127.0.0.1 · Context /1 · 2026-11-01☆"
+    }
+  ],
+  "fields": {
+    "Key": "en:apple",
+    "Word": "apple",
+    "Variants": "",
+    "Reading": "/ˈæpəl/",
+    "GlossNative": "苹果",
+    "GlossTarget": "a round fruit",
+    "Context1": "…fruit read about fruit read about fruit read about fruit read about fruit read about fruit read about fruit read about fruit read about fruit <b>apple</b> in the garden in the garden in the garden in the garden in the garden in the garden in the garden in the garden in the garden in the garden in the…",
+    "Source1": "127.0.0.1 · Context /long · 2026-11-01",
+    "Context2": "Our neighbour brought an <b>apple</b> for the picnic.",
+    "Source2": "127.0.0.1 · Context /4 · 2026-11-01",
+    "Context3": "They baked an <b>apple</b> into a delicious pie.",
+    "Source3": "127.0.0.1 · Context /3 · 2026-11-01",
+    "ManualStatus": "",
+    "Audio": "",
+    "VokaMeta": "{\"pinnedContext\":null,\"contextOrder\":[\"85db9ced0a744d6350aedf26a2f65101512d66990ef0c8aa90ba79dd413715ec\",\"613918eafde15385c8c9cbf2edd57f1d7f03425518b606bc05387f8ffbdbb287\",\"66179b376d726c9c1f6b24652ff39d06b95cb2b63a6cc1b22495c658eda9fea8\"]}"
+  },
+  "checks": [
+    "four pages, max three contexts",
+    "Anki edit preserved across later saves, stale pin cleared",
+    "replacement chooses oldest unpinned by default",
+    "single click unhighlighted ignored; link and button preserved; single highlighted click opens",
+    "actual surface bold; short rejected; long window; footnotes removed; duplicate refused",
+    "below-target add to its own real-data level deck without whole-level import; no full URL by default"
+  ]
+}
+END contexts 0
+START data T-03,T-11
+{
+  "target": {
+    "noteType": "VOKA Vocabulary · English",
+    "deck": "VOKA::English::B1"
+  },
+  "counts": {
+    "new": 2080,
+    "existing": 5,
+    "conflict": 0,
+    "skipped": 6410
+  },
+  "version": "en-2026.10.1",
+  "methods": [
+    "noteTypes.list",
+    "decks.list",
+    "noteTypes.get",
+    "notes.search",
+    "notes.getMany"
+  ]
+}
+T-11 'm 词典没有
+B1 preview only; no writes, imports, sync, or review operations.
+END data 0
+START gloss T-26,T-27
+Chrome Chrome/156.0.8078.47
+{
+  "port": 8766,
+  "modes": [
+    {
+      "mode": "target",
+      "scmBefore": 1793504349850,
+      "scmAfter": 1793504349850,
+      "outsideCssPreserved": true,
+      "notesAndSchedulingUnchanged": true
+    },
+    {
+      "mode": "native",
+      "scmBefore": 1793504349850,
+      "scmAfter": 1793504349850,
+      "outsideCssPreserved": true,
+      "notesAndSchedulingUnchanged": true
+    }
+  ],
+  "browser": "Chrome/156.0.8078.47",
+  "fallbacks": [
+    {
+      "mode": "native",
+      "missing": "native",
+      "cardId": "1793504578349",
+      "text": "target fallback",
+      "display": "block",
+      "noHas": true
+    },
+    {
+      "mode": "target",
+      "missing": "target",
+      "cardId": "1793504578350",
+      "text": "母语回退",
+      "display": "block",
+      "noHas": true
+    }
+  ]
+}
+END gloss 0
+START candidates T-28
+Chrome Chrome/156.0.8078.47
+{
+  browser: 'Chrome/156.0.8078.47',
+  port: 8766,
+  defaultLemma: 'saw',
+  sawNoteId: '1793454416743',
+  manualAdd: false,
+  checks: [
+    'see/saw switch',
+    'save writes saw, leaves see unchanged',
+    'manual action and red highlight use chosen lemma',
+    'tooltip uses chosen lemma',
+    'colour canonical color',
+    'choice retained on reopen',
+    'reload resets choice'
+  ]
+}
+END candidates 0
+START upgrade T-29
+Fixture and collection snapshot ready 9951 9951
+Chrome Chrome/156.0.8078.47
+Browser worker ready
+Options connected
+Import summary checked
+PASS T-29 {
+  noteType: 'VOKA Gloss Upgrade Test 1793504597225',
+  deck: 'VOKA::Gloss Upgrade Test 1793504597225::B1'
+} [ '1793504597550', '1793504597552' ] all collection notes/cards compared
+END upgrade 0
+START onboarding T-02
+Chrome Chrome/156.0.8078.47
+{
+  "install": "onInstalled opened full-page wizard; saved port 8766 auto-checked on open with no click",
+  "autoCheckClosedPort": {
+    "port": 57432,
+    "result": "unreachable on open, no click required"
+  },
+  "real": {
+    "anki": "26.09.3 at 8766",
+    "counts": [
+      "A1 · 1,050 词",
+      "A2 · 1,200 词",
+      "B1 · 2,085 词",
+      "B2 · 2,383 词",
+      "C1 · 909 词",
+      "C2 · 868 词"
+    ],
+    "preview": "A2 read-only",
+    "persistence": "nativeLanguage, glossLanguage, targetLevel",
+    "attribution": "Princeton and complete source details retained"
+  },
+  "mock": "legacy endpoint, old Anki, HTTP 401, HTTP 403 → access.requestPermission → explicit recheck → real 8766 success; no polling; no import writes",
+  "browser": "Chrome/156.0.8078.47",
+  "requestLog": {
+    "127.0.0.1:8765": 0,
+    "127.0.0.1:8766": 1569,
+    "source": "Chrome netlog captured for the whole acceptance run"
+  }
+}
+END onboarding 0
+START scope T-31
+Chrome Chrome/156.0.8078.47
+{
+  "chrome": "Chrome/156.0.8078.47",
+  "fixture": "*.localhost:57564",
+  "t31": {
+    "denyListed": {
+      "remembered": true,
+      "granted": true,
+      "autoRun": false,
+      "manualInjection": true,
+      "manualPath": "chrome.scripting.executeScript with content.js, the same call the toolbar handler makes after its click; the toolbar icon click itself is not automatable in Puppeteer."
+    },
+    "remembered": {
+      "autoRun": true,
+      "onlyNonDeniedOriginRegistered": true
+    },
+    "revoked": {
+      "permissionRevoked": true,
+      "registrationRemoved": true,
+      "autoRunAfterReload": false
+    },
+    "allSites": {
+      "grant": "*://*/* (all HTTP(S) sites)",
+      "registeredMatches": [
+        "*://*/*"
+      ],
+      "autoRunOnUnrememberedSite": true,
+      "denyListSuppressesAutoRun": true
+    },
+    "denyListedApplyToAll": {
+      "autoRun": false
+    },
+    "revokeAll": {
+      "permissionRevoked": true,
+      "registrationRemoved": true,
+      "autoRunAfterReload": false
+    }
+  },
+  "limitations": [
+    "The native Chrome extension permission bubble (Allow/Deny) cannot be clicked by Puppeteer; tests pre-authorize through Chrome's own extensions site-access backend and then exercise chrome.permissions.request from a trusted click.",
+    "The toolbar icon click cannot be synthesized by Puppeteer. The manual path is verified by calling the same chrome.scripting.executeScript({files:['content.js']}) injection that the action handler performs.",
+    "Install-time host-prompt text and the All-sites warning text were checked in the settings/wizard DOM and manifest, not in Chrome's native install prompt.",
+    "T-31 was verified on local *.localhost fixtures with the built-in deny list extended by deny.localhost; real Gmail/Outlook/WhatsApp accounts were not opened."
+  ],
+  "extensionId": "lapkepjabkpcoenckabopajdginmnkkd",
+  "defaultInstall": {
+    "origins": [
+      "http://127.0.0.1/*"
+    ],
+    "permissions": [
+      "activeTab",
+      "storage",
+      "scripting"
+    ],
+    "hostPermissions": [
+      "http://127.0.0.1/*"
+    ],
+    "optionalHostPermissions": [
+      "*://*/*"
+    ],
+    "note": "No optional origin is granted at install; the only host origin is the declared loopback Anki host. Chrome's install-time prompt text is not observable from automation."
+  },
+  "wizard": {
+    "scopes": [
+      "activeTab",
+      "remembered",
+      "all"
+    ],
+    "default": "activeTab",
+    "denyListHidden": true
+  },
+  "settings": {
+    "siteScope": "remembered",
+    "denyListSaved": 19,
+    "denyListIncludesDefaults": true,
+    "denyListEditable": true
+  },
+  "permissionHarness": {
+    "grantedOrigins": [
+      "*://allow.localhost/*",
+      "*://deny.localhost/*"
+    ],
+    "note": "Exact origins were pre-authorized through Chrome's site-access backend, then chrome.permissions.request was invoked from a trusted click. The native Allow/Deny bubble was not automated."
+  },
+  "remembered": {
+    "registeredMatches": [
+      "*://allow.localhost/*"
+    ],
+    "autoScript": [
+      "content-auto.js"
+    ]
+  }
+}
+END scope 0
+START cold T-31
+Chrome Chrome/156.0.8078.47
+{
+  "chrome": "Chrome/156.0.8078.47",
+  "forcedStop": true,
+  "startupCacheDelayMs": 60000,
+  "action": "Actual toolbar listener captured in temporary build, invoked after extension-message wake",
+  "promptOffered": true,
+  "productButtonClicked": true,
+  "autoRunOnReload": true,
+  "saved": {
+    "config": {
+      "rememberedSites": [
+        "cold.localhost"
+      ]
+    },
+    "scripts": [
+      {
+        "allFrames": false,
+        "id": "voka-site-auto",
+        "js": [
+          "content-auto.js"
+        ],
+        "matchOriginAsFallback": false,
+        "matches": [
+          "*://cold.localhost/*"
+        ],
+        "persistAcrossSessions": true,
+        "runAt": "document_idle",
+        "world": "ISOLATED"
+      }
+    ]
+  },
+  "limitations": [
+    "Startup cache snapshot delayed in throwaway build to deterministically force the race.",
+    "Temporary host grant supplies injection access, then is removed before recovery; actual toolbar icon/activeTab UI not automated.",
+    "Native permission Allow/Deny replaced by Chrome developerPrivate authorization before clicking actual product button."
+  ]
+}
+END cold 0
+START supplemental T-03,T-05,T-33
+END supplemental 0
+START final T-01,T-03,T-04,T-06,T-07,T-11,T-26,T-27,T-30,T-31
+Chrome Chrome/156.0.8078.47
+/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/common/util.ts:287
+          throw new TimeoutError(`Timed out after waiting ${ms}ms`, {cause});
+                ^
+
+TimeoutError: Timed out after waiting 30000ms
+    at <anonymous> (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/common/util.ts:287:17)
+    at file:///Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1944:31
+    at OperatorSubscriber2._this._next (file:///Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1001:9)
+    at Subscriber2.next (file:///Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:704:12)
+    at AsyncAction2.<anonymous> (file:///Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:2288:20)
+    at AsyncAction2._execute (file:///Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1368:12)
+    at AsyncAction2.execute (file:///Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1357:22)
+    at AsyncScheduler2.flush (file:///Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1435:26)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7) {
+  [cause]: Error: Locator.click
+      at NodeLocator.#click (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/api/locators/locators.ts:404:19)
+      at NodeLocator.click (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/node_modules/puppeteer-core/src/api/locators/locators.ts:850:38)
+      at finalChecks (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/scripts/check-p0-acceptance.ts:1206:46)
+      at async <anonymous> (/Users/xzpjerry/orca/workspaces/VOKA/p0-final-acceptance/scripts/check-p0-acceptance.ts:228:33)
+}
+
+Node.js v26.9.0
+END final 1
+START permission T-02
+Chrome Chrome/156.0.8078.47
+NATIVE_PERMISSION_PENDING 4371 chrome-extension://igncmcjhladfelojdclfmpmfkjklohmh
+END permission 0

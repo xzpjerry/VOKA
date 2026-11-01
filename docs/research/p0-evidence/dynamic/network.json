@@ -1,0 +1,21 @@
+[
+  {
+    "browser": "Chrome/156.0.8078.47",
+    "netlog": "chrome-netlog-1.json.gz",
+    "urls": [
+      "https://www.google.com/",
+      "http://clients2.google.com/time/1/current?cup2key=ML-DSA-44-10:TgRpnloyhDpT2cU9FM5DDBoZduK6os9yohO0qe69Alg&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard&laf=b64bin",
+      "https://www.google.com/async/folae?async=_fmt:pb&udm=50&client_locale=en-US&client_country=tw",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:rnv885Qgq3LmK5bnarXE084Jhvl-wvdPr4QGBvSBl3M&cup2hreq=c0a8029f26adba44cfb8b328eb1064f423d6c6d393680b859edaf68bf18f8704",
+      "http://127.0.0.1:52867/",
+      "http://127.0.0.1:52867/react.js",
+      "http://127.0.0.1:52867/react-dom.js",
+      "http://127.0.0.1:52867/favicon.ico",
+      "http://127.0.0.1:8766/api/v1",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:tbCbV0eJTmal5YFlhYxm1rUOOOTSiOSVHFgmetuy2I4&cup2hreq=c3fe22beaa72fe80d227ae68cb9b1255163d31fe4b0b905a7bbbfde38239be45",
+      "https://update.googleapis.com/service/update2/json?cup2key=ML-DSA-44-16:WDuhgViZ2oL1_umO1dTFRzNu9H4k-aLr3O6TUDqPp7g&cup2hreq=16337b2d35b8de183368d8786c8a55468ef119df40eb7d60abbed65b47ff5c6a"
+    ],
+    "forbidden": []
+  }
+]
