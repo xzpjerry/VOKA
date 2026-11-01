@@ -18,7 +18,8 @@
     "check:data:browser": "tsx scripts/check-data-browser.ts",
     "check:contexts": "tsx scripts/check-contexts.ts",
     "check:scope": "tsx scripts/check-site-scope.ts",
-    "check:gloss-data": "tsx scripts/check-gloss-data.ts"
+    "check:gloss-data": "tsx scripts/check-gloss-data.ts",
+    "check:gloss-upgrade": "tsx scripts/check-gloss-upgrade.ts"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.24",

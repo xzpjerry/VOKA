@@ -1,0 +1,41 @@
+{
+  "target": {
+    "noteType": "VOKA Gloss Upgrade Test 1793502788610",
+    "deck": "VOKA::Gloss Upgrade Test 1793502788610::B1"
+  },
+  "ids": [
+    "1793502788930",
+    "1793502788931"
+  ],
+  "groups": [
+    "You haven’t edited · 128",
+    "You have edited · 4"
+  ],
+  "checked": [
+    {
+      "id": "1793502788930",
+      "checked": true
+    },
+    {
+      "id": "1793502788931",
+      "checked": false
+    }
+  ],
+  "collectionNotes": 220,
+  "collectionCards": 220,
+  "verified": [
+    "preview read only entire collection",
+    "two groups/defaults",
+    "kept note untouched",
+    "selected updates only",
+    "metadata pin/extra/hash preservation",
+    "all card scheduling unchanged",
+    "idempotent fixture rerun",
+    "drawer/settings/import preview in Chrome for Testing"
+  ],
+  "notVerified": [
+    "AnkiMobile/AnkiDroid",
+    "real transport interruption or partial failure (unit tests cover)",
+    "concurrent edits from Anki during an in-flight write"
+  ]
+}

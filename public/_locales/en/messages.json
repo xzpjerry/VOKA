@@ -154,5 +154,44 @@
   },
   "rememberSiteDenied": {
     "message": "Access was not granted. The website was not remembered. You can retry."
+  },
+  "upgradeNotice": {
+    "message": "Gloss data updated · View"
+  },
+  "upgradeCount": {
+    "message": "Gloss updates for {count} existing cards"
+  },
+  "upgradeUnedited": {
+    "message": "You haven’t edited"
+  },
+  "upgradeEdited": {
+    "message": "You have edited"
+  },
+  "upgradeUseAll": {
+    "message": "Use new for group"
+  },
+  "upgradeKeepAll": {
+    "message": "Keep yours for group"
+  },
+  "upgradeUseNew": {
+    "message": "Use new version"
+  },
+  "upgradeYours": {
+    "message": "Your version"
+  },
+  "upgradeNew": {
+    "message": "New version"
+  },
+  "upgradeConfirm": {
+    "message": "Confirm selected updates"
+  },
+  "upgradeChecking": {
+    "message": "Checking gloss data…"
+  },
+  "upgradeProgress": {
+    "message": "Gloss update progress"
+  },
+  "upgradeFinished": {
+    "message": "Finished; verified by reading back"
   }
 }

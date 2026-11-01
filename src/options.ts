@@ -1,4 +1,5 @@
 import { settings, check, t } from "./shared";
+import { mountUpgrade } from "./upgrade-ui";
 import { LEVELS, loadData, type Level } from "./data";
 import {
   DEFAULT_DENY_SITES,
@@ -13,6 +14,7 @@ style.textContent = `body{font:16px/1.6 system-ui;color:#24342e;background:#f4f6
 document.head.append(style);
 const $ = <T extends HTMLElement>(id: string) =>
   document.getElementById(id) as T;
+const upgradeUI = mountUpgrade($("upgradePreview"), $("upgradeStatus"));
 const wizard = new URLSearchParams(location.search).has("wizard");
 let step = 0;
 let connected = false;
@@ -426,6 +428,7 @@ async function showPreview() {
   $("importConflicts").textContent = conflictLine;
   $("importSource").textContent = sourceLine;
   $("importStatus").textContent = "";
+  await showUpgradeSummary();
   previewLevel = level;
   previewNew = p.counts.new;
   confirmButton.textContent =
@@ -628,3 +631,25 @@ storeFullUrl.checked = initial.storeFullUrl;
 storeFullUrl.addEventListener("change", () =>
   chrome.storage.local.set({ storeFullUrl: storeFullUrl.checked }),
 );
+
+// Upgrade confirmation is separate from level import: neither preview writes notes.
+$("checkUpgrade").onclick = () => void upgradeUI.preview();
+async function showUpgradeSummary() {
+  const box = $("importUpgrade");
+  box.replaceChildren();
+  try {
+    const response = await chrome.runtime.sendMessage({ type: "upgrade-summary" });
+    if (response.error) throw new Error(response.error);
+    if (!response.data.count) return;
+    const line = document.createElement("p");
+    line.textContent = `已有 ${response.data.count} 张词卡的释义有更新`;
+    const button = document.createElement("button");
+    button.textContent = "查看";
+    button.onclick = () => { $("updates").hidden = false; void upgradeUI.preview(); $("updates").scrollIntoView(); };
+    box.append(line, button);
+  } catch (error) { box.textContent = `释义更新检查失败：${String(error)}`; }
+}
+if (connected && new URLSearchParams(location.search).has("upgrade")) {
+  await upgradeUI.preview();
+  $("updates").scrollIntoView();
+}
