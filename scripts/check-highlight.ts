@@ -176,7 +176,7 @@ try {
   const initialDrawer = await drawer();
   assert.deepEqual(
     (await drawer()).counts.map((text) => Number(text!.match(/\d+$/)![0])),
-    [4, 0, 1, 10],
+    [4, 0, 0, 1, 10],
   );
   assert.deepEqual((await drawer()).words, [
     "en:achieve",

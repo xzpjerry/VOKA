@@ -194,6 +194,14 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1100, height: 1100 });
   await page.goto(`chrome-extension://${extensionId}/options.html`);
+  const click = async (selector: string) => {
+    await page.bringToFront();
+    await page.locator(selector).click();
+  };
+  const select = async (selector: string, value: string) => {
+    await page.bringToFront();
+    await page.select(selector, value);
+  };
   await page.waitForFunction(
     () => document.querySelector("#status")?.textContent === "已连接",
     { timeout: 30000 },
@@ -202,10 +210,10 @@ try {
     () => document.querySelectorAll("#levels input").length === 6,
     { timeout: 30000 },
   );
-  await page.select("#importLevel", "B1");
+  await select("#importLevel", "B1");
 
   // T-03 preview.
-  await page.click("#preview");
+  await click("#preview");
   await page.waitForFunction(
     () =>
       document.querySelector("#importCounts")?.textContent?.includes(
@@ -258,7 +266,7 @@ try {
     }, 50);
   });
   const importStarted = Date.now();
-  await page.click("#confirm");
+  await click("#confirm");
   const progressObserved = await page
     .waitForFunction(
       () => {
@@ -374,7 +382,7 @@ try {
 
   // T-07: target-level switching only changes settings and offers the new level.
   const beforeSwitch = await snapshotTarget(targetATarget);
-  await page.click('input[name="targetLevel"][value="B2"]');
+  await click('input[name="targetLevel"][value="B2"]');
   await page.waitForFunction(
     async () =>
       (await chrome.storage.local.get("targetLevel")).targetLevel === "B2",
@@ -389,7 +397,7 @@ try {
   assert.match(hintB2, /不会删除、移动或重置旧卡/);
   assert.match(hintB2, /预览并导入/);
   await page.screenshot({ path: `${evidenceDir}/level-b2.png`, fullPage: true });
-  await page.click('input[name="targetLevel"][value="B1"]');
+  await click('input[name="targetLevel"][value="B1"]');
   await page.waitForFunction(
     async () =>
       (await chrome.storage.local.get("targetLevel")).targetLevel === "B1",
@@ -425,7 +433,7 @@ try {
     await page.$eval("#importLevel", (select: HTMLSelectElement) => select.value),
     "A1",
   );
-  await page.click("#preview");
+  await click("#preview");
   await page.waitForFunction(
     () =>
       document.querySelector("#importCounts")?.textContent?.includes(
@@ -434,7 +442,7 @@ try {
     { timeout: 120000 },
   );
   const cancelStarted = Date.now();
-  await page.click("#confirm");
+  await click("#confirm");
   await page.waitForFunction(
     () => {
       const bar = document.querySelector(
@@ -444,7 +452,7 @@ try {
     },
     { timeout: 120000, polling: 50 },
   );
-  await page.click("#cancelImport");
+  await click("#cancelImport");
   await page.waitForFunction(
     () =>
       document.querySelector("#importProgressText")?.textContent?.includes(
@@ -483,7 +491,7 @@ try {
     fullPage: true,
   });
   const resumeStarted = Date.now();
-  await page.click("#confirm");
+  await click("#confirm");
   await page.waitForFunction(
     () =>
       document.querySelector("#importCounts")?.textContent?.includes(
