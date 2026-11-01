@@ -9,6 +9,12 @@ import { previewImport, executeImport, importTarget } from "./import";
 import { checkConnection, rpc, GatewayError } from "./gateway";
 import { settings } from "../shared";
 import { scheduleSiteSync, shouldAutoRun } from "./sites";
+import {
+  prepareAnswer,
+  renderCard,
+  reviewRatings,
+  submitReview,
+} from "./review";
 const upgradePreviews = new Map<string, { preview: UpgradePreview; created: number }>();
 let upgradeBusy = false;
 let importBusy = false;
@@ -36,6 +42,8 @@ async function checked(config: Parameters<typeof checkConnection>[0]) {
   if (status !== "ok") void notifyDisconnected();
   return status;
 }
+const reviewCardId = (value: unknown): value is string =>
+  typeof value === "string" && /^\d+$/.test(value);
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== chrome.runtime.id) return;
   if (
@@ -125,6 +133,70 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
           reply({ error: String(error) });
         }
       });
+  } else if (
+    ["review-render", "review-prepare", "review-submit"].includes(
+      message?.type,
+    )
+  ) {
+    const cardId = message.cardId;
+    const validSubmission =
+      message.type !== "review-submit" ||
+      ((reviewRatings as readonly unknown[]).includes(message.rating) &&
+        typeof message.stateToken === "string" &&
+        message.stateToken.length > 0 &&
+        typeof message.elapsedMs === "number" &&
+        Number.isFinite(message.elapsedMs) &&
+        message.elapsedMs >= 0 &&
+        (typeof message.latestReviewId === "string" ||
+          typeof message.latestReviewId === "number" ||
+          message.latestReviewId === null));
+    if (!reviewCardId(cardId) || !validSubmission) {
+      reply({ error: "invalid review request" });
+      return;
+    }
+    (async () => {
+      const config = await settings();
+      if ((await checked(config)) !== "ok") throw new Error("unreachable");
+      const call = async (method: string, params = {}) => {
+        try {
+          return await gatewayCall(config, method, params, {
+            sideEffecting: method === "scheduling.answer",
+          });
+        } catch (error) {
+          const code =
+            error instanceof GatewayError
+              ? error.code
+              : typeof error === "object" && error !== null && "code" in error
+                ? (error as { code?: number }).code
+                : undefined;
+          if (
+            method === "scheduling.answer" &&
+            code !== 1008 &&
+            sender.tab?.id
+          )
+            void chrome.tabs
+              .sendMessage(sender.tab.id, {
+                type: "review-confirming",
+                cardId,
+              })
+              .catch(() => {});
+          throw error;
+        }
+      };
+      if (message.type === "review-render") return renderCard(call, cardId);
+      if (message.type === "review-prepare")
+        return prepareAnswer(call, cardId);
+      return submitReview(call, {
+        cardId,
+        rating: message.rating,
+        stateToken: message.stateToken,
+        elapsedMs: message.elapsedMs,
+        latestReviewId: message.latestReviewId,
+      });
+    })().then(
+      (data) => reply({ data }),
+      (error) => reply({ error: String(error) }),
+    );
   } else if (
     message?.type === "page-states" &&
     Array.isArray(message.keys) &&

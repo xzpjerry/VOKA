@@ -149,6 +149,63 @@
   "dueNone": {
     "message": "本页没有今日到期的词"
   },
+  "reviewStart": {
+    "message": "开始复习"
+  },
+  "reviewLoading": {
+    "message": "正在加载卡片…"
+  },
+  "reviewLoadError": {
+    "message": "无法加载复习卡片"
+  },
+  "reviewShowAnswer": {
+    "message": "显示答案"
+  },
+  "reviewPreparing": {
+    "message": "正在读取评分选项…"
+  },
+  "reviewPrepareError": {
+    "message": "无法读取评分选项"
+  },
+  "reviewRetry": {
+    "message": "重试"
+  },
+  "reviewAgain": {
+    "message": "重来"
+  },
+  "reviewHard": {
+    "message": "困难"
+  },
+  "reviewGood": {
+    "message": "良好"
+  },
+  "reviewEasy": {
+    "message": "简单"
+  },
+  "reviewSubmitting": {
+    "message": "正在提交…"
+  },
+  "reviewConfirming": {
+    "message": "正在确认是否已提交…"
+  },
+  "reviewNotDue": {
+    "message": "已在 Anki 里完成，跳过"
+  },
+  "reviewConflict": {
+    "message": "卡片状态已变化，请重新评分"
+  },
+  "reviewUnknown": {
+    "message": "无法确认是否已提交，请在 Anki 里查看"
+  },
+  "reviewNext": {
+    "message": "下一个"
+  },
+  "reviewFinished": {
+    "message": "本页今日到期的词复习完了"
+  },
+  "reviewReturn": {
+    "message": "返回列表"
+  },
   "drawerLearning": {
     "message": "学习语言"
   },

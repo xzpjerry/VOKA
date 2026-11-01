@@ -13,6 +13,7 @@
     "cleanup:level-import": "tsx scripts/cleanup-level-import.ts",
     "check:highlight": "tsx scripts/check-highlight.ts",
     "check:manual": "tsx scripts/check-manual.ts",
+    "check:review": "tsx scripts/check-review.ts",
     "check:dynamic": "tsx scripts/check-dynamic.ts",
     "check:due": "tsx scripts/check-due-today.ts",
     "data:build": "python3 tools/data/build.py",

@@ -1,6 +1,7 @@
 import { createDrawer } from "./drawer";
 import { DynamicReading } from "./dynamic-reading";
 import { fullCard } from "./full-card";
+import { createReviewUI } from "./review-ui";
 import { createHighlightRegistry } from "./highlight-registry";
 import { normalizeKey } from "./key";
 import { containsPoint, excluded, isDueToday, type Token } from "./reading";
@@ -50,7 +51,15 @@ function start() {
   retry.textContent = t("retry");
   const registry = createHighlightRegistry(document);
   let lastDueReadAt = 0;
-  const drawerUI = createDrawer(root, summary, retry, (token) => {
+  let config: ReadingSettings;
+  let drawerUI: ReturnType<typeof createDrawer>;
+  const reviewUI = createReviewUI(
+    root,
+    () => config,
+    () => drawerUI.showList(),
+    () => document.dispatchEvent(new Event("voka-refresh")),
+  );
+  drawerUI = createDrawer(root, summary, retry, (token) => {
     token.range.startContainer.parentElement?.scrollIntoView({
       block: "center",
       behavior: "instant",
@@ -69,7 +78,7 @@ function start() {
   }, () => {
     if (running && lastDueReadAt && Date.now() - lastDueReadAt > 5 * 60 * 1000)
       void refresh();
-  });
+  }, (tokens) => reviewUI.start(tokens), reviewUI.element);
   const tooltip = document.createElement("div");
   tooltip.setAttribute("role", "tooltip");
   tooltip.hidden = true;
@@ -83,7 +92,6 @@ function start() {
   const styles: HighlightStyle[] = ["target", "learning", "unknown", "weak"];
   let paused = false;
   let session: DynamicReading | undefined;
-  let config: ReadingSettings;
   let running = false,
     generation = 0;
   const choices = new Map<string, { key: string; entry: Token["entry"] }>();
