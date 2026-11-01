@@ -199,4 +199,35 @@ describe("page review scheduling", () => {
     ).rejects.toThrow("Invalid review rating");
     expect(call).not.toHaveBeenCalled();
   });
+  it("reports submitted when the answer succeeds but readback fails", async () => {
+    const call = vi.fn(async (method: string) => {
+      if (method === "scheduling.getDue") return { dueNow: true };
+      if (method === "scheduling.answer") return { reviewId: "r1" };
+      throw new Error("readback failed");
+    });
+    await expect(submitReview(call as ReviewCall, input)).resolves.toEqual({
+      outcome: "submitted",
+      scheduling: null,
+    });
+    expectAtMostOneAnswer(call);
+  });
+
+  it("omits afterId when the card had no earlier review", async () => {
+    const call = vi.fn(async (method: string) => {
+      if (method === "scheduling.getDue") return { dueNow: true };
+      if (method === "scheduling.answer") throw new Error("timeout");
+      if (method === "reviews.getLatestId") return { id: "r1" };
+      if (method === "reviews.list")
+        return { items: [{ cardId: input.cardId, rating: "good" }] };
+      return { type: "review" };
+    });
+    await expect(
+      submitReview(call as ReviewCall, { ...input, latestReviewId: null }),
+    ).resolves.toMatchObject({ outcome: "confirmed" });
+    expect(callsOf(call)).toContainEqual([
+      "reviews.list",
+      { cardIds: [input.cardId], limit: 20 },
+    ]);
+    expectAtMostOneAnswer(call);
+  });
 });

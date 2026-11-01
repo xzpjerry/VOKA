@@ -81,7 +81,9 @@ export async function submitReview(
 
       const result = await call("reviews.list", {
         cardIds: [answer.cardId],
-        afterId: answer.latestReviewId,
+        ...(answer.latestReviewId == null
+          ? {}
+          : { afterId: answer.latestReviewId }),
         limit: 20,
       });
       const found = Array.isArray(result?.items)
@@ -102,10 +104,11 @@ export async function submitReview(
     }
   }
 
+  // The answer was accepted; a failed readback must not report it as uncertain.
   try {
     const scheduling = await call("scheduling.get", { cardId: answer.cardId });
     return { outcome: "submitted", scheduling };
   } catch {
-    return unknownOutcome();
+    return { outcome: "submitted", scheduling: null };
   }
 }
