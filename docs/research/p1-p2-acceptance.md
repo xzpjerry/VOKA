@@ -3,37 +3,37 @@
 ## Summary
 
 - Date: 2026-11-01
-- Tested source baseline: `49ef8d739568dbf385db5fa4b6cfa2f989646b8d` (`origin/main`)
+- Tested commit: `6b077ae5096a863f96ac2132cc0b2b052cd2e381` (rebased on `origin/main` at `49ef8d739568dbf385db5fa4b6cfa2f989646b8d`)
 - Anki: 26.09.3
 - AnkiConnect: API v1 (`apiMajor: 1`)
 - Chrome for Testing: 156.0.8078.47
 - Node.js: v26.9.0
 - All Anki checks used only the isolated `http://127.0.0.1:8766` instance and local fixtures. No product code under `src/` changed.
 
-Before running checks, `rg -n '8765' scripts/` found only rejection guards, negative assertions, and comments. A stricter search for port 8765 URL, endpoint, or configuration targets returned no matches. The runtime onboarding audit also recorded 0 requests to 8765 and 1,541 requests to 8766.
+Before running checks, `rg -n '8765' scripts/` found only rejection guards, negative assertions, and comments. A stricter search for port 8765 URL, endpoint, or configuration targets returned no matches. A previous successful onboarding audit recorded 0 requests to 8765 and 1,541 requests to 8766.
 
-`check:all` ran `build` first, then the requested scripts in order. No script was missing. The latest full run exited 1 because six checks reported failures described below; the other twelve passed.
+`check:all` ran `build` first, then the requested scripts in order. No script was missing. The post-rebase full run exited 1: eight checks failed and ten passed. It used only the isolated 8766 Anki instance and local fixtures.
 
 | Script | Status | Exit code | Duration |
 | --- | --- | ---: | ---: |
-| build | PASS | 0 | 2.4s |
-| check:anki | PASS | 0 | 0.4s |
-| check:import | PASS | 0 | 4.4s |
-| check:level-import | PASS | 0 | 162.0s |
-| check:highlight | PASS | 0 | 7.5s |
-| check:manual | PASS | 0 | 69.1s |
-| check:dynamic | PASS | 0 | 7.3s |
-| check:contexts | FAIL | 1 | 139.6s |
+| build | PASS | 0 | 2.2s |
+| check:anki | PASS | 0 | 0.3s |
+| check:import | PASS | 0 | 6.2s |
+| check:level-import | PASS | 0 | 209.8s |
+| check:highlight | PASS | 0 | 7.9s |
+| check:manual | FAIL | 1 | 33.0s |
+| check:dynamic | PASS | 0 | 6.9s |
+| check:contexts | FAIL | 1 | 31.9s |
 | check:scope | PASS | 0 | 16.2s |
-| check:gloss-upgrade | PASS | 0 | 350.0s |
-| check:due | PASS | 0 | 4.5s |
-| check:review | PASS | 0 | 9.9s |
-| check:practice | PASS | 0 | 23.7s |
-| check:p1 | FAIL | 1 | 168.9s |
-| check:epub | FAIL | 1 | 57.7s |
-| check:pdf | FAIL | 1 | 36.9s |
+| check:gloss-upgrade | PASS | 0 | 524.0s |
+| check:due | PASS | 0 | 5.1s |
+| check:review | PASS | 0 | 10.1s |
+| check:practice | FAIL | 1 | 33.2s |
+| check:p1 | FAIL | 1 | 178.2s |
+| check:epub | FAIL | 1 | 68.0s |
+| check:pdf | FAIL | 1 | 37.5s |
 | check:youtube | FAIL | 1 | 34.7s |
-| check:p0 | FAIL | 1 | 1088.3s |
+| check:p0 | FAIL | 1 | 535.7s |
 
 Run logs, including the last 15 output lines for every command, remain in ignored `.cache/check-all/`.
 
@@ -49,24 +49,24 @@ Evidence pointers name the test script and the local `.cache/check-all/` log. An
 | T-14 | `check:p1`: Again, Hard, Good, Easy each create one record and update scheduling | ✅ PASS | `scripts/check-p1-acceptance.ts`; `.cache/check-all/check-p1.log` |
 | T-15 | `check:p1`: already-reviewed card is skipped without a duplicate review | ✅ PASS | `scripts/check-p1-acceptance.ts`; `.cache/check-all/check-p1.log` |
 | T-16 | `check:p1`: accepted answer with simulated lost response is confirmed without retry | ✅ PASS | `scripts/check-p1-acceptance.ts`; `.cache/check-all/check-p1.log` |
-| T-17 | `check:p1`: practice New and future Review cards without ratings or scheduling changes | ❌ FAIL; reproduced in three runs; issue [#113](https://github.com/xzpjerry/VOKA/issues/113) | `.cache/check-all/check-p1.log`; full card reports “未加入 Anki” for `aborigine`, `absence`, and `absent`, so the practice control never appears |
+| T-17 | `check:p1` and `check:practice`: practice New and future Review cards without ratings or scheduling changes | ❌ FAIL; reproduced in the practice and P1 checks; issue [#113](https://github.com/xzpjerry/VOKA/issues/113) | `.cache/check-all/check-practice.log`, `.cache/check-all/check-p1.log`; full cards report “未加入 Anki” for `aborigine`, `absence`, and `absent`, so the practice control never appears |
 | T-18 | `check:p1`: due underline, summary, and filters recalculate after review | ✅ PASS | `scripts/check-p1-acceptance.ts`; `.cache/check-all/check-p1.log` |
 | T-20 | `check:youtube`: hover pauses across subtitle, tooltip, and full card, then resumes | ✅ PASS in latest run | `scripts/check-youtube.ts`; `.cache/check-all/check-youtube.log` |
 | T-21 | `check:youtube`: user pause is preserved | ✅ PASS in latest run | `scripts/check-youtube.ts`; `.cache/check-all/check-youtube.log` |
 | T-22 | `check:youtube`: human/automatic English and other-language/no-track caption fixtures | ✅ PASS in the earlier complete run; latest rerun stopped before the later track fixtures | `scripts/check-youtube.ts`; `.cache/check-all/check-youtube.log` |
 | T-23 Web | `check:p1` shared web review flow, also covered by T-14 | ✅ PASS | `scripts/check-p1-acceptance.ts`; `.cache/check-all/check-p1.log` |
-| T-23 EPUB | `check:epub`: due-card review flow | ✅ PASS in the earlier complete run; latest rerun stopped in the preceding future-card practice check (#114) | `scripts/check-epub.ts`; `.cache/check-all/check-epub.log` |
-| T-23 PDF | `check:pdf`: due-card review flow | ✅ PASS in the earlier complete run; latest rerun stopped while loading the due card context (#114) | `scripts/check-pdf.ts`; `.cache/check-all/check-pdf.log` |
+| T-23 EPUB | `check:epub`: due-card review flow | ✅ PASS in the earlier complete run; latest rerun stopped in the future-card practice check (#113) before due-card review | `scripts/check-epub.ts`; `.cache/check-all/check-epub.log` |
+| T-23 PDF | `check:pdf`: due-card review flow | ✅ PASS in the earlier complete run; latest rerun stopped while loading the due-card context (#114) | `scripts/check-pdf.ts`; `.cache/check-all/check-pdf.log` |
 | T-23 Video | `check:youtube`: due cue review flow | ✅ PASS in the earlier complete run; latest rerun stopped while loading the first cue card (#114) | `scripts/check-youtube.ts`; `.cache/check-all/check-youtube.log` |
-| T-24 | `check:pdf`: text PDF support and image-only PDF unsupported message | ✅ PASS in the earlier complete run; latest rerun passed text-layer marking before stopping at card context (#114) | `scripts/check-pdf.ts`; `.cache/check-all/check-pdf.log` |
+| T-24 | `check:pdf`: text PDF support and image-only PDF unsupported message | ✅ PASS in the earlier complete run; latest rerun showed text-layer content but its Anki save control stayed disabled, so the image-only assertion was not reached (#114) | `scripts/check-pdf.ts`; `.cache/check-all/check-pdf.log` |
 | T-24a | `check:epub`: scripts/external resources are removed or blocked | ✅ PASS in latest run | `scripts/check-epub.ts`; `.cache/check-all/check-epub.log` |
-| T-24b | `check:epub` and `check:pdf`: saved-position restore | ✅ PASS for EPUB in latest run and PDF in the earlier complete run | `scripts/check-epub.ts`, `scripts/check-pdf.ts`; corresponding `.cache/check-all/` logs |
+| T-24b | `check:epub` and `check:pdf`: saved-position restore | ✅ PASS for EPUB in the post-rebase run and PDF in the prior full run; the latest PDF rerun stopped before this assertion | `scripts/check-epub.ts`, `scripts/check-pdf.ts`; corresponding `.cache/check-all/` logs |
 
-Issue [#114](https://github.com/xzpjerry/VOKA/issues/114) records the repeated context-loading failure: `check:contexts` timed out twice at the same long-sentence card wait, including inside `check:p0`. In the same latest run, PDF kept its Anki-backed save control disabled, while EPUB and YouTube timed out before their practice/save checks could continue. Both #113 and #114 have the `ready-for-agent` label and are sub-issues of #69.
+Issue [#114](https://github.com/xzpjerry/VOKA/issues/114) records the repeated full-card/context loading failure: `check:contexts` timed out again at the same long-sentence card wait, including inside `check:p0`; `check:manual` also timed out waiting for its full card, PDF kept its save control disabled, and YouTube timed out before its first cue card became usable. Both #113 and #114 have the `ready-for-agent` label and are sub-issues of #69.
 
 ### P0 regression
 
-`check:p0` returned FAIL because its `contexts` subcheck timed out waiting for the `apple` card on the local `/long` fixture. The other P0 subchecks passed, including T-28 after correcting its card-visibility wait. `check:data` also confirmed that `en-2026.11.1` has no unlisted level entries; the unlisted-word UI is exercised by `check:contexts`.
+`check:p0` returned FAIL after 535.7s. Its aggregate matrix recorded 2 PASS and 17 FAIL out of 19 (T-02 and T-09 passed); the local `/long` context check timed out again. The nested run also reported card-loading timeouts in manual/candidate checks, a locator timeout on the second level-import run, and `unreachable` gateway errors in upgrade, onboarding, scope, cold-start, supplemental, final, and lifecycle checks. Afterward, a standalone `check:manual` rerun returned `GatewayError: unreachable`; the 8766 process was still listening but its API version request timed out. `check:data` confirmed that `en-2026.11.1` has no unlisted level entries; the unlisted-word UI is exercised by `check:contexts`. See `.cache/check-all/check-p0.log` and `docs/research/p0-evidence/results.json` for the run evidence.
 
 ### Acceptance-harness corrections
 
@@ -84,8 +84,9 @@ No application behavior was changed to make these checks pass.
 - `npm ci` — passed; installed dependencies including `tsx`, with no reported vulnerabilities.
 - `npm run build` — passed (existing large reader bundle warning only).
 - `npm test` — passed: 30 files, 209 tests.
-- `npm run check:p0 -- --only=candidates` — passed after the candidate harness correction.
-- `npm run check:all` — exit 1 on the latest run because `check:contexts`, `check:p1`, `check:epub`, `check:pdf`, `check:youtube`, and `check:p0` exposed the issues above.
+- `npm run check:p0 -- --only=candidates` — passed after the candidate harness correction in an earlier run; the latest nested P0 candidate check timed out waiting for card controls.
+- `npm run check:all` — exit 1 on the post-rebase run because `check:manual`, `check:contexts`, `check:practice`, `check:p1`, `check:epub`, `check:pdf`, `check:youtube`, and `check:p0` reported the failures above.
+- `npm run check:manual` — the post-suite reproduction returned `GatewayError: unreachable`; the earlier full-suite failure was a full-card wait timeout.
 
 ## Known limits
 
