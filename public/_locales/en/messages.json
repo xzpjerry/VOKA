@@ -119,11 +119,23 @@
   "drawerFilter_learning": {
     "message": "Learning"
   },
+  "drawerFilter_due": {
+    "message": "Due today"
+  },
   "drawerFilter_missing": {
     "message": "Not in dictionary"
   },
   "drawerFilter_all": {
     "message": "All"
+  },
+  "dueToday": {
+    "message": "Due today"
+  },
+  "dueSummary": {
+    "message": "· {count} due today"
+  },
+  "dueNone": {
+    "message": "Nothing due today on this page"
   },
   "drawerLearning": {
     "message": "Learning language"

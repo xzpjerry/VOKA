@@ -7,11 +7,13 @@ import { sentenceForRange } from "./page-context";
 import {
   gloss,
   highlightRule,
+  isDueToday,
   type Token,
   type ReadingSettings,
   type WordState,
 } from "./reading";
 import { manualAction } from "./manual";
+import { t } from "./shared";
 type View = {
   exists: boolean;
   fields: Record<string, string>;
@@ -32,7 +34,7 @@ export function fullCard(
   card.setAttribute("aria-label", "VOKA 词条");
   const style = document.createElement("style");
   style.textContent =
-    "#voka-card{position:fixed;right:20px;bottom:70px;width:min(360px,calc(100vw - 40px));max-height:75vh;overflow:auto;box-sizing:border-box;background:#fff;color:#17212b;border:1px solid #d8dce2;border-radius:12px;box-shadow:0 8px 28px #0003;padding:16px;font:14px/1.5 system-ui}#voka-card[hidden]{display:none}#voka-card h2{font:600 24px Georgia;margin:0 0 6px}#voka-card p{margin:8px 0}#voka-card button{border:1px solid #ccd3dc;border-radius:6px;background:#fff;color:#17212b;margin:4px 4px 4px 0}#voka-card .primary{background:#2f6fde;color:white}#voka-card small{color:#657180}#voka-card label{display:flex;align-items:start;gap:6px;border-top:1px solid #eee;padding:8px 0}#voka-card .sentence{white-space:pre-wrap}";
+    "#voka-card{position:fixed;right:20px;bottom:70px;width:min(360px,calc(100vw - 40px));max-height:75vh;overflow:auto;box-sizing:border-box;background:#fff;color:#17212b;border:1px solid #d8dce2;border-radius:12px;box-shadow:0 8px 28px #0003;padding:16px;font:14px/1.5 system-ui}#voka-card[hidden]{display:none}#voka-card h2{font:600 24px Georgia;margin:0 0 6px}#voka-card p{margin:8px 0}#voka-card button{border:1px solid #ccd3dc;border-radius:6px;background:#fff;color:#17212b;margin:4px 4px 4px 0}#voka-card .primary{background:#2f6fde;color:white}#voka-card small{color:#657180}#voka-card .due-badge{display:inline-block;margin:6px 0;padding:2px 8px;border-radius:10px;background:#fff2cc;color:#7a5300;font-size:12px}#voka-card label{display:flex;align-items:start;gap:6px;border-top:1px solid #eee;padding:8px 0}#voka-card .sentence{white-space:pre-wrap}";
   root.append(style, card);
   let active: Token | undefined,
     view: View,
@@ -108,6 +110,12 @@ export function fullCard(
           .join(" · "),
       ),
     );
+    if (isDueToday(state)) {
+      const badge = element("small", t("dueToday"));
+      badge.className = "due-badge";
+      badge.setAttribute("role", "status");
+      card.append(badge);
+    }
     const candidates = element("div");
     candidates.dataset.slot = "lemma-candidates";
     const others = token.candidates?.filter((entry) => entry.lemma !== token.entry.lemma) ?? [];

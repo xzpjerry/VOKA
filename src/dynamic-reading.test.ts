@@ -204,6 +204,51 @@ it("reapplies manual precedence to existing ranges without rescanning", async ()
   expect(lookup).toHaveBeenCalledTimes(1);
   session.stop();
 });
+it("keeps mature due underlines separate and refreshes known status", async () => {
+  document.body.innerHTML = "<p>benefit benefit</p>";
+  const highlights = {
+    target: new Set<Range>(),
+    learning: new Set<Range>(),
+    unknown: new Set<Range>(),
+    weak: new Set<Range>(),
+  };
+  const due = new Set<Range>();
+  const session = new DynamicReading(
+    config,
+    highlights,
+    async () => ({
+      "en:benefit": {
+        fields: {},
+        cards: [
+          {
+            cardId: "mature",
+            type: "review",
+            queue: "review",
+            intervalDays: 30,
+            dueToday: true,
+          },
+        ],
+      },
+    }),
+    () => {},
+    undefined,
+    resolveWords,
+    due,
+  );
+  await session.start(document.body);
+  expect([...due].map((range) => range.toString())).toEqual([
+    "benefit",
+    "benefit",
+  ]);
+  expect(highlights.target.size + highlights.learning.size).toBe(0);
+  session.states["en:benefit"].fields.ManualStatus = "known";
+  session.refresh("en:benefit");
+  expect(due.size).toBe(0);
+  session.states["en:benefit"].fields.ManualStatus = "";
+  session.refresh("en:benefit");
+  expect(due.size).toBe(2);
+  session.stop();
+});
 it("keeps a surface choice for existing and newly scanned occurrences", async () => {
   document.body.innerHTML = "<p>saw saw</p>";
   const highlights = { target: new Set<Range>(), learning: new Set<Range>(), unknown: new Set<Range>(), weak: new Set<Range>() };

@@ -41,7 +41,7 @@ it("keeps missing dictionary membership independent of highlight state and recal
   const config = { targetLevel: "B1", showAdvanced: false } as const;
   tokens[0].style = highlightRule("B1", config, {
     fields: {},
-    cards: [{ type: "learning", queue: "learning", intervalDays: 0 }],
+    cards: [{ cardId: "learning", type: "learning", queue: "learning", intervalDays: 0, dueToday: false }],
   });
   tokens[1].style = highlightRule("A2", config, {
     fields: { ManualStatus: "unknown" },
@@ -53,9 +53,27 @@ it("keeps missing dictionary membership independent of highlight state and recal
   tokens[2].entry.GlossTarget = "user-authored definition";
   expect(tokens.filter((t) => matchesFilter(t, "target"))).toHaveLength(2);
   expect(tokens.filter((t) => matchesFilter(t, "learning"))).toHaveLength(1);
+  expect(tokens.filter((t) => matchesFilter(t, "due"))).toEqual([]);
   expect(tokens.filter((t) => matchesFilter(t, "missing"))).toEqual([
     tokens[2],
   ]);
   tokens[1].style = null;
   expect(tokens.filter((t) => matchesFilter(t, "target"))).toHaveLength(1);
+});
+it("includes a manually known word in the due filter", () => {
+  document.body.innerHTML = "<p>achieve</p>";
+  const token = extract(document.body)[0];
+  token.state = {
+    fields: { ManualStatus: "known" },
+    cards: [
+      {
+        cardId: "known-due",
+        type: "review",
+        queue: "review",
+        intervalDays: 3,
+        dueToday: true,
+      },
+    ],
+  };
+  expect(matchesFilter(token, "due")).toBe(true);
 });

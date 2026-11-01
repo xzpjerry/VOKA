@@ -119,11 +119,23 @@
   "drawerFilter_learning": {
     "message": "学习中"
   },
+  "drawerFilter_due": {
+    "message": "今日到期"
+  },
   "drawerFilter_missing": {
     "message": "词典没有"
   },
   "drawerFilter_all": {
     "message": "全部"
+  },
+  "dueToday": {
+    "message": "今日到期"
+  },
+  "dueSummary": {
+    "message": "· {count} 张今日到期"
+  },
+  "dueNone": {
+    "message": "本页没有今日到期的词"
   },
   "drawerLearning": {
     "message": "学习语言"

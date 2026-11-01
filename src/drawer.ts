@@ -1,6 +1,6 @@
 import { t } from "./shared";
-import type { ReadingSettings, Token } from "./reading";
-export const filters = ["target", "learning", "missing", "all"] as const;
+import { isDueToday, type ReadingSettings, type Token } from "./reading";
+export const filters = ["target", "learning", "due", "missing", "all"] as const;
 export type Filter = (typeof filters)[number];
 /** Keep the first occurrence in document order, including after incremental rescans. */
 export function pageWords(tokens: Token[]) {
@@ -18,20 +18,19 @@ export function pageWords(tokens: Token[]) {
   });
 }
 export function matchesFilter(token: Token, filter: Filter) {
-  return (
-    filter === "all" ||
-    (filter === "target"
-      ? token.style === "target" || token.style === "unknown"
-      : filter === "learning"
-        ? token.style === "learning"
-        : token.entry.dictionaryStatus === "missing")
-  );
+  if (filter === "all") return true;
+  if (filter === "target")
+    return token.style === "target" || token.style === "unknown";
+  if (filter === "learning") return token.style === "learning";
+  if (filter === "due") return isDueToday(token.state);
+  return token.entry.dictionaryStatus === "missing";
 }
 export function createDrawer(
   root: ShadowRoot,
   summary: HTMLElement,
   retry: HTMLButtonElement,
   activate: (token: Token) => void,
+  onExpanded: () => void = () => {},
 ) {
   const style = document.createElement("style");
   style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
@@ -72,6 +71,7 @@ export function createDrawer(
     body.hidden = !body.hidden;
     header.setAttribute("aria-expanded", String(!body.hidden));
     arrow.textContent = t(body.hidden ? "drawerExpand" : "drawerCollapse");
+    if (!body.hidden) onExpanded();
   };
   const connection = document.createElement("span");
   const row = document.createElement("div");
@@ -192,6 +192,12 @@ export function createDrawer(
               ),
             )
           : t(status === "checking" ? "checking" : "notRunning");
+      const dueCount = words.filter((word) => isDueToday(word.state)).length;
+      dueSlot.textContent =
+        dueCount > 0
+          ? t("dueSummary").replace("{count}", String(dueCount))
+          : t("dueNone");
+      dueSlot.hidden = status !== "ok";
       for (const input of [gloss, advanced, hover])
         input.disabled = status !== "ok";
       if (config) {

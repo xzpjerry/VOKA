@@ -19,6 +19,19 @@ function reply(result: unknown = description) {
   );
 }
 describe("v1 gateway", () => {
+  it("requires the P1 scheduling and review read methods", () => {
+    expect(REQUIRED_METHODS).toEqual(
+      expect.arrayContaining([
+        "scheduling.getDue",
+        "scheduling.get",
+        "scheduling.predict",
+        "scheduling.answer",
+        "cards.render",
+        "reviews.getLatestId",
+        "reviews.list",
+      ]),
+    );
+  });
   it("sends the JSON-RPC envelope, configured port and Bearer header", async () => {
     const fetch = reply();
     expect(
