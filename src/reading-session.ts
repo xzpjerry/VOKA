@@ -23,20 +23,37 @@ import {
 import { check, settings, t } from "./shared";
 import { extractFromStream, type TextStreamSource } from "./text-stream";
 
+export type ReadingSourceOptions = {
+  /** Keep this source available for reading interactions without listing its words. */
+  listed?: false;
+  /** Activate a listed token without scrolling to its DOM range. */
+  activate?: (token: Token) => void;
+  /** Optional source-specific detail shown beside a listed word. */
+  detail?: (token: Token) => string | undefined;
+};
+
 export type ReadingSource =
-  | { kind: "dom"; root: Element }
-  | {
+  | (ReadingSourceOptions & { kind: "dom"; root: Element })
+  | (ReadingSourceOptions & {
       kind: "stream";
       id: string;
       text: () => string;
       rangeFor: (start: number, end: number) => Range;
       document: Document;
-    };
+    });
+
+export type ReadingSentence = { text: string; html: string };
 
 export type ReadingSessionOptions = {
   uiDocument: Document;
   sources: ReadingSource[];
   sourceLabel?: () => { site: string; title: string };
+  sourceLabelForToken?: (
+    token: Token,
+    storeFullUrl: boolean,
+  ) => { site: string; title: string } | undefined;
+  sentenceForToken?: (token: Token) => ReadingSentence | undefined;
+  drawerNote?: () => string | undefined;
 };
 
 export const READING_HIGHLIGHT_CSS =
@@ -115,7 +132,7 @@ export function createReadingSession(options: ReadingSessionOptions) {
   pageStyle.textContent = READING_HIGHLIGHT_CSS;
   host.append(pageStyle);
 
-  let config: ReadingSettings;
+  let config: ReadingSettings & { storeFullUrl?: boolean };
   let drawerUI: ReturnType<typeof createDrawer>;
   let paused = false;
   let running = false;
@@ -160,8 +177,19 @@ export function createReadingSession(options: ReadingSessionOptions) {
     return controllers.flatMap((controller) => controller.tokens);
   }
 
+  function listedTokens() {
+    return controllers
+      .filter((controller) => controller.source.listed !== false)
+      .flatMap((controller) => controller.tokens);
+  }
+
+  function sourceForToken(token: Token) {
+    return controllers.find((controller) => controller.tokens.includes(token))
+      ?.source;
+  }
+
   function updateDrawer(status = "ok") {
-    drawerUI?.update(allTokens(), config, status);
+    drawerUI?.update(listedTokens(), config, status);
   }
 
   function syncState(key: string) {
@@ -526,10 +554,13 @@ export function createReadingSession(options: ReadingSessionOptions) {
     summary,
     retry,
     (token) => {
-      token.range.startContainer.parentElement?.scrollIntoView({
-        block: "center",
-        behavior: "instant",
-      });
+      const source = sourceForToken(token);
+      if (source?.activate) source.activate(token);
+      else
+        token.range.startContainer.parentElement?.scrollIntoView({
+          block: "center",
+          behavior: "instant",
+        });
       const event = new CustomEvent("voka-open-card", {
         detail: { token },
         cancelable: true,
@@ -555,6 +586,10 @@ export function createReadingSession(options: ReadingSessionOptions) {
     (tokens) => reviewUI.start(tokens),
     reviewUI.element,
     (token, cardId) => reviewUI.practice(token, cardId),
+    {
+      note: options.drawerNote,
+      detail: (token) => sourceForToken(token)?.detail?.(token),
+    },
   );
   root.append(tooltip);
 
@@ -615,7 +650,11 @@ export function createReadingSession(options: ReadingSessionOptions) {
       updateDrawer();
       tooltip.hidden = true;
     },
-    sourceLabel,
+    (token) =>
+      options.sourceLabelForToken?.(token, config?.storeFullUrl === true) ??
+      sourceLabel?.(),
+    (token) => options.sentenceForToken?.(token),
+    (token) => sourceForToken(token)?.listed !== false,
   );
 
   function handleDisconnect() {
@@ -688,7 +727,7 @@ export function createReadingSession(options: ReadingSessionOptions) {
       }
     }
     if (epoch !== generation) return;
-    drawerUI.update(allTokens(), config, status);
+    drawerUI.update(listedTokens(), config, status);
     retry.hidden = status === "ok";
     retry.disabled = false;
   }
@@ -698,9 +737,10 @@ export function createReadingSession(options: ReadingSessionOptions) {
     const token = (event as CustomEvent<{ token: Token }>).detail?.token;
     if (!token) return;
     event.preventDefault();
-    token.range.startContainer.parentElement?.scrollIntoView({
-      block: "center",
-    });
+    if (!sourceForToken(token)?.activate)
+      token.range.startContainer.parentElement?.scrollIntoView({
+        block: "center",
+      });
     void card.open(token);
   }
 
@@ -777,6 +817,7 @@ export function createReadingSession(options: ReadingSessionOptions) {
     refresh,
     addSource,
     removeSource,
+    refreshDrawer: () => updateDrawer(),
     isRunning: () => running,
     getHoverZones: () => {
       const fullCard = root.querySelector("#voka-card");

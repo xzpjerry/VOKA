@@ -3,7 +3,11 @@ import { afterEach, expect, it, vi } from "vitest";
 import type { Token, WordState } from "./reading";
 import { fullCard } from "./full-card";
 
-function setup(exists: boolean, state?: WordState) {
+function setup(
+  exists: boolean,
+  state?: WordState,
+  canPractice: (token: Token) => boolean = () => true,
+) {
   document.body.innerHTML = "<p>Benefit is useful.</p>";
   const text = document.querySelector("p")!.firstChild!;
   const range = document.createRange();
@@ -49,6 +53,10 @@ function setup(exists: boolean, state?: WordState) {
     }),
     vi.fn(),
     () => state,
+    undefined,
+    undefined,
+    undefined,
+    canPractice,
   );
   return { ui, token, root };
 }
@@ -85,4 +93,8 @@ it("shows practice only for a not-due word with an Anki card", async () => {
   const absent = setup(false);
   await absent.ui.open(absent.token);
   expect(absent.root.querySelector("#voka-practice-word")).toBeNull();
+
+  const unlisted = setup(true, card(false), () => false);
+  await unlisted.ui.open(unlisted.token);
+  expect(unlisted.root.querySelector("#voka-practice-word")).toBeNull();
 });

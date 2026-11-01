@@ -15,7 +15,7 @@ import { normalizeKey } from "../src/key";
 import { answerHtml, css, questionHtml } from "../src/data/template";
 
 const PORT = 8766;
-const TEST_DECK = "VOKA Test::95";
+const TEST_DECK = "VOKA Test::96";
 const config = { port: PORT, apiKey: "" };
 const call = (method: string, params = {}, write = false) =>
   rpc(config, method, params, { sideEffecting: write }) as Promise<any>;
@@ -66,6 +66,9 @@ let testDeckWasAbsent = false;
 let deckCreateAttempted = false;
 let createdNoteIds: string[] = [];
 let testWord = "";
+let dueWord = "";
+let dueCardId = "";
+let baselineReviewId: unknown;
 
 async function searchTestNotes() {
   const ids: string[] = [];
@@ -113,53 +116,93 @@ async function createFixtureNote() {
 
   deckCreateAttempted = true;
   await call("decks.create", { name: TEST_DECK }, true);
-  for (let start = 0; start < candidates.length && !testWord; start += 100) {
+  const available: typeof candidates = [];
+  for (let start = 0; start < candidates.length && available.length < 2; start += 100) {
     const batch = candidates.slice(start, start + 100);
     const matches = await lookup(
       call,
       DEFAULT_TARGET,
       batch.map((entry) => normalizeKey(entry.lemma)),
     );
-    testWord =
-      batch.find((entry) => matches.get(normalizeKey(entry.lemma))?.length === 0)
-        ?.lemma ?? "";
+    for (const entry of batch) {
+      if (matches.get(normalizeKey(entry.lemma))?.length === 0)
+        available.push(entry);
+      if (available.length === 2) break;
+    }
   }
-  assert(testWord, "need one unused B1 word for the YouTube caption fixture");
-  const entry = candidates.find((candidate) => candidate.lemma === testWord)!;
-  const escaped = {
-    ...entry,
-    Reading: escapeHtml(entry.Reading),
-    GlossNative: escapeHtml(entry.GlossNative),
-    GlossTarget: escapeHtml(entry.GlossTarget),
-  };
-  const fields = Object.fromEntries(CORE_FIELDS.map((field) => [field, ""]));
-  Object.assign(fields, {
-    Key: normalizeKey(entry.lemma),
-    Word: escapeHtml(entry.lemma),
-    Variants: escapeHtml(entry.Variants ?? ""),
-    Reading: escaped.Reading,
-    GlossNative: escaped.GlossNative,
-    GlossTarget: escaped.GlossTarget,
-    VokaMeta: await vokaMeta(escaped),
-  });
-  const note = {
-    noteType: { name: DEFAULT_TARGET.noteType },
-    deck: { name: TEST_DECK },
-    tags: ["voka", `voka::level::${entry.level}`],
-    fields,
-  };
-  const validation = await call("notes.validateMany", { notes: [note] });
-  assert.equal(validation.items[0]?.result?.valid, true);
+  assert.equal(available.length, 2, "need two unused B1 words for the YouTube fixture");
+  testWord = available[0].lemma;
+  dueWord = available[1].lemma;
+  const notes = await Promise.all(
+    available.map(async (entry) => {
+      const escaped = {
+        ...entry,
+        Reading: escapeHtml(entry.Reading),
+        GlossNative: escapeHtml(entry.GlossNative),
+        GlossTarget: escapeHtml(entry.GlossTarget),
+      };
+      const fields = Object.fromEntries(CORE_FIELDS.map((field) => [field, ""]));
+      Object.assign(fields, {
+        Key: normalizeKey(entry.lemma),
+        Word: escapeHtml(entry.lemma),
+        Variants: escapeHtml(entry.Variants ?? ""),
+        Reading: escaped.Reading,
+        GlossNative: escaped.GlossNative,
+        GlossTarget: escaped.GlossTarget,
+        VokaMeta: await vokaMeta(escaped),
+      });
+      return {
+        noteType: { name: DEFAULT_TARGET.noteType },
+        deck: { name: TEST_DECK },
+        tags: ["voka", `voka::level::${entry.level}`],
+        fields,
+      };
+    }),
+  );
+  const validation = await call("notes.validateMany", { notes });
+  assert.equal(validation.items.length, notes.length);
+  assert(
+    validation.items.every((item: any) => item.result?.valid === true),
+    `test note validation failed: ${JSON.stringify(validation.items)}`,
+  );
   const creation = await call(
     "notes.createMany",
-    { notes: [note], atomic: false },
+    { notes, atomic: false },
     true,
   );
   assert(
-    creation.items[0]?.result?.noteId && !creation.items[0]?.error,
-    `test note creation failed: ${JSON.stringify(creation.items[0])}`,
+    creation.items.every((item: any) => item.result?.noteId && !item.error),
+    `test note creation failed: ${JSON.stringify(creation.items)}`,
   );
-  createdNoteIds = [String(creation.items[0].result.noteId)];
+  createdNoteIds = creation.items.map((item: any) => String(item.result.noteId));
+  const noteResults = await call("notes.getMany", { ids: createdNoteIds });
+  const cardIds = noteResults.items.map((item: any) => {
+    assert(!item.error, `test note read failed: ${JSON.stringify(item.error)}`);
+    assert.equal(item.result.cardIds.length, 1);
+    return String(item.result.cardIds[0]);
+  });
+  dueCardId = cardIds[1];
+  const prediction = await call("scheduling.predict", { cardId: dueCardId });
+  assert(prediction.answers.some((answer: any) => answer.rating === "easy"));
+  const graduated = await call(
+    "scheduling.answer",
+    {
+      cardId: dueCardId,
+      rating: "easy",
+      stateToken: prediction.stateToken,
+      elapsedMs: 250,
+    },
+    true,
+  );
+  const state = graduated.scheduling ?? (await call("scheduling.get", { cardId: dueCardId }));
+  assert.equal(state.type, "review", "the due fixture word must be a Review card");
+  await call("scheduling.setDueDate", { cardIds: [dueCardId], days: "0" }, true);
+  assert.equal(
+    (await call("scheduling.getDue", { cardId: dueCardId })).dueNow,
+    true,
+    "the fixture word must be due today",
+  );
+  baselineReviewId = (await call("reviews.getLatestId", { cardIds: [dueCardId] })).id;
 }
 
 async function loadExtensionAndFindWorker() {
@@ -199,6 +242,7 @@ async function loadExtensionAndFindWorker() {
       glossLanguage: "native",
       showAdvanced: false,
       hoverScope: "highlighted",
+      storeFullUrl: false,
       youtubeDiagnostics: false,
       youtubeAutoResume: true,
       siteScope: "activeTab",
@@ -259,23 +303,48 @@ async function runBrowserCheck() {
         refetchUrls.push(request.url());
       let body = emptyJson3;
       if (hasPlayerToken) {
-        const caption =
-          videoId === "fixture1"
-            ? `The ${testWord} is ready.`
-            : videoId === "fixture2" && lang.startsWith("en")
+        if (videoId === "fixture1") {
+          body = JSON.stringify({
+            events: [
+              {
+                tStartMs: 1000,
+                dDurationMs: 4000,
+                segs: [{ utf8: `The ${testWord} is ready.` }],
+              },
+              {
+                tStartMs: 12000,
+                dDurationMs: 5000,
+                segs: [{ utf8: `A ${dueWord} shines in bright light.` }],
+              },
+              {
+                tStartMs: 35000,
+                dDurationMs: 5000,
+                segs: [{ utf8: `Another ${testWord} waits nearby.` }],
+              },
+              {
+                tStartMs: 65000,
+                dDurationMs: 5000,
+                segs: [{ utf8: `The ${testWord} returns before sunset.` }],
+              },
+            ],
+          });
+        } else {
+          const caption =
+            videoId === "fixture2" && lang.startsWith("en")
               ? `Auto ${testWord} is ready.`
               : videoId === "fixture2" && lang === "fr"
                 ? "French fixture caption."
                 : "Other fixture caption.";
-        body = JSON.stringify({
-          events: [
-            {
-              tStartMs: 0,
-              dDurationMs: 4000,
-              segs: [{ utf8: caption }],
-            },
-          ],
-        });
+          body = JSON.stringify({
+            events: [
+              {
+                tStartMs: 0,
+                dDurationMs: 4000,
+                segs: [{ utf8: caption }],
+              },
+            ],
+          });
+        }
       }
       void request.respond({
         status: 200,
@@ -347,7 +416,7 @@ async function runBrowserCheck() {
   assert(!diagnosticText.includes(testWord));
   assert(!diagnosticText.includes("The "));
   assert(!diagnosticText.includes("fixture1"));
-  assert.match(diagnosticText, /1 条|1 cues/);
+  assert.match(diagnosticText, /4 条|4 cues/);
   await page.evaluate(() => {
     const video = document.querySelector("video")!;
     Object.defineProperty(video, "currentTime", { configurable: true, writable: true, value: 5 });
@@ -383,9 +452,16 @@ async function runBrowserCheck() {
   assert(lineBox, "subtitle line is not visible for the hover check");
   await page.mouse.move(lineBox.x + lineBox.width / 2, lineBox.y + lineBox.height / 2);
   await page.waitForFunction(() => (document.querySelector("video") as HTMLVideoElement).paused);
+  await page.waitForFunction((word) => {
+    const subtitle = document.querySelector("#voka-subtitle");
+    return [...(CSS.highlights.get("voka-target") ?? [])].some(
+      (item) => item.toString().includes(word) && subtitle?.contains(item.startContainer),
+    );
+  }, {}, testWord);
   const wordRect = await page.evaluate((word) => {
+    const subtitle = document.querySelector("#voka-subtitle");
     const range = [...(CSS.highlights.get("voka-target") ?? [])].find(
-      (item) => item.toString().includes(word),
+      (item) => item.toString().includes(word) && subtitle?.contains(item.startContainer),
     );
     if (!range) return null;
     const rect = range.getBoundingClientRect();
@@ -449,6 +525,210 @@ async function runBrowserCheck() {
     "the video resumed after the user paused it",
   );
 
+  const testKey = normalizeKey(testWord);
+  const dueKey = normalizeKey(dueWord);
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector(".drawer-toggle") as HTMLButtonElement).click();
+    (root.querySelector('[data-filter="all"]') as HTMLButtonElement).click();
+  });
+  await page.waitForFunction(
+    (wordKey, dueWordKey) => {
+      const root = document.getElementById("voka-drawer")?.shadowRoot;
+      const word = root?.querySelector(
+        `.drawer-list button[data-key="${wordKey}"]`,
+      );
+      const due = root?.querySelector(
+        `.drawer-list button[data-key="${dueWordKey}"]`,
+      );
+      return (
+        word?.textContent?.includes("×3") &&
+        word.querySelector(".drawer-word-time")?.textContent === "00:01" &&
+        !!due
+      );
+    },
+    {},
+    testKey,
+    dueKey,
+  );
+  const panelSnapshot = await page.evaluate(
+    ({ wordKey, dueWordKey }) => {
+      const root = document.getElementById("voka-drawer")!.shadowRoot!;
+      return {
+        word: root.querySelector(
+          `.drawer-list button[data-key="${wordKey}"]`,
+        )?.textContent,
+        dueWord: root.querySelector(
+          `.drawer-list button[data-key="${dueWordKey}"]`,
+        )?.textContent,
+        scope: root.querySelector(".drawer-scope-note")?.textContent,
+        dueSummary: root.querySelector('[data-slot="due-summary"]')?.textContent,
+      };
+    },
+    { wordKey: testKey, dueWordKey: dueKey },
+  );
+  assert.match(panelSnapshot.word ?? "", /×3/);
+  assert.match(panelSnapshot.word ?? "", /00:01/);
+  assert(panelSnapshot.dueWord, "the drawer must include words from a later cue");
+  assert.match(panelSnapshot.scope ?? "", /整个视频的词汇|Whole video/);
+  assert.match(panelSnapshot.dueSummary ?? "", /1/);
+  assert(
+    !(await lineText()).includes(dueWord),
+    "the due word should be outside the current subtitle line",
+  );
+
+  await page.evaluate(() => {
+    const video = document.querySelector("video")!;
+    Object.defineProperty(video, "currentTime", {
+      configurable: true,
+      writable: true,
+      value: 80,
+    });
+  });
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  await page.evaluate((key) => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (
+      root.querySelector(
+        `.drawer-list button[data-key="${key}"] .drawer-word-time`,
+      ) as HTMLSpanElement
+    ).click();
+  }, testKey);
+  assert.equal(
+    await page.$eval("video", (video) => (video as HTMLVideoElement).currentTime),
+    1,
+    "clicking the first-appearance time must seek the fake video",
+  );
+  await page.waitForFunction(() => {
+    const card = document
+      .getElementById("voka-drawer")
+      ?.shadowRoot?.querySelector("#voka-card") as HTMLElement | null;
+    const save = card?.querySelector("#voka-save-context") as HTMLButtonElement | null;
+    return !!card && !card.hidden && !!save && !save.disabled;
+  });
+  const cardSentences = await page.$eval(
+    "#voka-drawer",
+    (host) =>
+      [...host.shadowRoot!.querySelectorAll("#voka-card p")]
+        .map((paragraph) => paragraph.textContent ?? "")
+        .join(" "),
+  );
+  assert.match(cardSentences, new RegExp(`The ${testWord} is ready\\.`));
+  assert.equal(
+    await page.$eval("#voka-drawer", (host) =>
+      !(host.shadowRoot!.querySelector("#voka-save-context") as HTMLButtonElement).disabled,
+    ),
+    true,
+    "the transcript example must be available to save",
+  );
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    const save = root.querySelector("#voka-save-context") as HTMLButtonElement;
+    save.click();
+  });
+  await page.waitForFunction(() => {
+    const card = document.getElementById("voka-drawer")?.shadowRoot;
+    return !!card?.querySelector('#voka-card [role="status"]')?.textContent?.trim();
+  });
+  const saveStatus = await page.$eval(
+    "#voka-drawer",
+    (host) => host.shadowRoot?.querySelector('#voka-card [role="status"]')?.textContent ?? "",
+  );
+  assert.match(saveStatus, /例句已保存|Context saved/);
+  const savedNote = await call("notes.getMany", { ids: [createdNoteIds[0]] });
+  const savedFields = savedNote.items[0]?.result?.fields ?? {};
+  assert.equal(
+    (savedFields.Context1 ?? "").replace(/<[^>]+>/g, ""),
+    `The ${testWord} is ready.`,
+  );
+  assert.match(
+    savedFields.Source1 ?? "",
+    /youtube\.com · Fixture YouTube video · 00:01 · \d{4}-\d{2}-\d{2}/,
+  );
+
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector("#voka-practice-word") as HTMLButtonElement).click();
+  });
+  await page.waitForFunction((word) => {
+    const root = document.getElementById("voka-drawer")?.shadowRoot;
+    return (
+      root?.querySelector("#voka-review-ui h3")?.textContent === word &&
+      root.querySelector("#voka-review-ui .review-sentence")?.textContent ===
+        `The ${word} is ready.`
+    );
+  }, {}, testWord);
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector('[data-practice-action="show-answer"]') as HTMLButtonElement).click();
+  });
+  await page.waitForFunction(() =>
+    !!document
+      .getElementById("voka-drawer")
+      ?.shadowRoot?.querySelector('[data-practice-action="next"]'),
+  );
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector('[data-practice-action="next"]') as HTMLButtonElement).click();
+  });
+  await page.waitForFunction(() =>
+    (document
+      .getElementById("voka-drawer")
+      ?.shadowRoot?.querySelector("#voka-review-ui") as HTMLElement | null)?.hidden,
+  );
+
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector("#voka-card button") as HTMLButtonElement).click();
+    (root.querySelector('[data-slot="review-button"]') as HTMLButtonElement).click();
+  });
+  await page.waitForFunction(
+    (word) => {
+      const root = document.getElementById("voka-drawer")?.shadowRoot;
+      const heading = root?.querySelector("#voka-review-ui h3")?.textContent ?? "";
+      const sentence =
+        root?.querySelector("#voka-review-ui .review-sentence")?.textContent ?? "";
+      return heading.startsWith(word) && sentence.includes(word);
+    },
+    {},
+    dueWord,
+  );
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    const showAnswer = [...root.querySelectorAll("#voka-review-ui button")].find(
+      (button) => /Show answer|显示答案/.test(button.textContent ?? ""),
+    ) as HTMLButtonElement | undefined;
+    showAnswer?.click();
+  });
+  await page.waitForFunction(() =>
+    !!document
+      .getElementById("voka-drawer")
+      ?.shadowRoot?.querySelector('[data-review-rating="good"]'),
+  );
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector('[data-review-rating="good"]') as HTMLButtonElement).click();
+  });
+  await page.waitForFunction(() => {
+    const heading = document
+      .getElementById("voka-drawer")
+      ?.shadowRoot?.querySelector("#voka-review-ui h3")?.textContent ?? "";
+    return /finished|完了/.test(heading.toLowerCase());
+  });
+  const reviewRecords = await call("reviews.list", {
+    cardIds: [dueCardId],
+    afterId: baselineReviewId,
+    limit: 20,
+  });
+  assert.equal(
+    reviewRecords.items.filter(
+      (item: any) => String(item.cardId) === dueCardId && item.rating === "good",
+    ).length,
+    1,
+    "the transcript due word must record one Good review",
+  );
+  assert.equal(reviewRecords.items.length, 1, "T-14 should add one review only");
+
   await page.evaluate(() => (window as any).__vokaSetVideo("fixture2"));
   await page.waitForFunction(() => {
     const diagnostic = document.querySelector("#voka-subtitle .voka-youtube-diagnostic");
@@ -505,8 +785,14 @@ async function runBrowserCheck() {
         browser: await browser!.version(),
         ankiPort: PORT,
         testDeck: TEST_DECK,
+        testWord,
+        dueWord,
         checks: [
           "fixture1 human English captions use method 1 and highlight a test word from 8766",
+          "the fixture1 drawer combines all cues, shows ×3 plus first appearance, scope and whole-video due count",
+          "clicking a first-appearance time seeks; saving the first cue stores its YouTube title, time and date",
+          "practice from a transcript word uses that first cue sentence and records no rating",
+          "the due word from a later transcript cue reviews through the shared flow and records one Good review",
           "T-20 pauses across the subtitle word, tooltip, and full card, then resumes after all zones are left",
           "T-21 preserves a user pause and does not resume after leaving the subtitle line",
           "subtitle line follows video.currentTime and native captions hide with opacity",

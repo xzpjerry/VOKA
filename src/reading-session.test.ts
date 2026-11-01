@@ -77,7 +77,7 @@ it("shares one session across an iframe DOM source and a text stream", async () 
 
   document.body.innerHTML = "<p id=\"caption\">achieve</p>";
   const caption = document.querySelector("#caption")!.firstChild!;
-  const sendMessage = vi.fn(async (message: { type?: string; words?: string[] }) => {
+  const sendMessage = vi.fn(async (message: { type?: string; words?: string[]; keys?: string[] }) => {
     if (message.type === "recognize-words")
       return {
         data: Object.fromEntries(
@@ -95,7 +95,28 @@ it("shares one session across an iframe DOM source and a text stream", async () 
           ]),
         ),
       };
-    if (message.type === "page-states") return { data: {} };
+    if (message.type === "page-states")
+      return {
+        data: Object.fromEntries(
+          (message.keys ?? [])
+            .filter((key) => key === "en:improve")
+            .map((key) => [
+              key,
+              {
+                fields: { Word: "improve" },
+                cards: [
+                  {
+                    cardId: "due-improve",
+                    type: "new",
+                    queue: "new",
+                    intervalDays: 0,
+                    dueToday: true,
+                  },
+                ],
+              },
+            ]),
+        ),
+      };
     if (message.type === "upgrade-summary") return { data: { count: 0 } };
     return { data: {} };
   });
@@ -126,7 +147,7 @@ it("shares one session across an iframe DOM source and a text stream", async () 
   const session = createReadingSession({
     uiDocument: document,
     sources: [
-      { kind: "dom", root: sourceDoc.body },
+      { kind: "dom", root: sourceDoc.body, listed: false },
       {
         kind: "stream",
         id: "caption-1",
@@ -147,8 +168,11 @@ it("shares one session across an iframe DOM source and a text stream", async () 
 
     const host = document.getElementById("voka-drawer")!;
     const listText = host.shadowRoot!.querySelector(".drawer-list")!.textContent;
-    expect(listText).toContain("improve");
     expect(listText).toContain("achieve");
+    expect(listText).not.toContain("improve");
+    expect(
+      host.shadowRoot!.querySelector('[data-slot="due-summary"]')!.textContent,
+    ).toContain("dueNone");
 
     const iframeTarget = iframeHighlights.get("voka-target") as TestHighlight;
     const mainTarget = mainHighlights.get("voka-target") as TestHighlight;

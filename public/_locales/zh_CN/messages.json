@@ -412,5 +412,17 @@
   },
   "youtubeSubtitleClose": {
     "message": "关闭 VOKA 字幕行"
+  },
+  "youtubeScopeWholeVideo": {
+    "message": "整个视频的词汇"
+  },
+  "youtubeScopePlayedPart": {
+    "message": "只包含已播放的片段"
+  },
+  "youtubeSentenceChanged": {
+    "message": "字幕已变更，请重新选择"
+  },
+  "youtubeSentenceTooShort": {
+    "message": "这句太短，换一句吧"
   }
 }

@@ -3,6 +3,10 @@ import { isDueToday, type ReadingSettings, type Token } from "./reading";
 export const filters = ["target", "learning", "due", "missing", "all"] as const;
 export type Filter = (typeof filters)[number];
 export type PageWordSort = "first" | "frequency";
+export type DrawerDisplayOptions = {
+  note?: () => string | undefined;
+  detail?: (token: Token) => string | undefined;
+};
 const pageWordId = (token: Token) =>
   token.recognized
     ? token.key
@@ -83,9 +87,10 @@ export function createDrawer(
   onStartReview: (tokens: Token[]) => void = () => {},
   reviewView?: HTMLElement,
   onStartPractice: (token: Token, cardId: string) => void = () => {},
+  display: DrawerDisplayOptions = {},
 ) {
   const style = document.createElement("style");
-  style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 8px 12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-due-summary{border:0;background:transparent;color:#285e9e;text-align:left;padding:8px 4px;white-space:nowrap}.drawer-due-summary:disabled{color:#566575;cursor:default}.drawer-review-button{border:1px solid #ccd3dc;border-radius:6px;background:white;color:#285e9e;padding:6px 10px;white-space:nowrap}.drawer-review-button[hidden]{display:none}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-sort{display:flex;align-items:center;gap:8px;margin:8px 0}.drawer-start-review{margin:4px 0 8px}.drawer-review-message{margin:8px 0;color:#566575}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
+  style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 8px 12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-due-summary{border:0;background:transparent;color:#285e9e;text-align:left;padding:8px 4px;white-space:nowrap}.drawer-due-summary:disabled{color:#566575;cursor:default}.drawer-review-button{border:1px solid #ccd3dc;border-radius:6px;background:white;color:#285e9e;padding:6px 10px;white-space:nowrap}.drawer-review-button[hidden]{display:none}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-sort{display:flex;align-items:center;gap:8px;margin:8px 0}.drawer-start-review{margin:4px 0 8px}.drawer-review-message{margin:8px 0;color:#566575}.drawer-scope-note{margin:8px 0;color:#566575;font-size:13px}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-word-time{margin-left:8px;color:#607080;font-variant-numeric:tabular-nums;white-space:nowrap}.drawer-connection{display:flex;align-items:center;gap:12px}`;
   root.append(style);
   const header = document.createElement("button");
   header.className = "drawer-toggle";
@@ -203,6 +208,10 @@ export function createDrawer(
   reviewMessage.className = "drawer-review-message";
   reviewMessage.setAttribute("role", "status");
   reviewMessage.hidden = true;
+  const scopeNote = document.createElement("p");
+  scopeNote.className = "drawer-scope-note";
+  scopeNote.setAttribute("role", "note");
+  scopeNote.hidden = true;
   let words: Token[] = [],
     counts = new Map<string, number>(),
     active: Filter = "target",
@@ -229,6 +238,9 @@ export function createDrawer(
     return button;
   });
   function render() {
+    const note = display.note?.() ?? "";
+    scopeNote.textContent = note;
+    scopeNote.hidden = !note;
     buttons.forEach((button, index) => {
       const filter = filters[index];
       if (filter === "due" && dueCount === 0)
@@ -260,6 +272,17 @@ export function createDrawer(
           )}`,
         ),
       );
+      const firstAppearance = display.detail?.(token);
+      if (firstAppearance) {
+        const time = document.createElement("span");
+        time.className = "drawer-word-time";
+        time.textContent = firstAppearance;
+        time.addEventListener("click", (event) => {
+          event.stopPropagation();
+          activate(token);
+        });
+        wordLabel.append(time);
+      }
       button.append(wordLabel);
       detail.textContent = [
         token.entry.level,
@@ -281,7 +304,7 @@ export function createDrawer(
   function setReviewing(value: boolean) {
     reviewing = value;
     if (value) reviewMessage.hidden = true;
-    for (const element of [row, language, controls, tabs, sortLabel, startReview, list, empty])
+    for (const element of [scopeNote, row, language, controls, tabs, sortLabel, startReview, list, empty])
       element.hidden = value;
     if (reviewView) reviewView.hidden = !value;
     if (!value) render();
@@ -323,7 +346,7 @@ export function createDrawer(
     beginReview();
   };
   startReview.onclick = beginReview;
-  body.append(reviewMessage, row, language, controls, tabs, sortLabel, startReview, list, empty);
+  body.append(reviewMessage, scopeNote, row, language, controls, tabs, sortLabel, startReview, list, empty);
   if (reviewView) {
     reviewView.hidden = true;
     body.append(reviewView);

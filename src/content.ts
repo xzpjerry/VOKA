@@ -1,5 +1,6 @@
 import { createReadingSession } from "./reading-session";
 import { createYouTubeController } from "./youtube/controller";
+import { createYouTubeWordPanel } from "./youtube/word-panel";
 
 declare const __VOKA_AUTO_RUN__: boolean;
 
@@ -39,16 +40,28 @@ void (async () => {
       void pageWindow.__VOKA_YOUTUBE_CONTROLLER__.start();
       return;
     }
+    const wordPanel = createYouTubeWordPanel(document);
     const controller = createYouTubeController({
       uiDocument: document,
-      createSession: () =>
-        createReadingSession({ uiDocument: document, sources: [] }),
+      createSession: () => {
+        const session = createReadingSession({
+          uiDocument: document,
+          sources: [],
+          sourceLabelForToken: wordPanel.sourceLabelForToken,
+          sentenceForToken: wordPanel.sentenceForToken,
+          drawerNote: wordPanel.drawerNote,
+        });
+        wordPanel.attachSession(session);
+        return session;
+      },
     });
+    wordPanel.bind(controller);
     pageWindow.__VOKA_YOUTUBE_CONTROLLER__ = controller;
     window.addEventListener(
       "unload",
       () => {
         controller.stop();
+        wordPanel.stop();
         delete pageWindow.__VOKA_YOUTUBE_CONTROLLER__;
       },
       { once: true },

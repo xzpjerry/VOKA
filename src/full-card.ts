@@ -26,7 +26,9 @@ export function fullCard(
   updated: (key: string, fields: Record<string, string>) => void,
   stateFor: (key: string) => WordState | undefined = () => undefined,
   choose: (token: Token, entry: Token["entry"]) => Promise<void> = async () => {},
-  getSourceLabel?: () => { site: string; title: string },
+  getSourceLabel?: (token: Token) => { site: string; title: string } | undefined,
+  getSentence?: (token: Token) => { text: string; html: string } | undefined,
+  canPractice?: (token: Token) => boolean,
 ) {
   const card = document.createElement("aside");
   card.id = "voka-card";
@@ -45,6 +47,8 @@ export function fullCard(
     selected: string | undefined,
     message = "",
     activeSourceLabel: { site: string; title: string } | undefined;
+  let activeSentence: { text: string; html: string } | undefined,
+    activeSentenceError = "";
   const text = (html: string) => {
     const t = document.createElement("template");
     t.innerHTML = html;
@@ -183,12 +187,14 @@ export function fullCard(
     manualButton.dataset.manual = action.status || "clear";
     manual.append(manualButton);
     card.append(manual);
-    let sentence: ReturnType<typeof sentenceForRange> | undefined,
-      error = "";
-    try {
-      sentence = sentenceForRange(token.range);
-    } catch (e) {
-      error = (e as Error).message;
+    let sentence = activeSentence,
+      error = activeSentenceError;
+    if (!sentence && !error) {
+      try {
+        sentence = sentenceForRange(token.range);
+      } catch (e) {
+        error = (e as Error).message;
+      }
     }
     if (sentence) card.append(element("p", sentence.text));
     const duplicate =
@@ -218,7 +224,12 @@ export function fullCard(
     save.disabled = busy || duplicate || !sentence;
     card.append(save);
     const firstCard = state?.cards[0];
-    if (view.exists && firstCard && !isDueToday(state)) {
+    if (
+      view.exists &&
+      firstCard &&
+      !isDueToday(state) &&
+      (canPractice?.(token) ?? true)
+    ) {
       const practice = button(t("practiceWord"), () => {
         root.dispatchEvent(
           new CustomEvent("voka-start-practice", {
@@ -324,7 +335,14 @@ export function fullCard(
   async function open(token: Token) {
     const current = ++epoch;
     active = token;
-    activeSourceLabel = getSourceLabel?.();
+    activeSourceLabel = getSourceLabel?.(token);
+    activeSentence = undefined;
+    activeSentenceError = "";
+    try {
+      activeSentence = getSentence?.(token);
+    } catch (error) {
+      activeSentenceError = (error as Error).message;
+    }
     busy = true;
     list = false;
     message = "";

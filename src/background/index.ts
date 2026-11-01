@@ -44,6 +44,30 @@ async function checked(config: Parameters<typeof checkConnection>[0]) {
 }
 const reviewCardId = (value: unknown): value is string =>
   typeof value === "string" && /^\d+$/.test(value);
+function isYouTubeWatchPage(value: string | undefined) {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    return (
+      url.hostname === "www.youtube.com" &&
+      (url.pathname === "/watch" || url.pathname.startsWith("/shorts/"))
+    );
+  } catch {
+    return false;
+  }
+}
+function isContextSourceLabel(value: unknown) {
+  if (!value || typeof value !== "object") return false;
+  const label = value as { site?: unknown; title?: unknown };
+  return (
+    typeof label.site === "string" &&
+    label.site.length > 0 &&
+    label.site.length <= 200 &&
+    typeof label.title === "string" &&
+    label.title.length > 0 &&
+    label.title.length <= 200
+  );
+}
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== chrome.runtime.id) return;
   if (
@@ -141,12 +165,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     sender.tab &&
     ((/^https?:/.test(sender.url || "")) ||
       (sender.url === chrome.runtime.getURL("reader.html") &&
-        typeof message.sourceLabel?.site === "string" &&
-        message.sourceLabel.site.length > 0 &&
-        message.sourceLabel.site.length <= 200 &&
-        typeof message.sourceLabel?.title === "string" &&
-        message.sourceLabel.title.length > 0 &&
-        message.sourceLabel.title.length <= 200)) &&
+        isContextSourceLabel(message.sourceLabel))) &&
     typeof message.key === "string" &&
     /^en:[\p{L}\p{M}'-]+$/u.test(message.key) &&
     ["read", "save", "pin", "manual"].includes(message.action)
@@ -164,7 +183,9 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
               ...message,
               url: sender.url,
               sourceLabel:
-                sender.url === chrome.runtime.getURL("reader.html")
+                sender.url === chrome.runtime.getURL("reader.html") ||
+                (isYouTubeWatchPage(sender.url) &&
+                  isContextSourceLabel(message.sourceLabel))
                   ? message.sourceLabel
                   : undefined,
             },

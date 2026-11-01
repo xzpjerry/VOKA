@@ -131,13 +131,14 @@ export async function acquireCaptions(
   };
 }
 
-type MainRequestType = "tracks" | "enable" | "refetch" | "time";
+type MainRequestType = "tracks" | "enable" | "refetch" | "time" | "seek";
 type MainRequest = {
   source: "voka-yt-req";
   type: MainRequestType;
   requestId: string;
   languageCode?: string;
   kind?: string;
+  timeSeconds?: number;
 };
 type MainTimedText = TimedTextCapture & {
   source: "voka-yt";
@@ -162,6 +163,7 @@ export type YouTubeCaptionAdapter = CaptionAcquisitionAdapter & {
   inject: () => Promise<void>;
   tracks: () => Promise<{ tracks: CaptionTrack[]; videoId?: string }>;
   getCurrentTime: () => Promise<number>;
+  seekTo?: (timeSeconds: number) => Promise<void>;
   readCaptionText: () => string;
   clearTimedTextWaiters: () => void;
   dispose: () => void;
@@ -313,6 +315,9 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
         /* The local video value is a safe fallback if the page hook is changing. */
       }
       return doc.querySelector("video")?.currentTime ?? 0;
+    },
+    async seekTo(timeSeconds) {
+      await request("seek", { timeSeconds });
     },
     readCaptionText() {
       const container = doc.querySelector(".ytp-caption-window-container");
@@ -618,11 +623,13 @@ export function createYouTubeController(options: ControllerOptions) {
     activeCueSignature = signature;
     if (!cue) {
       line.root.hidden = true;
+      delete line.root.dataset.startMs;
       line.text.textContent = "";
       removeNativeCaptionStyle();
       return;
     }
     line.root.hidden = false;
+    line.root.dataset.startMs = String(cue.startMs);
     if (line.text.textContent !== cue.text) line.text.textContent = cue.text;
     hideNativeCaptions();
   }
@@ -759,7 +766,7 @@ export function createYouTubeController(options: ControllerOptions) {
         return;
       }
       const subtitle = createLine(player);
-      source = { kind: "dom", root: subtitle.root };
+      source = { kind: "dom", root: subtitle.root, listed: false };
       activeSession.addSource(source);
       if (acquisition.method !== 3) screenRecorder = undefined;
       startDisplayLoop();
@@ -890,6 +897,15 @@ export function createYouTubeController(options: ControllerOptions) {
     getCues: () => cues.map((cue) => ({ ...cue })),
     getMethod: () => method,
     getScope: () => scope,
+    seekTo(timeSeconds: number) {
+      if (!Number.isFinite(timeSeconds) || timeSeconds < 0) return;
+      if (adapter.seekTo) {
+        void adapter.seekTo(timeSeconds).catch(() => {});
+        return;
+      }
+      const video = uiDocument.querySelector("video");
+      if (video) video.currentTime = timeSeconds;
+    },
     addEventListener: events.addEventListener.bind(events),
     removeEventListener: events.removeEventListener.bind(events),
   };

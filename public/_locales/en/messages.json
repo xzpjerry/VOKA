@@ -412,5 +412,17 @@
   },
   "youtubeSubtitleClose": {
     "message": "Close VOKA subtitles"
+  },
+  "youtubeScopeWholeVideo": {
+    "message": "Whole video"
+  },
+  "youtubeScopePlayedPart": {
+    "message": "Played part only"
+  },
+  "youtubeSentenceChanged": {
+    "message": "The subtitles changed. Select the word again."
+  },
+  "youtubeSentenceTooShort": {
+    "message": "This line is too short. Choose another one."
   }
 }
