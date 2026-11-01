@@ -318,7 +318,7 @@ function start() {
           },
         );
         await session.start(document.body);
-        if (epoch === generation) running = true;
+        if (epoch === generation) { running = true; void drawerUI.checkUpgrade(); }
       } catch {
         status = "unreachable";
         if (epoch === generation) clear();

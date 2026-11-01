@@ -72,3 +72,11 @@ Settings and wizard step 2 offer manual toolbar activation (default), remembered
 Run `npm run check:scope` after building for Chrome for Testing checks against isolated Anki 8766. See [site-scope acceptance and native-permission UI limits](docs/research/site-scope-acceptance.md).
 
 Run `npx tsx scripts/check-scope-cold-start.ts` for deterministic cold-cache browser coverage; see [cold-start evidence and limitations](docs/research/site-scope-cold-start.md).
+
+## Gloss data upgrades
+
+When the bundled dictionary version changes, the drawer offers **释义数据有更新 · 查看**. Options has **检查释义数据更新**, and level-import previews show how many existing cards have updates. The separate upgrade preview selects untouched generated fields by default and keeps manually edited cards by default; compare your version with the new version and choose individual cards or a whole group before confirming.
+
+Only GlossNative, GlossTarget, Reading and their VokaMeta version/hashes are patched. Contexts, manual status, tags, decks and scheduling are preserved. Progress and individual outcomes are shown; checking again safely omits completed updates. A stale or expired preview requires another check.
+
+Run `npm run check:gloss-upgrade` after building for Chrome for Testing and T-29 acceptance on isolated 8766. It retains uniquely named test fixtures and screenshots; see [evidence and verification limits](docs/research/gloss-upgrade-acceptance.md).

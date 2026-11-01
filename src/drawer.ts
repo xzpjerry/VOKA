@@ -48,7 +48,21 @@ export function createDrawer(
   const arrow = document.createElement("span");
   arrow.className = "chevron";
   arrow.textContent = t("drawerExpand");
+  const updateLink = document.createElement("a");
+  updateLink.textContent = t("upgradeNotice");
+  updateLink.href = chrome.runtime.getURL("options.html?upgrade=1");
+  updateLink.target = "_blank";
+  updateLink.hidden = true;
+  updateLink.onclick = event => {
+    event.preventDefault(); event.stopPropagation();
+    void chrome.runtime.sendMessage({ type: "open-gloss-upgrade" });
+  };
   header.append(brand, summary, dueSlot, arrow);
+  const headerRow = document.createElement("div");
+  headerRow.style.cssText = "display:flex;align-items:center";
+  header.style.flex = "1";
+  updateLink.style.cssText = "font:inherit;max-width:45%;padding:8px 12px 8px 0";
+  headerRow.append(header, updateLink);
   const body = document.createElement("div");
   body.className = "drawer-body";
   body.id = "drawer-body";
@@ -156,9 +170,16 @@ export function createDrawer(
   }
   body.append(row, language, controls, tabs, list, empty);
   return {
-    header,
+    header: headerRow,
     body,
+    async checkUpgrade() {
+      try {
+        const response = await chrome.runtime.sendMessage({ type: "upgrade-summary" });
+        updateLink.hidden = !response?.data?.count;
+      } catch { updateLink.hidden = true; }
+    },
     update(tokens: Token[], config?: ReadingSettings, status = "ok") {
+      if (status !== "ok") updateLink.hidden = true;
       words = pageWords(tokens);
       render();
       connection.textContent = t(status === "ok" ? "connected" : "notRunning");

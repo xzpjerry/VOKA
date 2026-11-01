@@ -114,6 +114,7 @@
         <div id="importTarget" class="import-meta"></div>
         <div id="importCounts" class="import-meta"></div>
         <div id="importConflicts" class="import-meta"></div>
+        <div id="importUpgrade"></div>
         <div id="importSource" class="import-meta"></div>
         <progress id="importProgress" max="100" value="0" hidden></progress>
         <p id="importProgressText" role="status"></p>
@@ -127,8 +128,9 @@
       </fieldset>
       <fieldset id="updates" disabled>
         <h2>释义数据更新</h2>
-        <button disabled>检查释义数据更新</button>
-        <p>数据更新检查即将提供。</p>
+        <button id="checkUpgrade" type="button">检查释义数据更新</button>
+        <div id="upgradePreview"></div>
+        <pre id="upgradeStatus" role="status"></pre>
       </fieldset>
       <fieldset id="denylist" disabled>
         <h2>站点禁用名单</h2>

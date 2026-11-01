@@ -154,5 +154,44 @@
   },
   "rememberSiteDenied": {
     "message": "未获得权限，网站尚未记住。可以重试。"
+  },
+  "upgradeNotice": {
+    "message": "释义数据有更新 · 查看"
+  },
+  "upgradeCount": {
+    "message": "已有 {count} 张词卡的释义有更新"
+  },
+  "upgradeUnedited": {
+    "message": "你没改过的"
+  },
+  "upgradeEdited": {
+    "message": "你改过的"
+  },
+  "upgradeUseAll": {
+    "message": "整组改用新版"
+  },
+  "upgradeKeepAll": {
+    "message": "整组保留你的版本"
+  },
+  "upgradeUseNew": {
+    "message": "改用新版"
+  },
+  "upgradeYours": {
+    "message": "你的版本"
+  },
+  "upgradeNew": {
+    "message": "新版本"
+  },
+  "upgradeConfirm": {
+    "message": "确认更新所选词卡"
+  },
+  "upgradeChecking": {
+    "message": "正在检查释义数据…"
+  },
+  "upgradeProgress": {
+    "message": "释义更新进度"
+  },
+  "upgradeFinished": {
+    "message": "更新完成；回读确认"
   }
 }

@@ -1,0 +1,22 @@
+# Gloss data upgrade (issue #35 / T-29)
+
+Implemented a collection-wide, paginated scan of `tag:voka Key:en:*`, independent of deck/type names. Notes qualify only when their `VokaMeta.data` differs from bundled `DATA_VERSION` and at least one generated field differs from the pack's HTML-escaped output. Unknown/malformed metadata is reported and skipped. Hash equality for all three generated fields puts the note in “你没改过的”; any mismatch puts it in “你改过的”.
+
+The drawer offers a non-interrupting link to Options, Options has a check entry, and level-import previews show an existing-card update block. Preview groups provide individual selections and group-wide use-new/keep controls; edited notes default to keep. Both versions render as inert text, including Anki HTML. Confirmation is a separate action from level import.
+
+The background retains a server-owned, expiring preview token: callers submit only token and selected note IDs. Before writes it re-reads in batches of at most 100 and rejects changed generated fields/metadata/identity. Context saves and upgrade operations share a queue so extension operations cannot race their VokaMeta merges. Each `notes.update` patches exactly `GlossNative`, `GlossTarget`, `Reading`, `VokaMeta`; metadata merges preserve the pinned-context hash, extra hash keys, and every unrelated metadata key. Writes are never blindly retried: each outcome is verified by Key plus exact note ID and patched content. Failures are per-note, processing continues, progress is reported, and a fresh preview omits completed notes. A worker restart or 30-minute preview expiry asks for another read-only preview.
+
+## Verification
+
+- `npm run build && npm test`: passes (17 files, 134 tests). New unit coverage includes T-29 grouping, exact write allowlist, HTML escaping, stale previews, malformed metadata, native-English behavior, 202-note bounded reads/partial failures, lost write responses without resubmission, idempotency, and preservation of metadata extensions.
+- `npm run check:gloss-upgrade`: passes against **127.0.0.1:8766 only**, with Chrome for Testing 156. The script seeds 8766 in a temporary extension copy before install-time Options starts; it never contacts 8765 and never calls sync, scheduling, move, structure-edit, or delete APIs.
+- The script imports two notes into a uniquely named `VOKA::Gloss Upgrade Test <timestamp>::B1` deck/type, seeds an older metadata version, and hand-edits one native gloss through `notes.update`. All fixtures remain clearly named; the latest exact target/IDs and collection counts are in [result.json](gloss-upgrade-evidence/result.json).
+- Full collection snapshots before and after preview match, including every field, tag, note property, and card property. The unedited fixture defaults selected and the edited fixture defaults unselected.
+- Confirming only the unedited fixture changes only its three generated fields, metadata, and Anki's expected note modification timestamp. Its pin, pinned-context hash, extra metadata, contexts/sources, ManualStatus, Audio, tags, note type and card IDs remain unchanged. Every other collection note remains byte-for-byte equal, including the kept edited fixture. All cards match the before snapshot, including due, interval and repetition data.
+- Selecting use-new for the edited fixture updates it; a subsequent preview omits both upgraded fixtures. Browser checks cover the drawer link, settings entry, import-preview block, two groups, side-by-side content, defaults, and confirmation.
+
+Screenshots: [import preview/settings entry](gloss-upgrade-evidence/import-preview.png), [edited note kept by default](gloss-upgrade-evidence/edited-default-keep.png), [drawer notice](gloss-upgrade-evidence/drawer-notice.png). Chrome used the English UI catalog on this macOS host; Chinese strings are provided in the default locale.
+
+## Limits
+
+Real connection loss, a rejected write, and a 202-note upgrade are covered by deterministic unit tests, not induced in the live Anki collection. Mobile clients, sync transport, and a full production-sized collection were not exercised. The v1 update API offers no conditional-write primitive: external Anki edits during the interval between a batch read and its patch cannot be atomically excluded; edits visible at the fresh read are rejected and require re-preview. Review actions were not performed; existing card state was compared read-only. Early automation attempts left additional clearly named test decks/notes and changed only those owned fixtures; none were deleted.
