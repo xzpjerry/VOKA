@@ -2,6 +2,11 @@ import { t } from "./shared";
 import { isDueToday, type ReadingSettings, type Token } from "./reading";
 export const filters = ["target", "learning", "due", "missing", "all"] as const;
 export type Filter = (typeof filters)[number];
+export type PageWordSort = "first" | "frequency";
+const pageWordId = (token: Token) =>
+  token.recognized
+    ? token.key
+    : token.range.toString().toLocaleLowerCase("en");
 /** Keep the first occurrence in document order, including after incremental rescans. */
 export function pageWords(tokens: Token[]) {
   const sorted = [...tokens].sort((a, b) =>
@@ -9,13 +14,37 @@ export function pageWords(tokens: Token[]) {
   );
   const seen = new Set<string>();
   return sorted.filter((token) => {
-    const id = token.recognized
-      ? token.key
-      : token.range.toString().toLocaleLowerCase("en");
+    const id = pageWordId(token);
     if (seen.has(id)) return false;
     seen.add(id);
     return true;
   });
+}
+/** Count every token using the same identity as the deduplicated page word list. */
+export function pageWordCounts(tokens: Token[]) {
+  const counts = new Map<string, number>();
+  for (const token of tokens) {
+    const id = pageWordId(token);
+    counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  return counts;
+}
+/** `words` is already in first-appearance order; keep that order for frequency ties. */
+export function sortPageWords(
+  words: Token[],
+  counts: Map<string, number>,
+  order: PageWordSort,
+) {
+  return words
+    .map((token, index) => ({ token, index }))
+    .sort((a, b) =>
+      order === "frequency"
+        ? (counts.get(pageWordId(b.token)) ?? 0) -
+            (counts.get(pageWordId(a.token)) ?? 0) ||
+          a.index - b.index
+        : a.index - b.index,
+    )
+    .map(({ token }) => token);
 }
 export function matchesFilter(token: Token, filter: Filter) {
   if (filter === "all") return true;
@@ -33,7 +62,7 @@ export function createDrawer(
   onExpanded: () => void = () => {},
 ) {
   const style = document.createElement("style");
-  style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
+  style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-sort{display:flex;align-items:center;gap:8px;margin:8px 0}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
   root.append(style);
   const header = document.createElement("button");
   header.className = "drawer-toggle";
@@ -119,10 +148,31 @@ export function createDrawer(
   tabs.setAttribute("aria-label", t("drawerFilters"));
   const list = document.createElement("ul");
   list.className = "drawer-list";
+  const sortLabel = document.createElement("label");
+  sortLabel.className = "drawer-sort";
+  sortLabel.append(document.createTextNode(t("drawerSortLabel")));
+  const sortSelect = document.createElement("select");
+  sortSelect.name = "drawerSort";
+  for (const [value, key] of [
+    ["first", "drawerSortFirst"],
+    ["frequency", "drawerSortFrequency"],
+  ]) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = t(key);
+    sortSelect.append(option);
+  }
+  sortLabel.append(sortSelect);
   const empty = document.createElement("p");
   empty.textContent = t("drawerEmpty");
   let words: Token[] = [],
-    active: Filter = "target";
+    counts = new Map<string, number>(),
+    active: Filter = "target",
+    sortOrder: PageWordSort = "first";
+  sortSelect.onchange = () => {
+    sortOrder = sortSelect.value as PageWordSort;
+    render();
+  };
   const buttons = filters.map((filter) => {
     const button = document.createElement("button");
     button.dataset.filter = filter;
@@ -143,16 +193,26 @@ export function createDrawer(
       button.setAttribute("aria-pressed", String(active === filter));
     });
     list.replaceChildren();
-    for (const token of words.filter((word) => matchesFilter(word, active))) {
+    for (const token of sortPageWords(words, counts, sortOrder).filter((word) =>
+      matchesFilter(word, active),
+    )) {
       const item = document.createElement("li"),
         button = document.createElement("button"),
         detail = document.createElement("small");
       button.dataset.key = token.key;
-      button.append(
+      const wordLabel = document.createElement("span");
+      wordLabel.append(
         document.createTextNode(
           token.recognized ? token.entry.lemma : token.range.toString(),
         ),
+        document.createTextNode(
+          ` ${t("drawerCount").replace(
+            "{count}",
+            String(counts.get(pageWordId(token)) ?? 0),
+          )}`,
+        ),
       );
+      button.append(wordLabel);
       detail.textContent = [
         token.entry.level,
         token.entry.dictionaryStatus === "missing"
@@ -168,7 +228,7 @@ export function createDrawer(
     }
     empty.hidden = list.childElementCount > 0;
   }
-  body.append(row, language, controls, tabs, list, empty);
+  body.append(row, language, controls, tabs, sortLabel, list, empty);
   return {
     header: headerRow,
     body,
@@ -181,6 +241,7 @@ export function createDrawer(
     update(tokens: Token[], config?: ReadingSettings, status = "ok") {
       if (status !== "ok") updateLink.hidden = true;
       words = pageWords(tokens);
+      counts = pageWordCounts(tokens);
       render();
       connection.textContent = t(status === "ok" ? "connected" : "notRunning");
       summary.textContent =
@@ -198,7 +259,7 @@ export function createDrawer(
           ? t("dueSummary").replace("{count}", String(dueCount))
           : t("dueNone");
       dueSlot.hidden = status !== "ok";
-      for (const input of [gloss, advanced, hover])
+      for (const input of [gloss, advanced, hover, sortSelect])
         input.disabled = status !== "ok";
       if (config) {
         language.textContent =
