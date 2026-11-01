@@ -35,7 +35,8 @@ body {
 }
 
 .toolbar button,
-.toolbar select {
+.toolbar select,
+.toolbar input {
   min-height: 36px;
   padding: 6px 10px;
   border: 1px solid #aeb9c5;
@@ -57,6 +58,31 @@ body {
 
 .toolbar select {
   min-width: 0;
+}
+
+.toolbar input[type="number"] {
+  width: 72px;
+}
+
+.pdf-controls {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pdf-controls[hidden] {
+  display: none;
+}
+
+.pdf-controls label {
+  margin-left: 4px;
+}
+
+.pdf-controls button[aria-pressed="true"] {
+  border-color: #476d9c;
+  background: #e8f0fa;
 }
 
 #reader-status {
@@ -81,15 +107,95 @@ main {
   box-shadow: 0 2px 16px #192d401c;
 }
 
+#epub-frame[hidden],
+#pdf-reader[hidden],
+#pdf-placeholder[hidden] {
+  display: none;
+}
+
 #pdf-placeholder {
+  display: grid;
   width: min(100%, 1040px);
   height: 100%;
   margin: 0 auto;
-  padding: 40px;
+  padding: 40px 24px;
   background: #fff;
   box-shadow: 0 2px 16px #192d401c;
   font-size: 20px;
   text-align: center;
+  place-items: center;
+}
+
+#pdf-reader {
+  width: min(100%, 1040px);
+  height: 100%;
+  margin: 0 auto;
+  overflow: auto;
+  background: #e8edf2;
+  box-shadow: 0 2px 16px #192d401c;
+}
+
+#pdf-pages {
+  position: relative;
+  min-width: 100%;
+  padding: 16px 0 24px;
+}
+
+.pdf-page {
+  position: relative;
+  margin: 0 auto 20px;
+  background: #fff;
+  box-shadow: 0 2px 12px #192d4030;
+}
+
+.pdf-page canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.pdf-text-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: transparent;
+  opacity: 1;
+  line-height: 1;
+  text-align: initial;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  z-index: 2;
+}
+
+.pdf-text-layer :is(span, br) {
+  position: absolute;
+  color: transparent;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0 0;
+}
+
+.pdf-page-message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #ffffffeb;
+  color: #536271;
+  font-size: 18px;
+  text-align: center;
+  z-index: 3;
+}
+
+/* The PDF text stays transparent over the canvas; keep the due underline visible. */
+::highlight(voka-due) {
+  text-decoration-line: underline !important;
+  text-decoration-style: solid !important;
+  text-decoration-color: #8c5a00 !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
 }
 
 @media (max-width: 800px) {

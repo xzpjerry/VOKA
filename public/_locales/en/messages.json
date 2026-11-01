@@ -353,6 +353,39 @@
   "readerPdfSoon": {
     "message": "PDF support coming soon"
   },
+  "readerPdfLoading": {
+    "message": "Opening PDF…"
+  },
+  "readerPdfFileNoText": {
+    "message": "This PDF has no recognizable text layer and isn't supported."
+  },
+  "readerPdfPageNoText": {
+    "message": "This page has no recognizable text layer and isn't supported."
+  },
+  "readerPdfPageLabel": {
+    "message": "Page {number}"
+  },
+  "readerPdfPageNumberLabel": {
+    "message": "Page"
+  },
+  "readerPreviousPage": {
+    "message": "Previous page"
+  },
+  "readerNextPage": {
+    "message": "Next page"
+  },
+  "readerPdfZoom100": {
+    "message": "100%"
+  },
+  "readerPdfFitWidth": {
+    "message": "Fit width"
+  },
+  "readerPdfPageInput": {
+    "message": "Page number"
+  },
+  "readerPdfReaderLabel": {
+    "message": "PDF reader"
+  },
   "readerInvalidFile": {
     "message": "Unsupported file. Choose an EPUB or PDF."
   },
