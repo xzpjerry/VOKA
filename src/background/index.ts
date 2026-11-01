@@ -47,6 +47,34 @@ const reviewCardId = (value: unknown): value is string =>
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== chrome.runtime.id) return;
   if (
+    message?.type === "youtube-main-inject" &&
+    sender.tab?.id !== undefined &&
+    sender.url
+  ) {
+    let allowedPage = false;
+    try {
+      const pageUrl = new URL(sender.url);
+      allowedPage =
+        pageUrl.hostname === "www.youtube.com" &&
+        (pageUrl.pathname === "/watch" || pageUrl.pathname.startsWith("/shorts/"));
+    } catch {
+      allowedPage = false;
+    }
+    if (!allowedPage) {
+      reply({ error: "unsupported YouTube page" });
+      return;
+    }
+    chrome.scripting
+      .executeScript({
+        target: { tabId: sender.tab.id },
+        files: ["youtube-main.js"],
+        world: "MAIN",
+      })
+      .then(
+        () => reply({ ok: true }),
+        () => reply({ error: "main world injection failed" }),
+      );
+  } else if (
     message?.type === "request-access" &&
     sender.url?.split("?")[0] === chrome.runtime.getURL("options.html")
   ) {

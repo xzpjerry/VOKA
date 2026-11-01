@@ -771,5 +771,13 @@ export function createReadingSession(options: ReadingSessionOptions) {
 
   uiDocument.defaultView?.addEventListener("unload", destroy, { once: true });
 
-  return { start: refresh, stop, refresh, addSource, removeSource };
+  return {
+    start: refresh,
+    stop,
+    refresh,
+    addSource,
+    removeSource,
+    isRunning: () => running,
+    destroy,
+  };
 }

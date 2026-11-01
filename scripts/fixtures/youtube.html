@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>VOKA local YouTube fixture</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #111;
+        color: white;
+        font: 18px system-ui, sans-serif;
+      }
+      #movie_player {
+        position: relative;
+        width: min(900px, 90vw);
+        height: 506px;
+        margin: 48px auto;
+        background: #222;
+      }
+      #movie_player video {
+        width: 100%;
+        height: 100%;
+      }
+      .ytp-caption-window-container {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 80px;
+        text-align: center;
+      }
+      .ytp-caption-segment {
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="movie_player">
+      <video></video>
+      <div class="ytp-caption-window-container">
+        <span class="ytp-caption-segment">Native fixture caption</span>
+      </div>
+    </div>
+    <script>
+      const video = document.querySelector("video");
+      Object.defineProperty(video, "currentTime", {
+        configurable: true,
+        writable: true,
+        value: 1,
+      });
+
+      function timedTextUrl(videoId, lang, kind) {
+        const url = new URL("https://www.youtube.com/api/timedtext");
+        url.searchParams.set("v", videoId);
+        url.searchParams.set("pot", "fixture-proof-token");
+        url.searchParams.set("c", "WEB");
+        url.searchParams.set("ei", "fixture-player-param");
+        url.searchParams.set("lang", lang);
+        if (kind) url.searchParams.set("kind", kind);
+        url.searchParams.set("fmt", "srv3");
+        url.searchParams.set("tlang", "zh");
+        url.searchParams.set("keep", "fixture-value");
+        return url.toString();
+      }
+
+      function fixtureFor(videoId) {
+        const englishHuman = {
+          languageCode: "en",
+          name: { simpleText: "English" },
+          baseUrl: timedTextUrl(videoId, "en"),
+        };
+        const englishAuto = {
+          languageCode: "en-US",
+          kind: "asr",
+          name: { simpleText: "English (auto-generated)" },
+          baseUrl: timedTextUrl(videoId, "en-US", "asr"),
+        };
+        const otherLanguage = {
+          languageCode: "fr",
+          name: { simpleText: "French" },
+          baseUrl: timedTextUrl(videoId, "fr"),
+        };
+        const captions = {
+          fixture1: [englishHuman],
+          fixture2: [englishAuto],
+          fixture3: [otherLanguage],
+          fixture4: [],
+        }[videoId] ?? [];
+        return {
+          response: {
+            videoDetails: { videoId },
+            captions: { playerCaptionsTracklistRenderer: { captionTracks: captions } },
+          },
+          // fixture2 makes a concurrent wrong-language player request first so
+          // VOKA exercises the token-preserving English refetch path.
+          requestUrl:
+            videoId === "fixture2"
+              ? timedTextUrl(videoId, "fr", "asr")
+              : captions[0]?.baseUrl,
+        };
+      }
+
+      let fixture = fixtureFor(new URL(location.href).searchParams.get("v") || "fixture1");
+      window.__vokaFixtureResponse = fixture.response;
+      window.__vokaFixtureRequestUrl = fixture.requestUrl;
+      window.__vokaSelectedTrack = undefined;
+
+      const player = document.getElementById("movie_player");
+      player.getPlayerResponse = () => window.__vokaFixtureResponse;
+      player.loadModule = () => {};
+      player.setOption = (_module, _option, selected) => {
+        window.__vokaSelectedTrack = selected;
+        if (!window.__vokaFixtureRequestUrl) return;
+        if (new URL(location.href).searchParams.get("v") === "fixture1") {
+          const request = new XMLHttpRequest();
+          request.open("GET", window.__vokaFixtureRequestUrl);
+          request.send();
+        } else {
+          void fetch(window.__vokaFixtureRequestUrl, { credentials: "include" });
+        }
+      };
+
+      window.__vokaSetVideo = (videoId) => {
+        fixture = fixtureFor(videoId);
+        window.__vokaFixtureResponse = fixture.response;
+        window.__vokaFixtureRequestUrl = fixture.requestUrl;
+        video.currentTime = 1;
+        history.pushState({}, "", `/watch?v=${videoId}`);
+        window.dispatchEvent(new Event("yt-navigate-finish"));
+        document.dispatchEvent(new Event("yt-navigate-finish"));
+      };
+    </script>
+  </body>
+</html>
