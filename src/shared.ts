@@ -1,3 +1,4 @@
+import { parseUpgradeKept, type UpgradeKept } from "./upgrade-kept";
 import type { Settings, Status } from "./background/gateway";
 import {
   DEFAULT_DENY_SITES,
@@ -27,9 +28,10 @@ export type SiteSettings = {
   rememberedSites: string[];
 };
 export async function settings(): Promise<
-  Settings & ReadingSettings & SiteSettings & { storeFullUrl: boolean; testImportTarget?: TestImportTarget }
+  Settings & ReadingSettings & SiteSettings & { upgradeKept: UpgradeKept; storeFullUrl: boolean; testImportTarget?: TestImportTarget }
 > {
   const value = await chrome.storage.local.get({
+    upgradeKept: {},
     port: 8765,
     apiKey: "",
     nativeLanguage: "zh",
@@ -44,6 +46,7 @@ export async function settings(): Promise<
     rememberedSites: [],
   });
   return {
+    upgradeKept: parseUpgradeKept(value.upgradeKept),
     port:
       typeof value.port === "number" &&
       Number.isInteger(value.port) &&

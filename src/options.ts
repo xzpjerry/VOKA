@@ -1,3 +1,4 @@
+import { readUpgradeKept, clearUpgradeKept } from "./upgrade-kept";
 import { settings, check, t } from "./shared";
 import { mountUpgrade } from "./upgrade-ui";
 import { LEVELS, loadData, type Level } from "./data";
@@ -653,3 +654,22 @@ if (connected && new URLSearchParams(location.search).has("upgrade")) {
   await upgradeUI.preview();
   $("updates").scrollIntoView();
 }
+
+async function showKeptCount() {
+  const count = Object.keys(await readUpgradeKept()).length;
+  $("upgradeKeptCount").textContent = `已保留 ${count} 张词卡的更新`;
+  ($("resetUpgradeKept") as HTMLButtonElement).disabled = count === 0;
+}
+$("resetUpgradeKept").onclick = async () => {
+  await clearUpgradeKept();
+  await showKeptCount();
+  await upgradeUI.preview();
+  await showUpgradeSummary();
+};
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes.upgradeKept) {
+    void showKeptCount();
+    if (connected) void showUpgradeSummary();
+  }
+});
+void showKeptCount();

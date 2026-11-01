@@ -1,11 +1,11 @@
 {
   "target": {
-    "noteType": "VOKA Gloss Upgrade Test 1793502788610",
-    "deck": "VOKA::Gloss Upgrade Test 1793502788610::B1"
+    "noteType": "VOKA Gloss Upgrade Test 1793503136858",
+    "deck": "VOKA::Gloss Upgrade Test 1793503136858::B1"
   },
   "ids": [
-    "1793502788930",
-    "1793502788931"
+    "1793503137182",
+    "1793503137183"
   ],
   "groups": [
     "You haven’t edited · 128",
@@ -13,20 +13,22 @@
   ],
   "checked": [
     {
-      "id": "1793502788930",
+      "id": "1793503137182",
       "checked": true
     },
     {
-      "id": "1793502788931",
+      "id": "1793503137183",
       "checked": false
     }
   ],
-  "collectionNotes": 220,
-  "collectionCards": 220,
+  "collectionNotes": 224,
+  "collectionCards": 224,
   "verified": [
     "preview read only entire collection",
     "two groups/defaults",
-    "kept note untouched",
+    "kept note byte-for-byte untouched including modification time",
+    "confirmed keeps excluded from fresh preview, import-preview count, and drawer notice",
+    "settings reset restores kept updates",
     "selected updates only",
     "metadata pin/extra/hash preservation",
     "all card scheduling unchanged",

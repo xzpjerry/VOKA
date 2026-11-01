@@ -213,6 +213,30 @@ try {
       ?.scrollIntoView();
   }, ids);
   await page.screenshot({ path: `${evidence}/edited-default-keep.png` });
+  const reading = await browser.newPage();
+  await reading.goto(base);
+  const tabId = await worker.evaluate(
+    async (base) =>
+      (await chrome.tabs.query({})).find((t) => t.url?.startsWith(base))!.id!,
+    base,
+  );
+  await worker.evaluate(
+    (id) =>
+      chrome.scripting.executeScript({
+        target: { tabId: id },
+        files: ["content.js"],
+      }),
+    tabId,
+  );
+  await reading.waitForFunction(
+    () => {
+      const root = document.querySelector("#voka-drawer")?.shadowRoot;
+      const link = root?.querySelector<HTMLAnchorElement>('a[target="_blank"]');
+      return link && !link.hidden;
+    },
+    { timeout: 120000, polling: 100 },
+  );
+  await reading.screenshot({ path: `${evidence}/drawer-notice.png` });
   await page.$eval("#confirmUpgrade", (e: HTMLElement) => e.click());
   await page.waitForFunction(
     () =>
@@ -261,7 +285,19 @@ try {
     before.notes.find((n) => n.id === ids[1]),
     "kept edited note untouched",
   );
+  await reading.waitForFunction(() => {
+    const link = document.querySelector("#voka-drawer")?.shadowRoot?.querySelector<HTMLAnchorElement>('a[target="_blank"]');
+    return link?.hidden;
+  }, { timeout: 120000, polling: 100 });
   await page.$eval("#checkUpgrade", (e: HTMLElement) => e.click());
+  await page.waitForFunction(() => !!document.querySelector<HTMLButtonElement>("#confirmUpgrade")?.disabled,
+    { timeout: 120000, polling: 100 });
+  for (const id of ids) assert.equal(await page.$(`input[data-id="${id}"]`), null);
+  await page.waitForFunction(() => document.querySelector("#importUpgrade")?.textContent === "",
+    { timeout: 120000, polling: 100 });
+  const kept = await worker.evaluate(async () => (await chrome.storage.local.get("upgradeKept")).upgradeKept);
+  assert.equal(kept[ids[1]], DATA_VERSION);
+  await page.$eval("#resetUpgradeKept", (e: HTMLElement) => e.click());
   await page.waitForFunction(
     (id) => !!document.querySelector(`#upgradePreview input[data-id="${id}"]`),
     { timeout: 120000, polling: 100 },
@@ -297,30 +333,6 @@ try {
   );
   for (const id of ids)
     assert.equal(await page.$(`input[data-id="${id}"]`), null);
-  const reading = await browser.newPage();
-  await reading.goto(base);
-  const tabId = await worker.evaluate(
-    async (base) =>
-      (await chrome.tabs.query({})).find((t) => t.url?.startsWith(base))!.id!,
-    base,
-  );
-  await worker.evaluate(
-    (id) =>
-      chrome.scripting.executeScript({
-        target: { tabId: id },
-        files: ["content.js"],
-      }),
-    tabId,
-  );
-  await reading.waitForFunction(
-    () => {
-      const root = document.querySelector("#voka-drawer")?.shadowRoot;
-      const link = root?.querySelector<HTMLAnchorElement>('a[target="_blank"]');
-      return link && !link.hidden;
-    },
-    { timeout: 120000, polling: 100 },
-  );
-  await reading.screenshot({ path: `${evidence}/drawer-notice.png` });
   await writeFile(
     `${evidence}/result.json`,
     JSON.stringify(
@@ -334,7 +346,9 @@ try {
         verified: [
           "preview read only entire collection",
           "two groups/defaults",
-          "kept note untouched",
+          "kept note byte-for-byte untouched including modification time",
+          "confirmed keeps excluded from fresh preview, import-preview count, and drawer notice",
+          "settings reset restores kept updates",
           "selected updates only",
           "metadata pin/extra/hash preservation",
           "all card scheduling unchanged",

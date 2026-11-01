@@ -1,7 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { executeUpgrade, previewUpgrade, generatedFields } from "./upgrade";
 import { vokaMeta, contentHash } from "./import";
 import { DATA_VERSION, type Entry } from "../data";
+import { clearUpgradeKept, readUpgradeKept } from "../upgrade-kept";
+let local: Record<string, any>;
+beforeEach(() => {
+  local = {};
+  vi.stubGlobal("chrome", { storage: { local: {
+    get: async (defaults: object) => ({ ...defaults, ...structuredClone(local) }),
+    set: async (values: object) => { Object.assign(local, structuredClone(values)); },
+  } } });
+});
 const old: Entry = {
   lemma: "test",
   level: "B1",
@@ -117,8 +126,11 @@ describe("gloss upgrades", () => {
       );
     expect(rest(f.notes[0])).toEqual(rest(snapshot[0]));
     const rerun = await previewUpgrade(f.call, "zh", () => next);
-    expect(rerun.rows.map((r) => r.id)).toEqual(["1"]);
-    await executeUpgrade(f.call, rerun, ["1"]);
+    expect(rerun.rows).toEqual([]);
+    await clearUpgradeKept();
+    const restored = await previewUpgrade(f.call, "zh", () => next);
+    expect(restored.rows.map((r) => r.id)).toEqual(["1"]);
+    await executeUpgrade(f.call, restored, ["1"]);
     expect((await previewUpgrade(f.call, "zh", () => next)).rows).toHaveLength(
       0,
     );
@@ -160,4 +172,30 @@ describe("gloss upgrades", () => {
     expect(p.rows).toHaveLength(1);
     expect(p.rows[0].next.GlossNative).toBe("");
   });
+});
+
+it("records keeps only on confirmation, excludes the same version even after edits, and clears", async () => {
+  const f = await fixture();
+  f.notes[1].fields.GlossNative = "my meaning";
+  const p = await previewUpgrade(f.call, "zh", () => next);
+  expect(await readUpgradeKept()).toEqual({}); // Cancel/abandon preview records nothing.
+  const snapshot = structuredClone(f.notes);
+  await executeUpgrade(f.call, p, []);
+  expect(await readUpgradeKept()).toEqual({ "0": DATA_VERSION, "1": DATA_VERSION });
+  expect(f.notes).toEqual(snapshot);
+  expect(f.writes).toEqual([]);
+  f.notes[1].fields.GlossNative = "edited again";
+  expect((await previewUpgrade(f.call, "zh", () => next)).rows).toEqual([]);
+  await clearUpgradeKept();
+  expect(await readUpgradeKept()).toEqual({});
+  expect((await previewUpgrade(f.call, "zh", () => next)).rows).toHaveLength(2);
+});
+it("re-prompts older kept versions using the original hashes and prunes missing/nonmatching IDs", async () => {
+  const f = await fixture();
+  f.notes[0].fields.GlossNative = "my meaning";
+  local.upgradeKept = { "0": "previous-version", "1": DATA_VERSION, "999": DATA_VERSION };
+  f.notes[1].tags = [];
+  const p = await previewUpgrade(f.call, "zh", () => next);
+  expect(p.rows.map(r => [r.id, r.edited])).toEqual([["0", true]]);
+  expect(await readUpgradeKept()).toEqual({});
 });
