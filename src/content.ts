@@ -78,7 +78,8 @@ function start() {
   }, () => {
     if (running && lastDueReadAt && Date.now() - lastDueReadAt > 5 * 60 * 1000)
       void refresh();
-  }, (tokens) => reviewUI.start(tokens), reviewUI.element);
+  }, (tokens) => reviewUI.start(tokens), reviewUI.element,
+  (token, cardId) => reviewUI.practice(token, cardId));
   const tooltip = document.createElement("div");
   tooltip.setAttribute("role", "tooltip");
   tooltip.hidden = true;

@@ -214,6 +214,19 @@ export function fullCard(
     save.id = "voka-save-context";
     save.disabled = busy || duplicate || !sentence;
     card.append(save);
+    const firstCard = state?.cards[0];
+    if (view.exists && firstCard && !isDueToday(state)) {
+      const practice = button(t("practiceWord"), () => {
+        root.dispatchEvent(
+          new CustomEvent("voka-start-practice", {
+            detail: { token, cardId: firstCard.cardId },
+          }),
+        );
+        close();
+      });
+      practice.id = "voka-practice-word";
+      card.append(practice);
+    }
     if (view.contexts.length && !list)
       card.append(
         button("查看例句 / ★ 置顶", () => {
