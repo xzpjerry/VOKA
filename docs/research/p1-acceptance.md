@@ -32,7 +32,7 @@ On `127.0.0.1:8766`, make the mature Review fixture card due, open it from the d
 
 ## Page-state request count
 
-The initial fixture page-state read made **8 HTTP requests** to the AnkiConnect v1 endpoint. The method list was: `notes.search` ×1, `notes.getMany` ×1, `cards.search` ×2, `cards.getMany` ×1, and `scheduling.getDue` ×3. Note and card lookup used batched calls rather than one lookup per fixture word; the due checks were limited to Anki's due-card candidates. The monitor recorded no request to a non-test Anki port.
+The fixture load made **13 HTTP requests** to the AnkiConnect v1 endpoint across two batched page-state scans (the extension refreshed once after its initial scan). The method counts were: `notes.search` ×2, `notes.getMany` ×2, `cards.search` ×4, `cards.getMany` ×2, and `scheduling.getDue` ×3. Note and card lookups were batched rather than sent once per fixture word; the due checks were limited to Anki's due-card candidates. The monitor recorded no request to a non-test Anki port.
 
 ## Environment and commands
 
@@ -43,7 +43,7 @@ The initial fixture page-state read made **8 HTTP requests** to the AnkiConnect 
 - Node.js: `v26.9.0`
 - Test endpoint/deck: `127.0.0.1:8766`, `VOKA Test::P1`
 - `npm run build` — passed
-- `npm test` — passed, 29 files / 202 tests
+- `npm test` — passed, 30 files / 207 tests
 - `npm run check:p1` — exited 1 because of T-18 above; T-12 through T-17 passed and cleanup printed `CLEANUP OK`
 
 ## 人工检查清单（维护者）
