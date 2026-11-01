@@ -1,0 +1,14 @@
+# Toolbar popup acceptance (#65)
+
+Implemented `action.default_popup`: opening the menu injects the manual reading script with activeTab, with no optional permission request. The popup shows host/status, remembered-site toggle, deny-list explanation/removal, pause and settings, using English/Chinese catalogs and browser light/dark colors. The worker toolbar listener/cache, cold recovery, confirmation page and obsolete tests/strings are removed.
+
+Turning on requests permission synchronously inside the popup click, records the host and syncs persistent registrations. From manual scope it selects remembered scope. Turning off removes the remembered host, removes its origin permission and syncs registrations; all-sites scope also denies that host because a broad grant may remain. Deny-list matches disable the toggle while manual injection remains available. Pause invalidates pending reading work, stops the dynamic session and removes highlights; storage changes do not restart the paused page, while another manual invocation or reload can.
+
+Validation (2026-11-01, Chrome for Testing 156.0.8078.47):
+
+- `npm run build && npm test`: passed, 17 test files / 137 tests. New popup tests cover injection without permission, synchronous toggle request, denied grants, deny-list removal and unsupported-page controls; sites tests cover removal under a broad grant.
+- `npm run check:anki`: passed against **127.0.0.1:8766**, including read-only deck/type queries and unreachable-port classification. Started the isolated test instance because it was initially down. No Anki writes or sync were needed.
+- `npm run check:scope`: passed, using local `*.localhost` fixtures for remembered/all-sites registration, deny-listed manual reading, permission revocation, and default install permissions.
+- `npx tsx scripts/check-scope-cold-start.ts`: passed after a forced service-worker stop, exercising the actual popup module, manual injection, remembered reload, real highlight clearing on pause, continued pause across storage changes, off/revocation and no confirmation tab. Light/dark screenshots under `/tmp/voka-popup-{light,dark}.png` were visually inspected.
+
+Not verified: the physical toolbar click and resulting native activeTab grant, native permission Allow/Deny bubbles, OS/browser versions other than this Chrome for Testing, or real third-party accounts/sites. The cold-start harness opens the popup as an extension tab, redirects only its active-tab query to the fixture, and uses Chrome developerPrivate authorization plus a trusted permission-button click to supply host access. Permission refusal is covered by a unit test rather than the native dialog. Popup window dimensions are inferred from the page CSS rather than a native toolbar-window screenshot. The scripts keep large logs out of git and use no real websites.

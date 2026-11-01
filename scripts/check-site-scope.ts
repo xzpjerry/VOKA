@@ -351,7 +351,7 @@ try {
     autoRun: false,
     manualInjection: true,
     manualPath:
-      "chrome.scripting.executeScript with content.js, the same call the toolbar handler makes after its click; the toolbar icon click itself is not automatable in Puppeteer.",
+      "chrome.scripting.executeScript with content.js, the same call the popup makes when it opens; the toolbar icon click itself is not automatable in Puppeteer.",
   };
   evidence.t31.remembered = {
     autoRun: true,
@@ -469,7 +469,7 @@ try {
 
   evidence.limitations = [
     "The native Chrome extension permission bubble (Allow/Deny) cannot be clicked by Puppeteer; tests pre-authorize through Chrome's own extensions site-access backend and then exercise chrome.permissions.request from a trusted click.",
-    "The toolbar icon click cannot be synthesized by Puppeteer. The manual path is verified by calling the same chrome.scripting.executeScript({files:['content.js']}) injection that the action handler performs.",
+    "The toolbar icon click cannot be synthesized by Puppeteer. The manual path is verified by calling the same chrome.scripting.executeScript({files:['content.js']}) injection that the popup performs.",
     "Install-time host-prompt text and the All-sites warning text were checked in the settings/wizard DOM and manifest, not in Chrome's native install prompt.",
     "T-31 was verified on local *.localhost fixtures with the built-in deny list extended by deny.localhost; real Gmail/Outlook/WhatsApp accounts were not opened.",
   ];

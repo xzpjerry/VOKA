@@ -253,7 +253,9 @@ Options 页（首次安装向导 + 设置页）
    - 点工具栏图标才在当前页运行（**默认**，用 `activeTab` + `scripting`，没有安装警告）；
    - 记住启用过的网站（`optional_host_permissions` 运行时授权 + `scripting.registerContentScripts`）；
    - 所有网站（运行时申请 `<all_urls>`，说明 Chrome 会显示的权限提示）。
-   - `permissions.request` 必须在用户手势里调用。
+   - 点图标立即通过 popup 在本页手动运行，同时展示域名、状态、自动运行开关、本页暂停和设置入口；默认不申请额外站点权限。
+   - 记住网站由 popup 开关完成：开启时在 popup 自己的点击处理里同步调用 `permissions.request`，允许后记住并注册；默认手动模式转为记住模式。关闭时移除 rememberedSites 和该 origin 授权，重新同步注册；所有网站模式下同时将该主机加入禁用名单。
+   - 禁用名单仅阻止自动运行，开关显示原因并提供移除匹配条目；手动点图标仍运行。本页暂停停止会话并清除高亮，刷新后按站点规则恢复。
 3. **导入预览**：见 13.3。
 
 ### 13.2 设置页
@@ -272,6 +274,7 @@ Options 页（首次安装向导 + 设置页）
 ## 14. 权限
 
 - `manifest.json`：`background.service_worker`；`permissions`：`storage`、`activeTab`、`scripting`；`host_permissions`：`http://127.0.0.1/*`（实测不声明也能连通，因为 AnkiConnect 会回 CORS 头，但声明后不依赖这一点；上架时确认安装提示的文案）；`optional_host_permissions`：`*://*/*`。
+- `action.default_popup` 指向工具栏菜单；由 popup 打开时用 `activeTab` + `scripting.executeScript` 手动注入，不依赖 service worker 的 `action.onClicked`、缓存或冷启动确认页。
 - 不再需要 `sidePanel` 权限（界面改成页面内抽屉）。
 - 不发起任何翻译、语音、AI 云调用（P0 没有）。
 

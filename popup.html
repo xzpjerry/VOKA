@@ -1,0 +1,11 @@
+<!doctype html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VOKA</title>
+<style>
+:root{color-scheme:light dark;font:14px system-ui,sans-serif}body{width:300px;margin:0;padding:18px;background:Canvas;color:CanvasText}h1{font-size:17px;margin:0 0 8px;overflow-wrap:anywhere}p{line-height:1.5;color:GrayText}label{display:flex;align-items:center;gap:10px;line-height:1.5;margin:18px 0}input{accent-color:#5478db}button{font:inherit;padding:8px 12px;border:1px solid GrayText;border-radius:7px;background:ButtonFace;color:ButtonText;cursor:pointer;margin:4px 4px 0 0}button:disabled{cursor:default;opacity:.5}[hidden]{display:none!important}#feedback{min-height:1.5em}
+</style></head><body>
+<h1 id="host">VOKA</h1><p id="status" role="status"></p>
+<label><input id="auto" type="checkbox" role="switch" disabled><span id="autoLabel"></span></label>
+<p id="blocked" hidden></p><button id="removeDeny" hidden></button>
+<p id="feedback" role="status" aria-live="polite"></p>
+<button id="pause" disabled></button><button id="options"></button>
+<script type="module" src="/src/popup.ts"></script></body></html>
