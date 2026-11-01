@@ -124,7 +124,7 @@ P0 的取词、分句和高亮代码直接使用全局 `document`。EPUB 的章�
 ### 13.1 运行范围与权限
 
 - 只在 `www.youtube.com` 的 `/watch` 和 `/shorts/` 页面工作，沿用 P0 的按站点授权（用户在 YouTube 上点工具栏图标运行或记住该站点）。不新增必需权限。
-- 需要一段在页面主环境（MAIN world）里、`document_start` 时运行的小脚本，用来观察播放器自己的字幕请求；它只把字幕 cue（文字 + 起止时间）转给 VOKA 的内容脚本，不做别的。授权 YouTube 后用 `scripting.registerContentScripts` 注册，撤销授权时注销。
+- 需要一段在页面主环境（MAIN world）里、`document_start` 时运行的小脚本，用来观察播放器自己的字幕请求；它只把字幕 cue（文字 + 起止时间）转给 VOKA 的内容脚本，不做别的。VOKA 在 YouTube 页面启动阅读会话时用 `scripting.executeScript({world: "MAIN"})` 注入（可重复调用、只装一次）；因为是在注入之后才由 VOKA 打开字幕，播放器的字幕请求一定会被截到，所以单次授权（activeTab）模式也能用。
 - 不登录、不读取账号信息；字幕、视频 ID、标题不发往任何地方，只在页面内使用（保存例句时按 13.6 写进 Anki）。
 
 ### 13.2 取字幕（逐级回退）
