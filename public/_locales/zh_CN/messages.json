@@ -146,6 +146,12 @@
   "dueSummary": {
     "message": "· {count} 张今日到期"
   },
+  "reviewButton": {
+    "message": "复习"
+  },
+  "reviewNothingDue": {
+    "message": "本页没有今日到期的词，可以点词卡练习"
+  },
   "dueNone": {
     "message": "本页没有今日到期的词"
   },

@@ -146,6 +146,12 @@
   "dueSummary": {
     "message": "· {count} due today"
   },
+  "reviewButton": {
+    "message": "Review"
+  },
+  "reviewNothingDue": {
+    "message": "Nothing on this page is due today. You can practice any word from its card."
+  },
   "dueNone": {
     "message": "Nothing due today on this page"
   },

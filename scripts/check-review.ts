@@ -16,7 +16,7 @@ import { answerHtml, css, questionHtml } from "../src/data/template";
 import { submitReview } from "../src/background/review";
 
 const PORT = 8766;
-const TEST_DECK = "VOKA Test::80";
+const TEST_DECK = "VOKA Test::99";
 const config = { port: PORT, apiKey: "" };
 const call = (method: string, params = {}, write = false) =>
   rpc(config, method, params, { sideEffecting: write }) as Promise<any>;
@@ -315,6 +315,34 @@ try {
     return tabId;
   }
 
+  await inject("review-button");
+  await page.waitForFunction(() => {
+    const button = document
+      .getElementById("voka-drawer")
+      ?.shadowRoot?.querySelector('[data-slot="review-button"]') as HTMLButtonElement | null;
+    return !!button && !button.hidden;
+  });
+  await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    (root.querySelector('[data-slot="review-button"]') as HTMLButtonElement).click();
+  });
+  await page.waitForFunction(
+    () =>
+      !!document
+        .getElementById("voka-drawer")
+        ?.shadowRoot?.querySelector("#voka-review-question"),
+  );
+  const headerReviewStarted = await page.evaluate(() => {
+    const root = document.getElementById("voka-drawer")!.shadowRoot!;
+    return {
+      questionVisible: !!root.querySelector("#voka-review-question"),
+      expanded: root.querySelector(".drawer-toggle")?.getAttribute("aria-expanded"),
+    };
+  });
+  assert(headerReviewStarted.questionVisible, "header Review button did not start the due queue");
+  assert.equal(headerReviewStarted.expanded, "true", "header Review button must expand the drawer");
+
+  // Reload before T-14 so the existing due-summary assertion remains unchanged.
   await inject("t14");
   await page.waitForFunction(() => {
     const summary = document
@@ -645,6 +673,7 @@ try {
           "T-15: due recheck skips a card answered in Anki and creates no second review",
           "T-16: timeout readback confirms the accepted answer without retrying",
           "T-18: due underline disappears and page due count falls after grading",
+          "header Review button is visible, expands the drawer, and starts the due queue",
           "due summary and due-filter Start review entry points both open the queue",
         ],
       },
