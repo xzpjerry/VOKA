@@ -104,6 +104,9 @@
           fixture2: [englishAuto],
           fixture3: [otherLanguage],
           fixture4: [],
+          "fixture-ad": [englishHuman],
+          "fixture-prehook": [englishHuman],
+          "fixture-forced": [englishHuman],
         }[videoId] ?? [];
         return {
           response: {
@@ -127,10 +130,19 @@
       const player = document.getElementById("movie_player");
       player.getPlayerResponse = () => window.__vokaFixtureResponse;
       player.loadModule = () => {};
+      player.unloadModule = () => {};
+      let setOptionCalls = 0;
       player.setOption = (_module, _option, selected) => {
+        setOptionCalls++;
+        window.__vokaSetOptionCalls = setOptionCalls;
         window.__vokaSelectedTrack = selected;
         if (!window.__vokaFixtureRequestUrl) return;
-        if (new URL(location.href).searchParams.get("v") === "fixture1") {
+        const videoId = new URL(location.href).searchParams.get("v");
+        if (videoId === "fixture-prehook") return;
+        if (videoId === "fixture-forced" && selected?.languageCode && setOptionCalls === 1)
+          return;
+        if (!selected?.languageCode) return;
+        if (videoId === "fixture1" || videoId === "fixture-ad" || videoId === "fixture-forced") {
           const request = new XMLHttpRequest();
           request.open("GET", window.__vokaFixtureRequestUrl);
           request.send();
@@ -138,6 +150,19 @@
           void fetch(window.__vokaFixtureRequestUrl, { credentials: "include" });
         }
       };
+
+      const initialVideoId = new URL(location.href).searchParams.get("v") || "fixture1";
+      if (initialVideoId === "fixture-ad") {
+        player.classList.add("ad-showing");
+        window.setTimeout(() => player.classList.remove("ad-showing"), 10000);
+      }
+      if (initialVideoId === "fixture-prehook") {
+        window.__vokaPrehookReady = fetch(window.__vokaFixtureRequestUrl, {
+          credentials: "include",
+        }).then((response) => response.text());
+      } else {
+        window.__vokaPrehookReady = Promise.resolve("");
+      }
 
       window.__vokaSetVideo = (videoId) => {
         fixture = fixtureFor(videoId);

@@ -10,12 +10,25 @@ export type CaptionTrack = {
   name?: string;
 };
 
+export type TokenSource = "hook" | "resource-timing" | "none";
+
 export type TimedTextCapture = {
   url: string;
   lang?: string;
   kind?: string;
   body: string;
+  status?: number;
+  responseBytes?: number;
 };
+
+export function hasPlayerToken(rawUrl: string | undefined): boolean {
+  if (!rawUrl) return false;
+  try {
+    return new URL(rawUrl).searchParams.has("pot");
+  } catch {
+    return false;
+  }
+}
 
 export function parseJson3(body: string): CaptionCue[] {
   let data: unknown;

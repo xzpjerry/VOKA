@@ -5,11 +5,19 @@ let config: Record<string, unknown>;
 let granted: boolean;
 let request: ReturnType<typeof vi.fn>;
 let register: ReturnType<typeof vi.fn>;
+let unregister: ReturnType<typeof vi.fn>;
+let registered: Array<Record<string, unknown>>;
 beforeEach(() => {
   config = { siteScope: "remembered", rememberedSites: ["example.com"], denyList: ["mail.google.com"] };
   granted = true;
   request = vi.fn(async () => granted);
-  register = vi.fn(async () => {});
+  registered = [];
+  register = vi.fn(async (scripts: Array<Record<string, unknown>>) => {
+    registered.push(...scripts);
+  });
+  unregister = vi.fn(async ({ ids }: { ids: string[] }) => {
+    registered = registered.filter((script) => !ids.includes(String(script.id)));
+  });
   vi.stubGlobal("chrome", {
     storage: { local: {
       get: vi.fn(async (defaults) => ({ ...defaults, ...config })),
@@ -21,8 +29,9 @@ beforeEach(() => {
       getAll: vi.fn(async () => ({ origins: ["*://*/*"] })),
     },
     scripting: {
-      getRegisteredContentScripts: vi.fn(async () => []),
+      getRegisteredContentScripts: vi.fn(async () => registered),
       registerContentScripts: register,
+      unregisterContentScripts: unregister,
     },
   });
 });
@@ -62,6 +71,44 @@ it("registers remembered sites covered by a broader grant", async () => {
   expect(register).not.toHaveBeenCalled();
 });
 
+it("registers the YouTube MAIN hook early only while YouTube is remembered", async () => {
+  config.rememberedSites = ["www.youtube.com"];
+  await scheduleSiteSync();
+  const scripts = register.mock.calls[0][0];
+  expect(scripts).toContainEqual(expect.objectContaining({
+    id: "voka-youtube-main",
+    matches: ["https://www.youtube.com/*"],
+    js: ["youtube-main.js"],
+    runAt: "document_start",
+    world: "MAIN",
+    allFrames: false,
+  }));
+
+  const remove = vi.fn(async () => true);
+  (chrome.permissions as unknown as { remove: typeof remove }).remove = remove;
+  await forgetRememberedYouTube();
+  expect(unregister).toHaveBeenCalledWith({ ids: expect.arrayContaining(["voka-youtube-main"]) });
+});
+
+it("registers the YouTube MAIN hook in all-sites mode unless YouTube is denied", async () => {
+  config.siteScope = "all";
+  config.rememberedSites = [];
+  await scheduleSiteSync();
+  expect(register.mock.calls[0][0]).toContainEqual(expect.objectContaining({
+    id: "voka-youtube-main",
+    matches: ["https://www.youtube.com/*"],
+    world: "MAIN",
+    runAt: "document_start",
+  }));
+
+  config.denyList = ["www.youtube.com"];
+  register.mockClear();
+  await scheduleSiteSync();
+  expect(register.mock.calls.flatMap(([scripts]) => scripts)).not.toContainEqual(
+    expect.objectContaining({ id: "voka-youtube-main" }),
+  );
+});
+
 
 it("removes remembered access and denies this host when all-sites permission remains", async () => {
   const { forgetSite } = await import("./sites");
@@ -74,3 +121,8 @@ it("removes remembered access and denies this host when all-sites permission rem
   expect(remove).toHaveBeenCalledWith({ origins: ["*://example.com/*"] });
   expect(await shouldAutoRun("https://example.com/")).toBe(false);
 });
+
+async function forgetRememberedYouTube() {
+  const { forgetSite } = await import("./sites");
+  await forgetSite("www.youtube.com");
+}

@@ -402,10 +402,25 @@
     "message": "Resume playback when the pointer leaves subtitles"
   },
   "youtubeNoSubtitles": {
+    "message": "This video has no subtitles"
+  },
+  "youtubeNoEnglishSubtitles": {
+    "message": "This video has no English subtitles"
+  },
+  "youtubeNoReadableSubtitles": {
     "message": "No readable English subtitles for this video"
   },
+  "youtubeAdWaiting": {
+    "message": "Waiting for the ad to finish"
+  },
+  "youtubeDiagnosticYes": {
+    "message": "Yes"
+  },
+  "youtubeDiagnosticNo": {
+    "message": "No"
+  },
   "youtubeDiagnosticLine": {
-    "message": "Method $1 · $2 cues · $3"
+    "message": "Method $1 · $2 cues · $3 · Ad $4 · Token $5 · HTTP $6 · Length $7 bytes · Retry $8"
   },
   "youtubeDiagnosticOk": {
     "message": "OK"
