@@ -281,6 +281,9 @@
   "popupAuto": {
     "message": "Run automatically on {host}"
   },
+  "popupOpenReader": {
+    "message": "Open e-book / PDF…"
+  },
   "popupPause": {
     "message": "Pause this page"
   },
@@ -316,5 +319,47 @@
   },
   "popupPaused": {
     "message": "Paused on this page; reload to follow site rules"
+  },
+  "readerPageTitle": {
+    "message": "VOKA Reader"
+  },
+  "readerOpenFile": {
+    "message": "Open file"
+  },
+  "readerNoBook": {
+    "message": "No book open"
+  },
+  "readerContents": {
+    "message": "Contents"
+  },
+  "readerPreviousChapter": {
+    "message": "Previous chapter"
+  },
+  "readerNextChapter": {
+    "message": "Next chapter"
+  },
+  "readerChooseFile": {
+    "message": "Choose an EPUB or PDF file."
+  },
+  "readerLoading": {
+    "message": "Opening EPUB…"
+  },
+  "readerFileTooLarge": {
+    "message": "File is too large (100 MB limit)"
+  },
+  "readerExpandedTooLarge": {
+    "message": "File is too large (100 MB expanded limit)"
+  },
+  "readerPdfSoon": {
+    "message": "PDF support coming soon"
+  },
+  "readerInvalidFile": {
+    "message": "Unsupported file. Choose an EPUB or PDF."
+  },
+  "readerOpenFailed": {
+    "message": "Could not open this EPUB. Check that the file is valid."
+  },
+  "readerChapter": {
+    "message": "Chapter {number}"
   }
 }

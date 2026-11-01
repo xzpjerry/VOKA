@@ -17,6 +17,7 @@
     "check:dynamic": "tsx scripts/check-dynamic.ts",
     "check:due": "tsx scripts/check-due-today.ts",
     "check:practice": "tsx scripts/check-practice.ts",
+    "check:epub": "tsx scripts/check-epub.ts",
     "data:build": "python3 tools/data/build.py",
     "check:data": "tsx scripts/check-data.ts",
     "check:data:browser": "tsx scripts/check-data-browser.ts",
@@ -30,7 +31,6 @@
     "@types/chrome": "^0.1.24",
     "@types/node": "^26.6.6",
     "fflate": "0.8.3",
-    "foliate-js": "1.0.1",
     "happy-dom": "^21.0.4",
     "pdf-lib": "1.17.1",
     "pdfjs-dist": "6.4.299",
@@ -42,5 +42,8 @@
   },
   "engines": {
     "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
+  },
+  "dependencies": {
+    "foliate-js": "1.0.1"
   }
 }

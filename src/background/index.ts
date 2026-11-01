@@ -111,7 +111,14 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   } else if (
     message?.type === "card-context" &&
     sender.tab &&
-    /^https?:/.test(sender.url || "") &&
+    ((/^https?:/.test(sender.url || "")) ||
+      (sender.url === chrome.runtime.getURL("reader.html") &&
+        typeof message.sourceLabel?.site === "string" &&
+        message.sourceLabel.site.length > 0 &&
+        message.sourceLabel.site.length <= 200 &&
+        typeof message.sourceLabel?.title === "string" &&
+        message.sourceLabel.title.length > 0 &&
+        message.sourceLabel.title.length <= 200)) &&
     typeof message.key === "string" &&
     /^en:[\p{L}\p{M}'-]+$/u.test(message.key) &&
     ["read", "save", "pin", "manual"].includes(message.action)
@@ -125,7 +132,14 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
           const data = await cardContext(
             (method, params = {}, write = false) =>
               gatewayCall(config, method, params, { sideEffecting: write }),
-            { ...message, url: sender.url },
+            {
+              ...message,
+              url: sender.url,
+              sourceLabel:
+                sender.url === chrome.runtime.getURL("reader.html")
+                  ? message.sourceLabel
+                  : undefined,
+            },
             config,
           );
           reply({ data });

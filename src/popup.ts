@@ -13,6 +13,14 @@ let supported = false;
 let busy = false;
 element("pause").textContent = t("popupPause");
 element("options").textContent = t("popupOptions");
+const openReader = document.getElementById("openReader");
+if (openReader) {
+  openReader.textContent = t("popupOpenReader");
+  openReader.onclick = () => {
+    void chrome.tabs.create({ url: chrome.runtime.getURL("reader.html") })
+      .catch(() => { feedback.textContent = t("popupFailed"); });
+  };
+}
 remove.textContent = t("popupRemoveDeny");
 element("options").onclick = () => void chrome.runtime.openOptionsPage();
 
