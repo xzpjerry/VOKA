@@ -1,7 +1,12 @@
 // @vitest-environment happy-dom
 import { expect, it } from "vitest";
 import { extract as extractRaw, highlightRule } from "./reading";
-import { pageWords, matchesFilter } from "./drawer";
+import {
+  pageWords,
+  pageWordCounts,
+  sortPageWords,
+  matchesFilter,
+} from "./drawer";
 import { readFileSync } from "node:fs";
 import { createData } from "./data";
 const data = createData(
@@ -34,6 +39,34 @@ it("deduplicates inflected Keys, restores document order, and retains surface fo
   ]);
   expect(words[0].range.toString()).toBe("achieved");
   expect(words[1].range.toString()).toBe("Mxyz");
+});
+it("counts repeated recognized Keys and lowercased unrecognized surfaces", () => {
+  document.body.innerHTML = "<p>runs ran runs Mxyz mxyz</p>";
+  const runEntry = {
+    lemma: "run",
+    level: "B1",
+    GlossNative: "",
+    GlossTarget: "",
+  };
+  const tokens = extractRaw(document.body, (surface) =>
+    /^(runs|ran)$/i.test(surface)
+      ? { key: "en:run", entry: runEntry }
+      : null,
+  );
+  const counts = pageWordCounts(tokens);
+  expect(counts.get("en:run")).toBe(3);
+  expect(counts.get("mxyz")).toBe(2);
+});
+it("keeps first appearance order by default and breaks frequency ties by first appearance", () => {
+  document.body.innerHTML =
+    "<p>achieve advice afford advice achieve afford afford</p>";
+  const tokens = extract(document.body);
+  const words = pageWords(tokens);
+  const counts = pageWordCounts(tokens);
+  const keys = (order: "first" | "frequency") =>
+    sortPageWords(words, counts, order).map((token) => token.key);
+  expect(keys("first")).toEqual(["en:achieve", "en:advice", "en:afford"]);
+  expect(keys("frequency")).toEqual(["en:afford", "en:achieve", "en:advice"]);
 });
 it("keeps missing dictionary membership independent of highlight state and recalculates filters", () => {
   document.body.innerHTML = "<p>achieve advice mxyz</p>";

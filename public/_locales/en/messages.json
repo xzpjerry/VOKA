@@ -113,6 +113,18 @@
   "drawerEmpty": {
     "message": "No words"
   },
+  "drawerSortLabel": {
+    "message": "Sort by"
+  },
+  "drawerSortFirst": {
+    "message": "First appearance"
+  },
+  "drawerSortFrequency": {
+    "message": "Most frequent"
+  },
+  "drawerCount": {
+    "message": "×{count}"
+  },
   "drawerFilter_target": {
     "message": "Target"
   },

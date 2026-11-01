@@ -113,6 +113,18 @@
   "drawerEmpty": {
     "message": "暂无词汇"
   },
+  "drawerSortLabel": {
+    "message": "排序"
+  },
+  "drawerSortFirst": {
+    "message": "首次出现"
+  },
+  "drawerSortFrequency": {
+    "message": "出现次数"
+  },
+  "drawerCount": {
+    "message": "×{count}"
+  },
   "drawerFilter_target": {
     "message": "目标词"
   },
