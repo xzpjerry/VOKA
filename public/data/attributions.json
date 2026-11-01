@@ -186,9 +186,9 @@
       ],
       "byConfiguration": {
         "gpt-6-luna (effort max)": {
-          "batches": 311,
-          "retryBatches": 0,
-          "lemmas": 31081
+          "batches": 403,
+          "retryBatches": 1,
+          "lemmas": 40242
         },
         "deepseek/deepseek-flash": {
           "batches": 342,
@@ -200,12 +200,12 @@
       "promptSha256": "56cf4d1e5d64dc904dc4aab3ee42784a55da63cd365ec9581e22629ee0749a9b",
       "attribution": "VOKA-generated Simplified Chinese native glosses derived from Open English WordNet 2025 (CC BY 4.0; includes Princeton WordNet material). Generated with model(s) deepseek/deepseek-flash, gpt-6-luna (effort max) through Codex/OpenCode CLI on 2026-10-31; prompt SHA-256 56cf4d1e5d64dc904dc4aab3ee42784a55da63cd365ec9581e22629ee0749a9b. Modifications: generated per single-word OEWN lemma, grouped by OEWN POS, at most three senses per POS and at most ten Han characters per sense. Chinese text is VOKA's own; no ECDICT or Wiktionary data is included.",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "complete": false,
-      "entryCount": 65280,
+      "complete": true,
+      "entryCount": 74441,
       "sourceLemmaCount": 74441,
-      "missingCount": 9161,
-      "rawBytes": 2726087,
-      "gzipBytes": 873303
+      "missingCount": 0,
+      "rawBytes": 3007109,
+      "gzipBytes": 969513
     }
   ],
   "notices": {

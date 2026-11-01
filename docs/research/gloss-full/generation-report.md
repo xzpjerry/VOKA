@@ -1,22 +1,22 @@
 # Native gloss generation report (#30)
 
-Generated 65,280 / 74,441 OEWN lemmas; 9,161 missing. Pack complete: False. Data version: en-2026.10.1.
+Generated 74,441 / 74,441 OEWN lemmas; 0 missing. Pack complete: True. Data version: en-2026.10.1.
 
-Pack size: 2,726,087 bytes raw / 873,303 bytes gzip.
+Pack size: 3,007,109 bytes raw / 969,513 bytes gzip.
 
-Processed-word format-valid rate: 99.9694%; remaining format violations: 20 (0.0306%). Unprocessed words: 9,141; coverage and format compliance are separate measures.
+Processed-word format-valid rate: 100.0000%; remaining format violations: 0 (0.0000%). Unprocessed words: 0; coverage and format compliance are separate measures.
 
 | Model / effort | Round-0 batches | Retry batches | Valid lemmas |
 |---|---:|---:|---:|
-| gpt-6-luna (effort max) | 311 | 0 | 31081 |
+| gpt-6-luna (effort max) | 403 | 1 | 40242 |
 | deepseek/deepseek-flash | 342 | 0 | 34199 |
 
 Timing from cached requests (parallel call durations overlap):
 
-- gpt-6-luna (effort max): 16,526.830 cumulative call seconds; 4,158.126 elapsed seconds from first to last cached result.
+- gpt-6-luna (effort max): 21,036.072 cumulative call seconds; 5,319.688 elapsed seconds from first to last cached result.
 - deepseek/deepseek-flash: 14,482.881 cumulative call seconds; 2,042.925 elapsed seconds from first to last cached result.
 
-This assembly invocation took 0.872 seconds. Elapsed envelopes include pauses between calls and exclude failed attempts that produced no cache record.
+This assembly invocation took 0.868 seconds. Elapsed envelopes include pauses between calls and exclude failed attempts that produced no cache record.
 
 The unchanged pilot prompt and validator require exact POS coverage, one to three distinct senses per POS, and one to ten Han characters per sense. Two retry rounds are allowed; an assemble-only snapshot does not generate retries.
 

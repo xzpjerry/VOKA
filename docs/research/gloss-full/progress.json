@@ -1,22 +1,22 @@
 {
-  "status": "partial",
-  "generatedAt": "2026-10-31T14:54:54.311727+00:00",
+  "status": "complete",
+  "generatedAt": "2026-10-31T15:15:05.507441+00:00",
   "models": [
     "deepseek/deepseek-flash",
     "gpt-6-luna"
   ],
   "batchSize": 100,
   "batchesTotal": 745,
-  "batchesCached": 653,
-  "batchesRemaining": 92,
+  "batchesCached": 745,
+  "batchesRemaining": 0,
   "lemmasTotal": 74441,
-  "lemmasDone": 65280,
-  "lemmasMissing": 9161,
+  "lemmasDone": 74441,
+  "lemmasMissing": 0,
   "byConfiguration": {
     "gpt-6-luna (effort max)": {
-      "batches": 311,
-      "retryBatches": 0,
-      "lemmas": 31081
+      "batches": 403,
+      "retryBatches": 1,
+      "lemmas": 40242
     },
     "deepseek/deepseek-flash": {
       "batches": 342,
@@ -26,8 +26,8 @@
   },
   "timingByConfiguration": {
     "gpt-6-luna (effort max)": {
-      "callSeconds": 16526.83,
-      "elapsedEnvelopeSeconds": 4158.126
+      "callSeconds": 21036.072,
+      "elapsedEnvelopeSeconds": 5319.688
     },
     "deepseek/deepseek-flash": {
       "callSeconds": 14482.881,
@@ -40,10 +40,10 @@
       "lemmas": 34199
     },
     "gpt-6-luna": {
-      "batches": 311,
-      "lemmas": 31081
+      "batches": 403,
+      "lemmas": 40242
     }
   },
   "resumeCommand": "python3 tools/gloss/generate.py --model gpt-6-luna --effort max --timeout 1800 --workers 4 --batch-size 100",
-  "note": "Partial pack for development; missing native glosses fall back to GlossTarget."
+  "note": "Complete pack."
 }
