@@ -24,13 +24,17 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.1.24",
+    "@types/node": "^26.6.6",
+    "fflate": "0.8.3",
+    "foliate-js": "1.0.1",
     "happy-dom": "^21.0.4",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "6.4.299",
     "puppeteer": "^25.16.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
-    "vitest": "^5.0.5",
-    "@types/node": "^26.6.6"
+    "vitest": "^5.0.5"
   },
   "engines": {
     "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
