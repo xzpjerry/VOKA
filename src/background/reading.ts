@@ -11,7 +11,8 @@ export async function pageStates(
   const unique = [...new Set(keys)];
   for (let offset = 0; offset < unique.length; offset += 100) {
     const batch = unique.slice(offset, offset + 100);
-    const query = `note:${quote(DEFAULT_TARGET.noteType)} (${batch.map((k) => quote("Key:" + k)).join(" or ")})`;
+    const keyFilter = `(${batch.map((k) => quote("Key:" + k)).join(" or ")})`;
+    const query = `note:${quote(DEFAULT_TARGET.noteType)} ${keyFilter}`;
     const notes: any[] = [];
     let cursor: string | undefined;
     do {
@@ -37,8 +38,9 @@ export async function pageStates(
       cursor = result.nextCursor ?? undefined;
     } while (cursor);
     const cards: any[] = [];
+    const dueTodayByCard = new Map<string, boolean>();
     cursor = undefined;
-    if (notes.length)
+    if (notes.length) {
       do {
         const result = await call("cards.search", {
           query,
@@ -63,6 +65,28 @@ export async function pageStates(
         }
         cursor = result.nextCursor ?? undefined;
       } while (cursor);
+      const dueIds = new Set<string>();
+      cursor = undefined;
+      do {
+        const result = await call("cards.search", {
+          query: `note:${quote(DEFAULT_TARGET.noteType)} is:due ${keyFilter}`,
+          limit: 1000,
+          ...(cursor ? { cursor } : {}),
+        });
+        for (const id of result.ids) dueIds.add(String(id));
+        cursor = result.nextCursor ?? undefined;
+      } while (cursor);
+      const candidates = [...dueIds];
+      for (let start = 0; start < candidates.length; start += 20) {
+        const due = await Promise.all(
+          candidates.slice(start, start + 20).map(async (cardId) => {
+            const result = await call("scheduling.getDue", { cardId });
+            return [cardId, result.dueNow === true] as const;
+          }),
+        );
+        for (const [cardId, isDue] of due) dueTodayByCard.set(cardId, isDue);
+      }
+    }
     for (const note of notes) {
       // Conflicting duplicate Keys must not silently select one note.
       if (notes.filter((n) => n.fields.Key === note.fields.Key).length !== 1)
@@ -74,7 +98,11 @@ export async function pageStates(
           ?.split("::")[2],
         cards: cards
           .filter((c) => note.cardIds.includes(c.id))
-          .map((c) => c.scheduling),
+          .map((c) => ({
+            cardId: String(c.id),
+            ...c.scheduling,
+            dueToday: dueTodayByCard.get(String(c.id)) === true,
+          })),
       };
     }
   }

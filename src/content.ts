@@ -3,7 +3,7 @@ import { DynamicReading } from "./dynamic-reading";
 import { fullCard } from "./full-card";
 import { createHighlightRegistry } from "./highlight-registry";
 import { normalizeKey } from "./key";
-import { containsPoint, excluded, type Token } from "./reading";
+import { containsPoint, excluded, isDueToday, type Token } from "./reading";
 import { check, settings, t } from "./shared";
 import {
   gloss,
@@ -49,6 +49,7 @@ function start() {
   const retry = document.createElement("button");
   retry.textContent = t("retry");
   const registry = createHighlightRegistry(document);
+  let lastDueReadAt = 0;
   const drawerUI = createDrawer(root, summary, retry, (token) => {
     token.range.startContainer.parentElement?.scrollIntoView({
       block: "center",
@@ -65,6 +66,9 @@ function start() {
       registry.set("voka-flash", [token.range]);
       setTimeout(() => registry.clear("voka-flash"), 900);
     }
+  }, () => {
+    if (running && lastDueReadAt && Date.now() - lastDueReadAt > 5 * 60 * 1000)
+      void refresh();
   });
   const tooltip = document.createElement("div");
   tooltip.setAttribute("role", "tooltip");
@@ -74,7 +78,7 @@ function start() {
   root.append(tooltip);
   const pageStyle = document.createElement("style");
   pageStyle.textContent =
-    "::highlight(voka-flash){background:#ffad45;color:inherit}::highlight(voka-target){background:#ffe89a;color:inherit}::highlight(voka-learning){background:#c9e4ff;color:inherit}::highlight(voka-unknown){background:#ffc9c9;color:inherit}::highlight(voka-weak){background:#fff4cf;color:inherit}";
+    "::highlight(voka-flash){background:#ffad45;color:inherit}::highlight(voka-target){background:#ffe89a;color:inherit}::highlight(voka-learning){background:#c9e4ff;color:inherit}::highlight(voka-unknown){background:#ffc9c9;color:inherit}::highlight(voka-weak){background:#fff4cf;color:inherit}::highlight(voka-due){text-decoration:underline solid 2px;text-underline-offset:3px}";
   host.append(pageStyle);
   const styles: HighlightStyle[] = ["target", "learning", "unknown", "weak"];
   let paused = false;
@@ -135,7 +139,7 @@ function start() {
       ) ?? [];
     const token = candidates.find(
       (t) =>
-        (all || t.style !== null) &&
+        (all || t.style !== null || t.dueMarked === true) &&
         t.range.startContainer.isConnected &&
         !excluded(t.range.startContainer.parentElement) &&
         Array.from(t.range.getClientRects()).some((r) =>
@@ -168,6 +172,7 @@ function start() {
     drawerUI.update([], config, "unreachable");
     tooltip.hidden = true;
     for (const name of styles) registry.clear("voka-" + name);
+    registry.clear("voka-due");
   }
   document.addEventListener("mousemove", (event) => {
     const token = running
@@ -194,6 +199,13 @@ function start() {
         : "");
     tooltip.textContent =
       token.entry.lemma + " · " + text.replace(/\s+/g, " ").trim();
+    if (isDueToday(state)) {
+      const badge = document.createElement("span");
+      badge.textContent = t("dueToday");
+      badge.style.cssText =
+        "display:inline-block;margin-left:8px;padding:1px 6px;border-radius:10px;background:#fff;color:#17212b;font-size:11px";
+      tooltip.append(badge);
+    }
     tooltip.style.left =
       Math.max(
         12,
@@ -280,6 +292,7 @@ function start() {
           HighlightStyle,
           { add(range: Range): void; delete(range: Range): void }
         >;
+        const dueHighlight = registry.set("voka-due");
         session = new DynamicReading(
           config,
           highlights,
@@ -315,9 +328,14 @@ function start() {
             }
             return matches;
           },
+          dueHighlight,
         );
         await session.start(document.body);
-        if (epoch === generation) { running = true; void drawerUI.checkUpgrade(); }
+        if (epoch === generation) {
+          lastDueReadAt = Date.now();
+          running = true;
+          void drawerUI.checkUpgrade();
+        }
       } catch {
         status = "unreachable";
         if (epoch === generation) clear();

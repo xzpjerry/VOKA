@@ -14,6 +14,7 @@
     "check:highlight": "tsx scripts/check-highlight.ts",
     "check:manual": "tsx scripts/check-manual.ts",
     "check:dynamic": "tsx scripts/check-dynamic.ts",
+    "check:due": "tsx scripts/check-due-today.ts",
     "data:build": "python3 tools/data/build.py",
     "check:data": "tsx scripts/check-data.ts",
     "check:data:browser": "tsx scripts/check-data-browser.ts",

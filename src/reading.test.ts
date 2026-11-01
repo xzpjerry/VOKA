@@ -2,6 +2,8 @@
 import { describe, it, expect } from "vitest";
 import {
   highlightRule,
+  isDueToday,
+  dueMarker,
   excluded,
   extract as extractRaw,
   containsPoint,
@@ -46,7 +48,7 @@ const state = (
   intervalDays = 0,
   queue = type,
   ManualStatus = "",
-) => ({ fields: { ManualStatus }, cards: [{ type, queue, intervalDays }] });
+) => ({ fields: { ManualStatus }, cards: [{ cardId: "1", type, queue, intervalDays, dueToday: false }] });
 describe("highlight precedence", () => {
   it("manual judgments beat scheduling and level", () => {
     expect(
@@ -79,6 +81,71 @@ describe("highlight precedence", () => {
     expect(highlightRule("C1", config)).toBeNull();
     expect(highlightRule("C1", { ...config, showAdvanced: true })).toBe("weak");
     expect(highlightRule(undefined, config)).toBeNull();
+  });
+});
+describe("due today markers", () => {
+  it("marks due mature reviews without changing the existing highlight rule", () => {
+    const mature = {
+      fields: {},
+      cards: [
+        {
+          cardId: "mature",
+          type: "review",
+          queue: "review",
+          intervalDays: 21,
+          dueToday: true,
+        },
+      ],
+    };
+    expect(highlightRule("B1", config, mature)).toBeNull();
+    expect(isDueToday(mature)).toBe(true);
+    expect(dueMarker("B1", config, mature)).toBe(true);
+  });
+  it("keeps known due words in the due count but suppresses their marker", () => {
+    const known = {
+      fields: { ManualStatus: "known" },
+      cards: [
+        {
+          cardId: "known",
+          type: "review",
+          queue: "review",
+          intervalDays: 3,
+          dueToday: true,
+        },
+      ],
+    };
+    expect(isDueToday(known)).toBe(true);
+    expect(dueMarker("B1", config, known)).toBe(false);
+  });
+  it("ignores suspended due cards and New cards", () => {
+    const suspended = {
+      fields: {},
+      cards: [
+        {
+          cardId: "suspended",
+          type: "review",
+          queue: "suspended",
+          intervalDays: 3,
+          dueToday: true,
+        },
+      ],
+    };
+    const fresh = {
+      fields: {},
+      cards: [
+        {
+          cardId: "new",
+          type: "new",
+          queue: "new",
+          intervalDays: 0,
+          dueToday: false,
+        },
+      ],
+    };
+    expect(isDueToday(suspended)).toBe(false);
+    expect(dueMarker("B1", config, suspended)).toBe(false);
+    expect(isDueToday(fresh)).toBe(false);
+    expect(dueMarker("B1", config, fresh)).toBe(false);
   });
 });
 describe("extraction privacy", () => {
@@ -145,6 +212,9 @@ describe("range hit testing", () => {
       ] as unknown as DOMRectList;
     expect(hitTest([token], 5, 5, "highlighted")).toBeUndefined();
     expect(hitTest([token], 5, 5, "all")).toBe(token);
+    token.dueMarked = true;
+    expect(hitTest([token], 25, 15, "highlighted")).toBe(token);
+    token.dueMarked = false;
     token.style = "target";
     expect(hitTest([token], 25, 15, "highlighted")).toBe(token);
     expect(hitTest([token], 15, 5, "all")).toBeUndefined();

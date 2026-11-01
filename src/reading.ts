@@ -11,7 +11,13 @@ export type ReadingSettings = {
   showAdvanced: boolean;
   hoverScope: "highlighted" | "all";
 };
-export type CardState = { type: string; queue: string; intervalDays: number };
+export type CardState = {
+  cardId: string;
+  type: string;
+  queue: string;
+  intervalDays: number;
+  dueToday: boolean;
+};
 export type WordState = {
   fields: Record<string, string>;
   cards: CardState[];
@@ -47,6 +53,26 @@ export function highlightRule(
     config.showAdvanced
     ? "weak"
     : null;
+}
+/** True when Anki confirms at least one active card is due right now. */
+export function isDueToday(state?: WordState): boolean {
+  return (
+    state?.cards.some(
+      (card) =>
+        card.dueToday &&
+        !["suspended", "buriedByScheduler", "buriedByUser"].includes(
+          card.queue,
+        ),
+    ) ?? false
+  );
+}
+/** The due underline is independent of level highlights and respects known. */
+export function dueMarker(
+  _level: string | undefined,
+  _config: Pick<ReadingSettings, "targetLevel" | "showAdvanced">,
+  state?: WordState,
+): boolean {
+  return isDueToday(state) && state?.fields.ManualStatus !== "known";
 }
 export interface Lemmatizer {
   candidates(surface: string): string[];
@@ -108,6 +134,8 @@ export type Token = {
   recognized: boolean;
   range: Range;
   style: HighlightStyle | null;
+  state?: WordState;
+  dueMarked?: boolean;
 };
 export function extract(
   root: Node,
@@ -172,7 +200,9 @@ export function hitTest(
   return tokens.find(
     (token) =>
       token.range.startContainer.isConnected &&
-      ((scope === "all" && token.recognized) || token.style !== null) &&
+      ((scope === "all" && token.recognized) ||
+        token.style !== null ||
+        token.dueMarked === true) &&
       Array.from(token.range.getClientRects()).some((rect) =>
         containsPoint(rect, x, y),
       ) &&

@@ -1,5 +1,6 @@
 import {
   extract,
+  dueMarker,
   highlightRule,
   type Token,
   type WordState,
@@ -27,6 +28,7 @@ export class DynamicReading {
   private stopped = false;
   private draining = false;
   private timer?: ReturnType<typeof setTimeout>;
+  private dueMarks = new WeakSet<Range>();
   constructor(
     private config: ReadingSettings,
     private highlights: Record<HighlightStyle, HighlightSet>,
@@ -36,6 +38,7 @@ export class DynamicReading {
     private resolve?: (
       words: string[],
     ) => Promise<Record<string, { key: string; entry: Token["entry"]; candidates?: Token["entry"][] }>>,
+    private dueHighlight?: HighlightSet,
   ) {}
   get tokens() {
     return [...this.blocks.values()].flat();
@@ -59,10 +62,13 @@ export class DynamicReading {
       const matching = tokens.filter((token) => token.key === key);
       if (!matching.length) continue;
       touched = true;
-      for (const token of matching)
+      for (const token of matching) {
         if (token.style) this.highlights[token.style].delete(token.range);
+        this.clearDue(token);
+      }
       for (const token of matching) {
         const state = this.states[key];
+        token.state = state;
         if (state) {
           token.recognized = true;
           token.entry = {
@@ -76,9 +82,23 @@ export class DynamicReading {
           state,
         );
         if (token.style) this.highlights[token.style].add(token.range);
+        this.markDue(token, state);
       }
     }
     if (touched) this.changed(this.tokens);
+  }
+  private clearDue(token: Token) {
+    if (this.dueMarks.has(token.range)) {
+      this.dueHighlight?.delete(token.range);
+      this.dueMarks.delete(token.range);
+    }
+    token.dueMarked = false;
+  }
+  private markDue(token: Token, state?: WordState) {
+    token.dueMarked = dueMarker(token.entry.level, this.config, state);
+    if (!this.dueHighlight || !token.dueMarked) return;
+    this.dueHighlight.add(token.range);
+    this.dueMarks.add(token.range);
   }
   /** Replace every occurrence of this surface, including future incremental scans. */
   choose(surface: string, match: { key: string; entry: Token["entry"] }) {
@@ -92,8 +112,10 @@ export class DynamicReading {
     this.refresh(match.key);
   }
   private remove(block: Element) {
-    for (const token of this.blocks.get(block) ?? [])
+    for (const token of this.blocks.get(block) ?? []) {
       if (token.style) this.highlights[token.style].delete(token.range);
+      this.clearDue(token);
+    }
     this.blocks.delete(block);
   }
   private enqueue(block: Element) {
@@ -216,6 +238,7 @@ export class DynamicReading {
           this.remove(block);
           for (const token of tokens) {
             const state = this.states[token.key];
+            token.state = state;
             if (state) {
               token.recognized = true;
               token.entry = {
@@ -229,6 +252,7 @@ export class DynamicReading {
               state,
             );
             if (token.style) this.highlights[token.style].add(token.range);
+            this.markDue(token, state);
           }
           this.blocks.set(block, tokens);
         }
