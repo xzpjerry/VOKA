@@ -1,6 +1,7 @@
 import { createDrawer } from "./drawer";
 import { DynamicReading } from "./dynamic-reading";
 import { fullCard } from "./full-card";
+import { createHighlightRegistry } from "./highlight-registry";
 import { normalizeKey } from "./key";
 import { containsPoint, excluded, type Token } from "./reading";
 import { check, settings, t } from "./shared";
@@ -47,6 +48,7 @@ function start() {
   summary.setAttribute("role", "status");
   const retry = document.createElement("button");
   retry.textContent = t("retry");
+  const registry = createHighlightRegistry(document);
   const drawerUI = createDrawer(root, summary, retry, (token) => {
     token.range.startContainer.parentElement?.scrollIntoView({
       block: "center",
@@ -59,9 +61,9 @@ function start() {
         cancelable: true,
       }),
     );
-    if (unclaimed && registry && HighlightCtor) {
-      registry.set("voka-flash", new HighlightCtor(token.range));
-      setTimeout(() => registry.delete("voka-flash"), 900);
+    if (unclaimed && registry.available) {
+      registry.set("voka-flash", [token.range]);
+      setTimeout(() => registry.clear("voka-flash"), 900);
     }
   });
   const tooltip = document.createElement("div");
@@ -74,11 +76,6 @@ function start() {
   pageStyle.textContent =
     "::highlight(voka-flash){background:#ffad45;color:inherit}::highlight(voka-target){background:#ffe89a;color:inherit}::highlight(voka-learning){background:#c9e4ff;color:inherit}::highlight(voka-unknown){background:#ffc9c9;color:inherit}::highlight(voka-weak){background:#fff4cf;color:inherit}";
   host.append(pageStyle);
-  type Registry = Map<string, unknown>;
-  const registry = (CSS as unknown as { highlights: Registry }).highlights;
-  const HighlightCtor = (
-    globalThis as unknown as { Highlight: new (...ranges: Range[]) => unknown }
-  ).Highlight;
   const styles: HighlightStyle[] = ["target", "learning", "unknown", "weak"];
   let paused = false;
   let session: DynamicReading | undefined;
@@ -167,10 +164,10 @@ function start() {
     running = false;
     session?.stop();
     session = undefined;
-    registry?.delete("voka-flash");
+    registry.clear("voka-flash");
     drawerUI.update([], config, "unreachable");
     tooltip.hidden = true;
-    for (const name of styles) registry?.delete("voka-" + name);
+    for (const name of styles) registry.clear("voka-" + name);
   }
   document.addEventListener("mousemove", (event) => {
     const token = running
@@ -275,18 +272,10 @@ function start() {
     if (status === "ok") {
       try {
         config = await settings();
-        if (!registry || !HighlightCtor)
-          throw new Error("Highlight API unavailable");
+        if (!registry.available) throw new Error("Highlight API unavailable");
         if (epoch !== generation) return;
         const highlights = Object.fromEntries(
-          styles.map((name) => {
-            const highlight = new HighlightCtor() as {
-              add(range: Range): void;
-              delete(range: Range): void;
-            };
-            registry.set("voka-" + name, highlight);
-            return [name, highlight];
-          }),
+          styles.map((name) => [name, registry.set("voka-" + name)]),
         ) as Record<
           HighlightStyle,
           { add(range: Range): void; delete(range: Range): void }

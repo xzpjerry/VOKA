@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { it, expect } from "vitest";
-import { sentenceForRange } from "./page-context";
+import { sentenceForRange, sentenceForStream } from "./page-context";
+import { textStream } from "./text-stream";
 function target(html: string) {
   document.body.innerHTML = html;
   const node = document.getElementById("target")!.firstChild!;
@@ -25,6 +26,21 @@ it("selects across inline markup and strips footnotes without losing target offs
     '<p>Another sentence. We[1] <em id="target">achieved</em>¹ a difficult goal. Then we left.</p>',
   );
   expect(sentenceForRange(range).html).toBe(
+    "We <b>achieved</b> a difficult goal.",
+  );
+});
+it("finds a full sentence when text is split over several spans", () => {
+  document.body.innerHTML =
+    '<p id="sentence">We <span>ach</span><span>ieved</span> a difficult goal.</p>';
+  const root = document.querySelector("#sentence")!;
+  const stream = textStream(root);
+  const start = stream.text.indexOf("achieved");
+  const end = start + "achieved".length;
+
+  expect(sentenceForStream(stream, start, end).html).toBe(
+    "We <b>achieved</b> a difficult goal.",
+  );
+  expect(sentenceForRange(stream.rangeFor(start, end)).html).toBe(
     "We <b>achieved</b> a difficult goal.",
   );
 });

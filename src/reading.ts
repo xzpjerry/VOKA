@@ -1,4 +1,7 @@
 import { normalizeKey } from "./key";
+const SHOW_TEXT = 4;
+const FILTER_ACCEPT = 1;
+const FILTER_REJECT = 2;
 export const levels = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 export type Level = (typeof levels)[number];
 export type ReadingSettings = {
@@ -78,7 +81,9 @@ export function excluded(element: Element | null): boolean {
     if (el.matches(excludedSelector)) return true;
     const editable = el.getAttribute("contenteditable");
     if (editable !== null && editable.toLowerCase() !== "false") return true;
-    const style = getComputedStyle(el);
+    const win = el.ownerDocument.defaultView;
+    const style = win?.getComputedStyle(el);
+    if (!style) continue;
     if (
       style.display === "none" ||
       style.visibility === "hidden" ||
@@ -109,11 +114,12 @@ export function extract(
   recognizeWord: (surface: string) => ReturnType<typeof recognize> = () => null,
   accept = (_node: Node) => true,
 ): Token[] {
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+  const doc = root.ownerDocument ?? (root as Document);
+  const walker = doc.createTreeWalker(root, SHOW_TEXT, {
     acceptNode: (node) =>
       !accept(node) || excluded(node.parentElement)
-        ? NodeFilter.FILTER_REJECT
-        : NodeFilter.FILTER_ACCEPT,
+        ? FILTER_REJECT
+        : FILTER_ACCEPT,
   });
   const segmenter = new Intl.Segmenter("en", { granularity: "word" });
   const tokens: Token[] = [];
@@ -135,7 +141,7 @@ export function extract(
           GlossTarget: "",
         },
       };
-      const range = document.createRange();
+      const range = doc.createRange();
       range.setStart(node, part.index);
       range.setEnd(node, part.index + part.segment.length);
       tokens.push({ ...word, recognized: !!match, range, style: null });

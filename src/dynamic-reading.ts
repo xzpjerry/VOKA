@@ -7,6 +7,8 @@ import {
   type HighlightStyle,
 } from "./reading";
 
+const SHOW_TEXT = 4;
+
 const blockSelector =
   "p,li,h1,h2,h3,h4,h5,h6,td,th,blockquote,figcaption,div,section,article,main,header,aside,body";
 export const textBlock = (node: Node): Element | null =>
@@ -100,8 +102,9 @@ export class DynamicReading {
     this.pending.add(block);
   }
   private discover(root: Node) {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    const nodes: Node[] = root.nodeType === Node.TEXT_NODE ? [root] : [];
+    const doc = root.ownerDocument ?? (root as Document);
+    const walker = doc.createTreeWalker(root, SHOW_TEXT);
+    const nodes: Node[] = root.nodeType === 3 ? [root] : [];
     for (let node = walker.nextNode(); node; node = walker.nextNode())
       nodes.push(node);
     for (const node of nodes) {
@@ -121,7 +124,7 @@ export class DynamicReading {
   update(records: MutationRecord[]) {
     if (this.stopped) return;
     for (const record of records) {
-      if (record.target.nodeType === Node.TEXT_NODE) {
+      if (record.target.nodeType === 3) {
         const block = textBlock(record.target);
         if (block) this.enqueue(block);
       } else if (record.type === "attributes") {
@@ -131,8 +134,8 @@ export class DynamicReading {
       } else {
         // Removed text changes its owning block; added subtrees discover only new blocks.
         const owner =
-          record.target instanceof Element
-            ? record.target.closest(blockSelector)
+          record.target.nodeType === 1
+            ? (record.target as Element).closest(blockSelector)
             : textBlock(record.target);
         if (owner && (this.blocks.has(owner) || this.pending.has(owner)))
           this.enqueue(owner);

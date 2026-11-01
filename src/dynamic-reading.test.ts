@@ -3,6 +3,7 @@ import { expect, it, vi } from "vitest";
 import { DynamicReading } from "./dynamic-reading";
 import { readFileSync } from "node:fs";
 import { createData } from "./data";
+import { Window } from "happy-dom";
 const data = createData(
   [
     "cefrj",
@@ -31,6 +32,44 @@ const config = {
   showAdvanced: false,
   hoverScope: "highlighted",
 } as const;
+it("discovers and extracts text from the root's own iframe document", async () => {
+  const parentWindow = new Window({
+    settings: { enableIframePageLoading: true },
+  });
+  const parentDoc = parentWindow.document as unknown as Document;
+  const iframe = parentDoc.createElement("iframe");
+  parentDoc.body.append(iframe);
+  const doc = iframe.contentDocument! as unknown as Document;
+  doc.open();
+  doc.write("<!doctype html><html><body><p>achieve</p></body></html>");
+  doc.close();
+  const highlights = {
+    target: new Set<Range>(),
+    learning: new Set<Range>(),
+    unknown: new Set<Range>(),
+    weak: new Set<Range>(),
+  };
+  const session = new DynamicReading(
+    config,
+    highlights,
+    async () => ({}),
+    () => {},
+    undefined,
+    resolveWords,
+  );
+
+  try {
+    await session.start(doc.body);
+    expect(session.tokens.map((token) => token.range.toString())).toEqual([
+      "achieve",
+    ]);
+    expect(session.tokens[0].range.startContainer.ownerDocument).toBe(doc);
+  } finally {
+    session.stop();
+    iframe.remove();
+    parentWindow.close();
+  }
+});
 it("retains unaffected ranges, caches absent Keys, and drops replaced/detached ranges", async () => {
   document.body.innerHTML = "<main><p>achieve</p><p>improve</p></main>";
   const highlights = {
