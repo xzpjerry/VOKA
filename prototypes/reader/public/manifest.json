@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "VOKA Reader Research Prototype",
+  "version": "0.1.0",
+  "description": "Isolated EPUB and PDF reader probe.",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self' data: blob:; script-src 'self'; object-src 'none'; connect-src 'none'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data: blob:; media-src 'none'; frame-src 'self' blob:; worker-src 'self'"
+  }
+}

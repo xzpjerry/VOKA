@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOKA Reader Research Prototype</title>
+  </head>
+  <body>
+    <header>
+      <h1>VOKA Reader Research Prototype</h1>
+      <label for="file-input">Open an EPUB or PDF</label>
+      <input
+        id="file-input"
+        type="file"
+        accept=".epub,.pdf,application/epub+zip,application/pdf"
+      />
+      <p id="status" role="status" aria-live="polite">Choose a local EPUB or PDF file.</p>
+      <p id="position" aria-live="polite"></p>
+    </header>
+    <main>
+      <section id="epub-reader" hidden aria-label="EPUB chapter">
+        <nav id="epub-nav" aria-label="EPUB navigation">
+          <button id="epub-prev" type="button">Previous chapter</button>
+          <span id="epub-chapter"></span>
+          <button id="epub-next" type="button">Next chapter</button>
+        </nav>
+        <iframe id="epub-frame" title="EPUB chapter" sandbox="allow-same-origin"></iframe>
+      </section>
+      <section id="pdf-reader" hidden aria-label="PDF page 1">
+        <div id="pdf-page"></div>
+      </section>
+    </main>
+    <script type="module" src="/reader.ts"></script>
+  </body>
+</html>
