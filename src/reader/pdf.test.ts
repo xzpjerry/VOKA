@@ -1,7 +1,12 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from "vitest";
 import type { ReadingSource } from "../reading-session";
-import { PdfPageStreamRegistry, hasPdfPageText, isPdfFileTextless } from "./pdf";
+import {
+  PdfPageStreamRegistry,
+  hasPdfPageText,
+  isPdfFileTextless,
+  pdfPageNumberFromSourceId,
+} from "./pdf";
 
 describe("PDF text availability", () => {
   it("detects per-page text using non-whitespace characters", () => {
@@ -15,6 +20,17 @@ describe("PDF text availability", () => {
     expect(isPdfFileTextless([0, 4, 0], 3)).toBe(false);
     expect(isPdfFileTextless([0, 0], 2)).toBe(true);
     expect(isPdfFileTextless([0], 2)).toBe(false);
+  });
+});
+
+describe("PDF stream source page numbers", () => {
+  it("extracts a page number only from a PDF page source id", () => {
+    expect(pdfPageNumberFromSourceId("pdf-page-3")).toBe(3);
+    expect(pdfPageNumberFromSourceId("pdf-page-1")).toBe(1);
+    expect(pdfPageNumberFromSourceId("pdf-page-0")).toBeUndefined();
+    expect(pdfPageNumberFromSourceId("page-3")).toBeUndefined();
+    expect(pdfPageNumberFromSourceId("pdf-page-3-extra")).toBeUndefined();
+    expect(pdfPageNumberFromSourceId("pdf-page-9007199254740992")).toBeUndefined();
   });
 });
 

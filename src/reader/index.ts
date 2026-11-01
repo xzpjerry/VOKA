@@ -6,7 +6,13 @@ import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 import { createReadingSession, READING_HIGHLIGHT_CSS, type ReadingSource } from "../reading-session";
 import { t } from "../shared";
 import { sanitizeEpubDocument } from "./sanitizer";
-import { PdfPageStreamRegistry, hasPdfPageText, isPdfFileTextless, pdfTextCharacterCount } from "./pdf";
+import {
+  PdfPageStreamRegistry,
+  hasPdfPageText,
+  isPdfFileTextless,
+  pdfPageNumberFromSourceId,
+  pdfTextCharacterCount,
+} from "./pdf";
 import {
   assertReaderSize,
   hashFileBytes,
@@ -110,12 +116,18 @@ status.textContent = t("readerChooseFile");
 const session = createReadingSession({
   uiDocument: document,
   sources: [],
-  sourceLabel: () => ({
-    site: bookTitle,
-    title: pdfDocument
-      ? t("readerPdfPageLabel").replace("{number}", String(currentPdfPage))
-      : chapterTitle,
-  }),
+  sourceLabelForToken: (_token, _storeFullUrl, source) => {
+    const pageNumber =
+      source?.kind === "stream"
+        ? pdfPageNumberFromSourceId(source.id)
+        : undefined;
+    return {
+      site: bookTitle,
+      title: pdfDocument
+        ? pageLabel(pageNumber ?? currentPdfPage)
+        : chapterTitle,
+    };
+  },
 });
 void session.start();
 pdfStreams = new PdfPageStreamRegistry(session);
