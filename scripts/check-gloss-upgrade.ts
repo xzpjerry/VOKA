@@ -1,5 +1,6 @@
 /** T-29 and Chrome UI acceptance. Writes ONLY isolated 8766; retains named fixtures. */
 import puppeteer from "puppeteer";
+import { execFileSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
@@ -12,23 +13,73 @@ import {
   vokaMeta,
   contentHash,
 } from "../src/background/import";
-import { DATA_VERSION } from "../src/data";
+import { DATA_VERSION, createData } from "../src/data";
 const config = { port: 8766, apiKey: "" };
 assert.equal(await checkConnection(config), "ok");
 const call = (method: string, params = {}, write = false): Promise<any> =>
   rpc(config, method, params, { sideEffecting: write }) as Promise<any>;
+const offline = createData(
+  await Promise.all(
+    [
+      "cefrj",
+      "octanove",
+      "oewn",
+      "readings",
+      "oewn-readings",
+      "morphology",
+      "gloss-zh",
+      "gloss-leveled",
+    ].map(async (name) =>
+      JSON.parse(await readFile(`public/data/${name}.json`, "utf8")),
+    ),
+  ),
+);
+const html = (s: string) =>
+  s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 const stamp = Date.now();
 const target = {
   noteType: `VOKA Gloss Upgrade Test ${stamp}`,
   deck: `VOKA::Gloss Upgrade Test ${stamp}::B1`,
 };
-const entries = ["achieve", "benefit"].map((lemma) => ({
-  lemma,
-  level: "B1",
-  GlossNative: "",
-  GlossTarget: "old test meaning",
-  Reading: "old test reading",
-}));
+const fixtureWords = process.env.VOKA_UPGRADE_WORDS?.split(",") ?? [
+  "achieve",
+  "benefit",
+];
+assert.equal(fixtureWords.length, 2);
+const oldData = process.env.VOKA_UPGRADE_WORDS
+  ? createData(
+      [
+        "cefrj",
+        "octanove",
+        "oewn",
+        "readings",
+        "oewn-readings",
+        "morphology",
+        "gloss-zh",
+      ].map((name) =>
+        JSON.parse(
+          execFileSync(
+            "git",
+            [
+              "show",
+              `a2d6dc1f1af0db7a2b1bda06b788125877bf70bb:public/data/${name}.json`,
+            ],
+            { maxBuffer: 32 * 1024 * 1024 },
+          ).toString(),
+        ),
+      ),
+    )
+  : undefined;
+const entries = fixtureWords.map(
+  (lemma) =>
+    (oldData ? { ...oldData.lookupEntry(lemma), level: "B1" } : undefined) ?? {
+      lemma,
+      level: "B1",
+      GlossNative: "",
+      GlossTarget: "old test meaning",
+      Reading: "old test reading",
+    },
+);
 const created = await executeImport(call, target, "native", "zh", entries);
 assert.equal(created.created, 2);
 const ids = [
@@ -46,7 +97,7 @@ let notes = await read();
 for (const note of notes) {
   const entry = entries.find((e) => note.fields.Key === "en:" + e.lemma)!;
   const meta = {
-    ...JSON.parse(await vokaMeta(entry, "en-test-old")),
+    ...JSON.parse(await vokaMeta(entry, "en-2026.10.1")),
     pin: "keep-pin",
     extra: { test: stamp },
     hashes: {
@@ -107,7 +158,8 @@ console.log(
   before.notes.length,
   before.cards.length,
 );
-const evidence = "docs/research/gloss-upgrade-evidence";
+const evidence =
+  process.env.VOKA_UPGRADE_EVIDENCE ?? "docs/research/gloss-upgrade-evidence";
 await mkdir(evidence, { recursive: true });
 const scratch = await mkdtemp(join(tmpdir(), "voka-gloss-upgrade-"));
 const extension = join(scratch, "extension");
@@ -285,17 +337,30 @@ try {
     before.notes.find((n) => n.id === ids[1]),
     "kept edited note untouched",
   );
-  await reading.waitForFunction(() => {
-    const link = document.querySelector("#voka-drawer")?.shadowRoot?.querySelector<HTMLAnchorElement>('a[target="_blank"]');
-    return link?.hidden;
-  }, { timeout: 120000, polling: 100 });
+  await reading.waitForFunction(
+    () => {
+      const link = document
+        .querySelector("#voka-drawer")
+        ?.shadowRoot?.querySelector<HTMLAnchorElement>('a[target="_blank"]');
+      return link?.hidden;
+    },
+    { timeout: 120000, polling: 100 },
+  );
   await page.$eval("#checkUpgrade", (e: HTMLElement) => e.click());
-  await page.waitForFunction(() => !!document.querySelector<HTMLButtonElement>("#confirmUpgrade")?.disabled,
-    { timeout: 120000, polling: 100 });
-  for (const id of ids) assert.equal(await page.$(`input[data-id="${id}"]`), null);
-  await page.waitForFunction(() => document.querySelector("#importUpgrade")?.textContent === "",
-    { timeout: 120000, polling: 100 });
-  const kept = await worker.evaluate(async () => (await chrome.storage.local.get("upgradeKept")).upgradeKept);
+  await page.waitForFunction(
+    () =>
+      !!document.querySelector<HTMLButtonElement>("#confirmUpgrade")?.disabled,
+    { timeout: 120000, polling: 100 },
+  );
+  for (const id of ids)
+    assert.equal(await page.$(`input[data-id="${id}"]`), null);
+  await page.waitForFunction(
+    () => document.querySelector("#importUpgrade")?.textContent === "",
+    { timeout: 120000, polling: 100 },
+  );
+  const kept = await worker.evaluate(
+    async () => (await chrome.storage.local.get("upgradeKept")).upgradeKept,
+  );
   assert.equal(kept[ids[1]], DATA_VERSION);
   await page.$eval("#resetUpgradeKept", (e: HTMLElement) => e.click());
   await page.waitForFunction(
@@ -326,6 +391,15 @@ try {
   const afterBoth = await read();
   assert.equal(JSON.parse(afterBoth[1].fields.VokaMeta).data, DATA_VERSION);
   assert.notEqual(afterBoth[1].fields.GlossNative, "my handmade meaning");
+  for (const note of afterBoth) {
+    const expected = offline.lookupEntry(note.fields.Key);
+    for (const field of ["GlossNative", "GlossTarget", "Reading"] as const)
+      assert.equal(
+        note.fields[field],
+        html(expected[field]),
+        `${note.fields.Key}: ${field}`,
+      );
+  }
   await page.$eval("#checkUpgrade", (e: HTMLElement) => e.click());
   await page.waitForFunction(
     () => !!document.querySelector("#confirmUpgrade"),
@@ -341,6 +415,14 @@ try {
         ids,
         groups,
         checked,
+        oldVersion: "en-2026.10.1",
+        oldEntries: entries,
+        upgradedFields: afterBoth.map((n: any) => ({
+          key: n.fields.Key,
+          native: n.fields.GlossNative,
+          target: n.fields.GlossTarget,
+          version: JSON.parse(n.fields.VokaMeta).data,
+        })),
         collectionNotes: before.notes.length,
         collectionCards: before.cards.length,
         verified: [

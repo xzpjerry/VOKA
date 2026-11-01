@@ -1,5 +1,5 @@
 /** Offline packs are separate files with independent licensing. Call loadData once before lookup. */
-export const DATA_VERSION = "en-2026.10.1";
+export const DATA_VERSION = "en-2026.11.1";
 export const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 export type Level = (typeof LEVELS)[number];
 export interface Entry {
@@ -18,7 +18,7 @@ export interface Pack {
 }
 export const normalizeLemma = (word: string) =>
   word.toLowerCase().normalize("NFC").replace(/[‘’]/g, "'");
-type LevelEntries = Record<string, [Level, string[]]>;
+type LevelEntries = Record<string, [Level, string[], string[]?]>;
 type Dictionary = Record<string, Record<string, string[]>>;
 export type ReadPack = (name: string) => Promise<any>;
 const readPack: ReadPack = async (name) => {
@@ -32,6 +32,18 @@ const labels: Record<string, string> = {
   v: "v.",
   a: "adj.",
   r: "adv.",
+  s: "adj.",
+  pron: "pron.",
+  prep: "prep.",
+  det: "det.",
+  conj: "conj.",
+  num: "num.",
+  modal: "modal",
+  be: "be",
+  do: "aux. do",
+  have: "aux. have",
+  interj: "interj.",
+  to: "inf. to",
 };
 const format = (groups: Record<string, string[]>) =>
   Object.entries(groups)
@@ -39,10 +51,13 @@ const format = (groups: Record<string, string[]>) =>
     .join(" · ");
 
 export function createData(packs: any[]) {
-  const [cefr, octa, oewn, cmu, fallback, morphology, native] = packs;
-  const levels = new Map<string, { level: Level; variants: string[] }>();
+  const [cefr, octa, oewn, cmu, fallback, morphology, native, leveled] = packs;
+  const levels = new Map<
+    string,
+    { level: Level; variants: string[]; pos: string[] }
+  >();
   for (const pack of [cefr, octa]) {
-    for (const [lemma, [level, variants]] of Object.entries(
+    for (const [lemma, [level, variants, pos]] of Object.entries(
       pack.entries as LevelEntries,
     )) {
       const previous = levels.get(lemma);
@@ -52,7 +67,20 @@ export function createData(packs: any[]) {
             ? previous.level
             : level,
         variants: [...new Set([...(previous?.variants ?? []), ...variants])],
+        pos: [...new Set([...(previous?.pos ?? []), ...(pos ?? [])])],
       });
+    }
+  }
+  // Preserve raw source POS while hiding acronym-only POS for case-colliding Keys.
+  for (const pack of [cefr, octa]) {
+    for (const [lemma, collision] of Object.entries(
+      pack.caseCollisions ?? {},
+    ) as [string, { suppressedPos: string[] }][]) {
+      const info = levels.get(lemma);
+      if (info)
+        info.pos = info.pos.filter(
+          (pos) => !collision.suppressedPos.includes(pos),
+        );
     }
   }
   const aliases = new Map<string, string>();
@@ -70,6 +98,7 @@ export function createData(packs: any[]) {
       primary.variants = [
         ...new Set([...primary.variants, variant, ...standalone.variants]),
       ];
+      primary.pos = [...new Set([...primary.pos, ...standalone.pos])];
       levels.delete(variant);
     }
   }
@@ -89,14 +118,33 @@ export function createData(packs: any[]) {
     const glosses: Record<string, string[]> = {};
     const nativeByPos: Record<string, string[]> = {};
     for (const word of spellings) {
-      for (const [pos, definitions] of Object.entries(dictionary[word] ?? {}))
+      for (const [pos, definitions] of Object.entries(dictionary[word] ?? {})) {
+        if (
+          info?.pos.length &&
+          !info.pos.includes(pos.split("-")[0].replace(/^s$/, "a"))
+        )
+          continue;
         glosses[pos] = [
           ...new Set([...(glosses[pos] ?? []), ...definitions]),
         ].slice(0, 2);
-      for (const [pos, senses] of Object.entries(nativeGlosses[word] ?? {}))
+      }
+      for (const [pos, senses] of Object.entries(nativeGlosses[word] ?? {})) {
+        if (info?.pos.length && !info.pos.includes(pos)) continue;
         nativeByPos[pos] = [
           ...new Set([...(nativeByPos[pos] ?? []), ...senses]),
         ].slice(0, 3);
+      }
+    }
+    if (info) {
+      for (const [pos, value] of Object.entries(
+        leveled?.entries?.[lemma] ?? {},
+      ) as [string, { native: string[]; target: string[] }][]) {
+        if (!info.pos.includes(pos)) continue;
+        nativeByPos[pos] = value.native;
+        for (const existing of Object.keys(glosses))
+          if (existing.split("-")[0] === pos) delete glosses[existing];
+        glosses[pos] = value.target;
+      }
     }
     let reading =
       spellings
@@ -109,7 +157,9 @@ export function createData(packs: any[]) {
           pronunciations[pos] ??= [`/${value}/`];
       reading = format(pronunciations);
     }
-    const found = spellings.some(hasDictionary);
+    const found = info
+      ? Object.keys(glosses).length > 0
+      : spellings.some(hasDictionary);
     return {
       lemma,
       level: info?.level ?? "",
@@ -135,8 +185,7 @@ export function createData(packs: any[]) {
     add(word);
     for (const pos of ["n", "v", "a", "r"]) {
       const exceptions = morphology.entries[pos]?.[word] as
-        | string[]
-        | undefined;
+        string[] | undefined;
       if (exceptions) exceptions.forEach((lemma) => add(lemma, pos));
       else
         for (const [suffix, replacement] of (morphology.rules[pos] ??
@@ -176,6 +225,7 @@ export function loadData(read: ReadPack = readPack): Promise<Data> {
       "oewn-readings",
       "morphology",
       "gloss-zh",
+      "gloss-leveled",
     ].map(read),
   )
     .then(createData)

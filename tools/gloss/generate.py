@@ -122,7 +122,7 @@ def levels() -> dict[str, str]:
     found: dict[str, str] = {}
     variants: dict[str, list[str]] = {}
     for pack in packs.values():
-        for lemma, (level, aliases) in pack["entries"].items():
+        for lemma, (level, aliases, *_) in pack["entries"].items():
             found[lemma] = min(found.get(lemma, level), level, key=LEVELS.index)
             variants[lemma] = list(dict.fromkeys(variants.get(lemma, []) + aliases))
     for lemma, aliases in variants.items():
@@ -884,6 +884,9 @@ def update_metadata(pack: dict, raw_size: int, gzip_size: int) -> None:
 
 
 def main() -> None:
+    if "--supplement" in sys.argv:
+        from supplement import main as supplement_main
+        sys.exit(supplement_main([arg for arg in sys.argv[1:] if arg != "--supplement"]))
     global PROMPT
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default=DEFAULT_MODEL)

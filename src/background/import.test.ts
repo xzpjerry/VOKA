@@ -25,7 +25,7 @@ it("hashes exact UTF-8 content with SHA-256 and records version", async () => {
     meta = JSON.parse(await vokaMeta(entry));
   expect(meta).toEqual({
     schema: 1,
-    data: "en-2026.10.1",
+    data: "en-2026.11.1",
     hashes: {
       GlossNative: await contentHash(entry.GlossNative),
       GlossTarget: await contentHash(entry.GlossTarget),

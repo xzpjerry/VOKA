@@ -1,0 +1,35 @@
+{
+  "version": "en-2026.11.1",
+  "coverage": [
+    {
+      "level": "A1",
+      "entries": 1050,
+      "missing": 0
+    },
+    {
+      "level": "A2",
+      "entries": 1200,
+      "missing": 0
+    },
+    {
+      "level": "B1",
+      "entries": 2085,
+      "missing": 0
+    },
+    {
+      "level": "B2",
+      "entries": 2383,
+      "missing": 0
+    },
+    {
+      "level": "C1",
+      "entries": 909,
+      "missing": 0
+    },
+    {
+      "level": "C2",
+      "entries": 868,
+      "missing": 0
+    }
+  ]
+}

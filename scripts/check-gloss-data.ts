@@ -20,6 +20,7 @@ const names = [
   "oewn-readings",
   "morphology",
   "gloss-zh",
+  "gloss-leveled",
 ];
 const packs = await Promise.all(
   names.map(async (name) =>
@@ -28,7 +29,7 @@ const packs = await Promise.all(
 );
 const data = createData(packs);
 const native = packs[6];
-assert.equal(native.dataVersion, DATA_VERSION);
+assert.equal(packs[7].dataVersion, DATA_VERSION);
 assert(native.models.includes("deepseek/deepseek-flash"));
 assert.equal(native.sourceLemmaCount, 74441);
 assert.equal(native.entryCount, Object.keys(native.entries).length);

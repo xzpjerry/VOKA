@@ -12,6 +12,7 @@ const data = createData(
     "oewn-readings",
     "morphology",
     "gloss-zh",
+  "gloss-leveled",
   ].map(
     (name) => JSON.parse(readFileSync(`public/data/${name}.json`, "utf8")),
   ),

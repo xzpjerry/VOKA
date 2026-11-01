@@ -18,3 +18,10 @@ Level tuples are `[level, variants[]]`; source files normalize within their own 
 `src/data/index.ts` exports `loadData()` for a cached async load, then synchronous `data.lookupEntry(key)` and `data.lemmaCandidates(form)`. Async convenience exports have the same names. Entries contain `lemma`, `level` (empty when ungraded), `Variants`, `Reading`, `GlossTarget`, `GlossNative`, `dictionaryStatus` and `message` (`词典没有` when OEWN is missing). Native glosses are merged across spelling variants and capped at three senses per POS; entries absent from the native-gloss pack (and missing OEWN words) stay empty rather than inventing a gloss, and the UI falls back to `GlossTarget`. Import iterates `data.pack.entries` (levels only); dictionary lookup covers the whole OEWN single-word lexicon. No ECDICT, Wiktionary or Kaikki data is downloaded or distributed.
 
 Section 7.3 publication gates remain: confirm CEFR-J embedded-product terms and Octanove construction provenance with the rights holders before public-store publication. This pipeline does not claim those confirmations occurred.
+
+Level entry tuples now contain `[lowestLevel, variants, sourcePos]`. Source POS
+is unioned across rows and variant spellings and filters both learner gloss
+languages for leveled words. Closed-class labels are separate from OEWN POS.
+`gloss-leveled.json` contains the filtered same-POS bilingual reuse plus generated
+gaps; its model/prompt provenance and reuse report are described in
+[`tools/gloss/README.md`](../gloss/README.md). Unleveled lookups retain OEWN behavior.

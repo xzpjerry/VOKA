@@ -35,6 +35,7 @@ const names = [
   "oewn-readings",
   "morphology",
   "gloss-zh",
+  "gloss-leveled",
 ];
 const packs = await Promise.all(
   names.map(async (name) =>

@@ -10,6 +10,7 @@ const names = [
   "oewn-readings",
   "morphology",
   "gloss-zh",
+  "gloss-leveled",
 ];
 const packs = names.map((name) =>
   JSON.parse(readFileSync(`public/data/${name}.json`, "utf8")),
@@ -74,9 +75,18 @@ describe("production offline data", () => {
     );
     expect(found.length).toBeGreaterThan(0);
     expect(found.some((entry) => entry.GlossNative !== "")).toBe(true);
-    for (const [lemma, poses] of Object.entries(native.entries) as [string, Record<string, string[]>][]) {
+    for (const [lemma, poses] of Object.entries(native.entries) as [
+      string,
+      Record<string, string[]>,
+    ][]) {
       expect(Object.keys(poses).sort()).toEqual(
-        [...new Set(Object.keys(packs[2].entries[lemma]).map((pos) => pos.split("-")[0]))].sort(),
+        [
+          ...new Set(
+            Object.keys(packs[2].entries[lemma]).map(
+              (pos) => pos.split("-")[0],
+            ),
+          ),
+        ].sort(),
       );
       expect(Object.keys(poses).length).toBeGreaterThan(0);
       for (const senses of Object.values(poses)) {
@@ -110,12 +120,65 @@ describe("production offline data", () => {
     expect(missing.message).toBe("词典没有");
     expect(missing.GlossTarget).toBe("");
     expect(missing.GlossNative).toBe("");
-    // Closed-class words in CEFR remain importable even when OEWN lacks a definition.
-    const knownMissing = data.pack.entries.find(
-      (e) => data.lookupEntry(e.lemma).dictionaryStatus === "missing",
+    expect(data.pack.entries.every((e) => e.GlossNative && e.GlossTarget)).toBe(
+      true,
     );
-    expect(knownMissing).toBeDefined();
-    expect(data.lookupEntry(knownMissing!.lemma).message).toBe("词典没有");
+    expect(data.lookupEntry("and").dictionaryStatus).toBe("found");
+  });
+  it("filters leveled senses to source POS and supplies bilingual closed classes", () => {
+    for (const word of [
+      "a",
+      "it",
+      "he",
+      "or",
+      "as",
+      "at",
+      "can",
+      "and",
+      "because",
+      "could",
+      "myself",
+      "to",
+      "was",
+    ]) {
+      const entry = data.lookupEntry(word);
+      expect(entry.GlossNative, word).toMatch(/[\u4e00-\u9fff]/);
+      expect(entry.GlossTarget, word).not.toBe("");
+      expect(entry.GlossNative, word).not.toMatch(/氦|砷|砹|信息技术|手术室/);
+    }
+    expect(data.lookupEntry("goods").GlossNative).not.toMatch(/好处|美德/);
+    expect(data.lookupEntry("a").GlossNative).toContain("det.");
+    expect(data.lookupEntry("can").GlossNative).toContain("modal");
+    expect(data.lookupEntry("may").GlossNative).toContain("n.");
+    expect(data.lookupEntry("may").GlossNative).toContain("modal");
+    expect(packs[0].entries.it[2]).toContain("n");
+    expect(packs[0].caseCollisions.it.headwords.IT).toEqual(["n"]);
+    const supplement = packs[7];
+    expect(supplement.complete).toBe(true);
+    expect(supplement.model).toBe("gpt-6-luna");
+    expect(supplement.effort).toBe("max");
+    expect(supplement.promptSha256).toBe(
+      createHash("sha256")
+        .update(readFileSync("tools/gloss/supplement-prompt.txt"))
+        .digest("hex"),
+    );
+    for (const poses of Object.values(supplement.entries) as Record<
+      string,
+      { native: string[]; target: string[] }
+    >[]) {
+      for (const group of Object.values(poses)) {
+        expect(group.native.length).toBeGreaterThan(0);
+        expect(group.native.length).toBeLessThanOrEqual(3);
+        expect(group.target.length).toBeGreaterThan(0);
+        expect(group.target.length).toBeLessThanOrEqual(3);
+        for (const sense of group.native)
+          expect(sense).toMatch(
+            /^[\u3400-\u4dbf\u4e00-\u9fff\u{20000}-\u{323af}]{1,10}$/u,
+          );
+      }
+    }
+    // Unleveled OEWN entries keep all their original senses.
+    expect(data.lookupEntry("aardwolf").GlossTarget).toContain("n.");
   });
   it("uses irregular exceptions, suffix candidates, and ADR-0001 ambiguity ordering", () => {
     expect(data.lemmaCandidates("went")).toContain("go");

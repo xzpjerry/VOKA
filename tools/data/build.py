@@ -161,4 +161,8 @@ def build():
     (OUT/'sizes.json').write_text(json.dumps(sizes,indent=2)+'\n')
     print('TOTAL',sum(s['raw'] for s in sizes.values()),'raw;',sum(s['gzip'] for s in sizes.values()),'gzip bytes')
 
-if __name__ == '__main__': build()
+if __name__ == '__main__':
+    build()
+    from level_pos import rebuild, metadata
+    rebuild()
+    metadata()

@@ -1,5 +1,5 @@
 {
-  "dataVersion": "en-2026.10.1",
+  "dataVersion": "en-2026.11.1",
   "generatedDate": "2026-10-31",
   "packs": [
     {
@@ -11,8 +11,23 @@
       "generatedDate": "2026-10-31",
       "dataVersion": "en-2026.10",
       "entryCount": 6719,
-      "attribution": "The CEFR-J Wordlist Version 1.6. Compiled by Yukio Tono, Tokyo University of Foreign Studies. Retrieved from https://www.cefr-j.org/download.html on 31/10/2026. Copyright Tono Laboratory, TUFS. Modified: normalized, merged POS, removed multiword headwords; first slash spelling retained.",
-      "licenseUrl": "https://www.cefr-j.org/download.html"
+      "attribution": "The CEFR-J Wordlist Version 1.6. Compiled by Yukio Tono, Tokyo University of Foreign Studies. Retrieved from https://www.cefr-j.org/download.html on 31/10/2026. Copyright Tono Laboratory, TUFS. Modified: normalized, merged POS, removed multiword headwords; first slash spelling retained. Source POS retained in entry tuple item 3; mapped to OEWN content POS or explicit closed-class labels. Uppercase acronym collision source POS retained in caseCollisions; acronym-only POS suppressed in learner glosses.",
+      "licenseUrl": "https://www.cefr-j.org/download.html",
+      "caseCollisions": {
+        "it": {
+          "headwords": {
+            "IT": [
+              "n"
+            ],
+            "it": [
+              "pron"
+            ]
+          },
+          "suppressedPos": [
+            "n"
+          ]
+        }
+      }
     },
     {
       "source": [
@@ -23,8 +38,9 @@
       "generatedDate": "2026-10-31",
       "dataVersion": "en-2026.10",
       "entryCount": 1945,
-      "attribution": "Octanove Vocabulary Profile C1/C2 1.0, Octanove Labs. Modified: normalized, merged POS, removed multiword headwords; first slash spelling retained. Adapted data distributed under CC BY-SA 4.0.",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+      "attribution": "Octanove Vocabulary Profile C1/C2 1.0, Octanove Labs. Modified: normalized, merged POS, removed multiword headwords; first slash spelling retained. Adapted data distributed under CC BY-SA 4.0. Source POS retained in entry tuple item 3; mapped to OEWN content POS or explicit closed-class labels. Uppercase acronym collision source POS retained in caseCollisions; acronym-only POS suppressed in learner glosses.",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "caseCollisions": {}
     },
     {
       "source": [
@@ -206,6 +222,33 @@
       "missingCount": 0,
       "rawBytes": 3007109,
       "gzipBytes": 969513
+    },
+    {
+      "attribution": "VOKA-generated bilingual learner gloss supplement, gpt-6-luna effort max; reused content from separately attributed OEWN and VOKA native packs. Level POS selection from CEFR-J / Octanove.",
+      "complete": true,
+      "dataVersion": "en-2026.11.1",
+      "effort": "max",
+      "entryCount": 8495,
+      "generatedDate": "2026-11-01",
+      "license": "CC-BY-4.0; Princeton WordNet notice for reused definitions; independent level source licenses retained",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "model": "gpt-6-luna",
+      "prompt": "tools/gloss/supplement-prompt.txt",
+      "promptSha256": "693a8958dbb263bd01ee73ed15510c0fd72bdce4ce9c6d0646ee77ec42a61f80",
+      "source": [
+        "CEFR-J 1.6",
+        "Octanove 1.0",
+        "oewn.json",
+        "gloss-zh.json"
+      ],
+      "sourcePackSha256": {
+        "cefrj.json": "11e56314efda3ffea880ec39b9c6d18511899a6e9322b4767604a7684d97b7ec",
+        "gloss-zh.json": "ed7eaa26630ff26b9466713e86de13e1f116aed25b4173d524647d8d51c31975",
+        "morphology.json": "6cc43a1e7448a35f489464af0499e0f83a588346a00b5c754baaeedb8698c7d0",
+        "octanove.json": "d8d4a7aa3e101879df37156e9b3ce51f98f0cdfefb0f185db7e467f8aeb23b99",
+        "oewn.json": "ab96095e5377f7396d8902aae5b517584e73bf984a41c99169b51a6bfae202ee"
+      },
+      "version": "1"
     }
   ],
   "notices": {
