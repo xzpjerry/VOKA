@@ -19,11 +19,24 @@
       <select id="toc" disabled></select>
       <button id="previous-chapter" type="button" disabled></button>
       <button id="next-chapter" type="button" disabled></button>
+      <div id="pdf-controls" class="pdf-controls" hidden>
+        <button id="pdf-previous-page" type="button" disabled></button>
+        <label for="pdf-page-number"><span id="pdf-page-number-label"></span></label>
+        <input id="pdf-page-number" type="number" min="1" step="1" disabled />
+        <span aria-hidden="true">/</span>
+        <span id="pdf-page-total"></span>
+        <button id="pdf-next-page" type="button" disabled></button>
+        <button id="pdf-zoom-100" type="button"></button>
+        <button id="pdf-zoom-fit" type="button"></button>
+      </div>
     </header>
     <p id="reader-status" role="status" aria-live="polite"></p>
     <main>
       <iframe id="epub-frame" title="" sandbox="allow-same-origin" hidden></iframe>
-      <section id="pdf-placeholder" hidden></section>
+      <section id="pdf-reader" hidden>
+        <div id="pdf-pages"></div>
+      </section>
+      <section id="pdf-placeholder" role="status" aria-live="polite" hidden></section>
     </main>
     <script type="module" src="/src/reader/index.ts"></script>
   </body>
