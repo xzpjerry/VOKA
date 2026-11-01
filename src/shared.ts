@@ -28,7 +28,7 @@ export type SiteSettings = {
   rememberedSites: string[];
 };
 export async function settings(): Promise<
-  Settings & ReadingSettings & SiteSettings & { upgradeKept: UpgradeKept; storeFullUrl: boolean; testImportTarget?: TestImportTarget }
+  Settings & ReadingSettings & SiteSettings & { upgradeKept: UpgradeKept; storeFullUrl: boolean; youtubeDiagnostics: boolean; testImportTarget?: TestImportTarget }
 > {
   const value = await chrome.storage.local.get({
     upgradeKept: {},
@@ -40,6 +40,7 @@ export async function settings(): Promise<
     showAdvanced: false,
     hoverScope: "highlighted",
     storeFullUrl: false,
+    youtubeDiagnostics: false,
     testImportTarget: null,
     siteScope: "activeTab",
     denyList: [...DEFAULT_DENY_SITES],
@@ -55,6 +56,7 @@ export async function settings(): Promise<
         ? value.port
         : 8765,
     storeFullUrl: value.storeFullUrl === true,
+    youtubeDiagnostics: value.youtubeDiagnostics === true,
     apiKey: typeof value.apiKey === "string" ? value.apiKey : "",
     nativeLanguage: value.nativeLanguage === "en" ? "en" : "zh",
     glossLanguage: value.glossLanguage === "target" ? "target" : "native",

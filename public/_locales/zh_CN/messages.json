@@ -361,5 +361,20 @@
   },
   "readerChapter": {
     "message": "第 {number} 章"
+  },
+  "youtubeDiagnostics": {
+    "message": "YouTube 诊断信息"
+  },
+  "youtubeNoSubtitles": {
+    "message": "此视频没有可读取的英文字幕"
+  },
+  "youtubeDiagnosticLine": {
+    "message": "方法 $1 · $2 条 · $3"
+  },
+  "youtubeDiagnosticOk": {
+    "message": "OK"
+  },
+  "youtubeSubtitleClose": {
+    "message": "关闭 VOKA 字幕行"
   }
 }

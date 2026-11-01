@@ -361,5 +361,20 @@
   },
   "readerChapter": {
     "message": "Chapter {number}"
+  },
+  "youtubeDiagnostics": {
+    "message": "YouTube diagnostics"
+  },
+  "youtubeNoSubtitles": {
+    "message": "No readable English subtitles for this video"
+  },
+  "youtubeDiagnosticLine": {
+    "message": "Method $1 · $2 cues · $3"
+  },
+  "youtubeDiagnosticOk": {
+    "message": "OK"
+  },
+  "youtubeSubtitleClose": {
+    "message": "Close VOKA subtitles"
   }
 }

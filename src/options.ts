@@ -632,6 +632,12 @@ storeFullUrl.checked = initial.storeFullUrl;
 storeFullUrl.addEventListener("change", () =>
   chrome.storage.local.set({ storeFullUrl: storeFullUrl.checked }),
 );
+const youtubeDiagnostics = $("youtubeDiagnostics") as HTMLInputElement;
+youtubeDiagnostics.checked = initial.youtubeDiagnostics;
+$("youtubeDiagnosticsLabel").textContent = t("youtubeDiagnostics");
+youtubeDiagnostics.addEventListener("change", () =>
+  chrome.storage.local.set({ youtubeDiagnostics: youtubeDiagnostics.checked }),
+);
 
 // Upgrade confirmation is separate from level import: neither preview writes notes.
 $("checkUpgrade").onclick = () => void upgradeUI.preview();
