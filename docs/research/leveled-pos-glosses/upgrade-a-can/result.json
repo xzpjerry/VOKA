@@ -1,0 +1,80 @@
+{
+  "target": {
+    "noteType": "VOKA Gloss Upgrade Test 1793520129070",
+    "deck": "VOKA::Gloss Upgrade Test 1793520129070::B1"
+  },
+  "ids": [
+    "1793520129625",
+    "1793520129626"
+  ],
+  "groups": [
+    "You haven’t edited · 1",
+    "You have edited · 1"
+  ],
+  "checked": [
+    {
+      "id": "1793520129625",
+      "checked": true
+    },
+    {
+      "id": "1793520129626",
+      "checked": false
+    }
+  ],
+  "oldVersion": "en-2026.10.1",
+  "oldEntries": [
+    {
+      "lemma": "a",
+      "level": "B1",
+      "Variants": "",
+      "Reading": "/ə/",
+      "GlossNative": "n. 埃; 维生素甲",
+      "GlossTarget": "n. a metric unit of length equal to one ten billionth of a meter (or 0.0001 micron); used to specify wavelengths of electromagnetic radiation; any of several fat-soluble vitamins essential for normal vision; prevents night blindness or inflammation or dryness of the eyes",
+      "dictionaryStatus": "found",
+      "message": ""
+    },
+    {
+      "lemma": "can",
+      "level": "B1",
+      "Variants": "",
+      "Reading": "/kˈæn/",
+      "GlossNative": "n. 罐头; 一罐 · v. 装罐; 解雇",
+      "GlossTarget": "n. airtight sealed metal container for food or drink or paint etc.; the quantity contained in a can · v. preserve in a can or tin; terminate the employment of; discharge from an office or position",
+      "dictionaryStatus": "found",
+      "message": ""
+    }
+  ],
+  "upgradedFields": [
+    {
+      "key": "en:a",
+      "native": "det. 一个; 一位; 一名",
+      "target": "det. Used before a singular countable noun when it is not specific.",
+      "version": "en-2026.11.1"
+    },
+    {
+      "key": "en:can",
+      "native": "n. 罐头; 一罐 · modal 能够; 可以; 可能",
+      "target": "modal be able to do something; be allowed to do something; be possible · n. airtight sealed metal container for food or drink or paint etc.; the quantity contained in a can",
+      "version": "en-2026.11.1"
+    }
+  ],
+  "collectionNotes": 10,
+  "collectionCards": 10,
+  "verified": [
+    "preview read only entire collection",
+    "two groups/defaults",
+    "kept note byte-for-byte untouched including modification time",
+    "confirmed keeps excluded from fresh preview, import-preview count, and drawer notice",
+    "settings reset restores kept updates",
+    "selected updates only",
+    "metadata pin/extra/hash preservation",
+    "all card scheduling unchanged",
+    "idempotent fixture rerun",
+    "drawer/settings/import preview in Chrome for Testing"
+  ],
+  "notVerified": [
+    "AnkiMobile/AnkiDroid",
+    "real transport interruption or partial failure (unit tests cover)",
+    "concurrent edits from Anki during an in-flight write"
+  ]
+}

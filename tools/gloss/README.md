@@ -79,3 +79,25 @@ Offline generator regression checks (no model calls):
 ```sh
 python3 -m unittest discover -s tools/gloss -p 'test_*.py'
 ```
+
+## Leveled POS supplement (#64)
+
+Run `python3 tools/data/level_pos.py` to retain the pinned source POS in tuple
+item 3 of the independent level packs. `data:build` also runs this step.
+`batter`'s missing Octanove POS is noun (source note “one who bats”);
+`remonstrate`'s `vern` is corrected to verb.
+
+```sh
+python3 tools/gloss/generate.py --supplement --model gpt-6-luna --effort max
+```
+
+This path reuses `generate.py`'s resumable content-addressed cache, Codex runner,
+format retry rounds and per-batch provenance. It uses `supplement-prompt.txt`;
+the OEWN pilot prompt remains unchanged. Only missing level/POS pairs are generated
+in Chinese and English. Exact spellings, source variants, morphology exceptions
+and suffix candidates reuse existing same-POS bilingual data first. Outputs are
+`gloss-leveled.json`, a reuse mapping, coverage/progress and a 20-lemma-per-level
+spot-check CSV in `docs/research/leveled-pos-glosses/`. `--assemble-only` resumes
+without model calls; quota exhaustion records PAUSED and returns nonzero.
+The original 74,441-entry native pack is never regenerated or overwritten.
+Assembly refreshes size/attribution metadata. All-uppercase acronym-only POS is suppressed on lowercase Key collisions while raw source POS is retained (Title-case collisions remain merged). The lexical plural goods is generated instead of incorrectly inheriting good’s benefit/virtue senses.

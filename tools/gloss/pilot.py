@@ -21,7 +21,7 @@ def sample():
     packs = {n: json.loads((ROOT/f'public/data/{n}.json').read_text()) for n in ['cefrj','octanove','oewn']}
     levels, variants = {}, {}
     for name in ['cefrj','octanove']:
-        for lemma,(level,aliases) in packs[name]['entries'].items():
+        for lemma,(level,aliases,*_) in packs[name]['entries'].items():
             levels[lemma] = min(levels.get(lemma,level),level,key=LEVELS.index)
             variants[lemma] = list(dict.fromkeys(variants.get(lemma,[])+aliases))
     for lemma, aliases in variants.items():

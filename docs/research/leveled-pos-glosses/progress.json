@@ -1,0 +1,28 @@
+{
+  "complete": true,
+  "levelLemmas": 8495,
+  "generatedLemmas": 453,
+  "generatedPOS": 520,
+  "missing": [],
+  "rounds": [
+    {
+      "round": 0,
+      "words": 453,
+      "valid": 453,
+      "invalid": 0,
+      "batches": 12,
+      "missingBatches": 0,
+      "parseErrors": 0,
+      "formatInvalidWords": 0,
+      "unprocessedWords": 0,
+      "unexpectedLemmas": [],
+      "models": {
+        "gpt-6-luna": 12
+      },
+      "generationSeconds": 521.757,
+      "wallSeconds": 13.982,
+      "generated": 1,
+      "issues": 0
+    }
+  ]
+}

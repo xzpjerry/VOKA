@@ -1,0 +1,154 @@
+level,lemma,POS,Chinese,English,generated
+A1,'m,be,我是; 我在,The short form of “I am.”,True
+A1,'re,be,是; 在,"The short form of “are,” used after you, we, or they.",True
+A1,'s,be,是; 在,"The short form of “is,” used after a singular subject.",True
+A1,a,det,一个; 一位; 一名,Used before a singular countable noun when it is not specific.,True
+A1,a.m.,r,午前,before 12 noon,False
+A1,a.m.,be,上午,In the period before noon.,True
+A1,about,r,大约; 到处,(of quantities) imprecise but fairly close to correct; all around or on all sides,False
+A1,about,prep,关于; 大约; 在附近,On the subject of something.; Approximately a certain amount or time.; In or near a place.,True
+A1,above,a,上述的,appearing earlier in the same text,False
+A1,above,r,在上文; 在上方,(in writing) at an earlier place; in or to a place that is higher,False
+A1,above,prep,在上方; 高于,In a higher position than something.; More than a stated amount or level.,True
+A1,after,r,之后; 在后面,happening at a time subsequent to a reference time; behind or in the rear,False
+A1,after,conj,之后; 以后,Later than the time when something happens.; When one event has finished.,True
+A1,after,prep,之后; 以后,Later than a time or event.; Following someone or something.,True
+A1,all,r,完全,to a complete degree or to the full or entire extent; Completely or entirely,False
+A1,all,det,所有的; 全部的; 整个,The whole amount or every member of a group.,True
+A1,all,pron,全部; 一切; 大家,Everything or everyone in a group.,True
+A1,along,r,向前; 一起,with a forward motion; in accompaniment or as a companion,False
+A1,along,prep,沿着; 顺着; 沿途,Following the length or direction of something.,True
+A1,vote,n,投票; 表决结果,a choice that is made by counting the number of people in favor of each alternative; the opinion of a group as determined by voting,False
+A1,vote,v,投票; 表决,express one's preference for a candidate or for a measure or resolution; cast a vote; express one's choice or preference by vote,False
+A1,drink,n,一份饮品; 酗酒,a single serving of a beverage; the act of drinking alcoholic beverages to excess,False
+A1,drink,v,喝; 饮酒,take in liquids; consume alcohol,False
+A1,soup,n,汤; 浓汤状物,liquid food especially of meat or fish or vegetable stock often containing pieces of solid food; any composition having a consistency suggestive of soup,False
+A1,around,r,附近; 绕道,in the area or vicinity; by a circular or circuitous route,False
+A1,around,prep,周围; 围绕; 大约,in or to the area surrounding something; encircling or moving around something; approximately,True
+A1,hear,v,听见; 得知,"perceive (sound) via the auditory sense; get to know or become aware of, usually accidentally",False
+A1,mean,a,平均的; 刻薄的,approximating the statistical norm or average or expected value; characterized by malice,False
+A1,mean,n,平均数,an average of n numbers computed by adding some function of the numbers and dividing by some function of n,False
+A1,mean,v,表达; 意味着,mean or intend to express or convey; have as a logical consequence,False
+A1,head,n,头; 一头家畜,the upper part of the human body or the front part of the body in animals; contains the face and brains; a single domestic animal,False
+A1,head,v,前往; 主管,to go or travel towards; be in charge of,False
+A1,family,n,家庭,a social unit living together; primary social group; parents and children,False
+A1,chocolate,n,热巧克力; 巧克力,a beverage made from cocoa powder and milk and sugar; usually drunk hot; a food made from roasted ground cacao beans,False
+A1,strong,a,强壮的; 强有力的,having strength or power greater than average or expected; not faint or feeble,False
+A2,across,r,横过; 到对面,to the opposite side; transversely,False
+A2,across,prep,穿过; 横过; 在对面,From one side of something to the other.; On the opposite side of something.,True
+A2,against,prep,反对; 倚着; 防备,In opposition to someone or something.; Touching or supported by something.; For protection from something harmful.,True
+A2,although,conj,虽然; 尽管,Used to introduce a fact that contrasts with another fact.,True
+A2,among,prep,在之中; 其中,In or surrounded by a group of people or things.,True
+A2,been,be,曾是; 曾在; 去过,the past participle of be used for a past identity or state; the past participle of be used for having been in a place; the past participle of be used for having visited a place,True
+A2,besides,r,此外; 而且,making an additional point; anyway; in addition,False
+A2,besides,prep,另加; 除外,in addition to someone or something; apart from someone or something,True
+A2,beyond,prep,以外; 超出,on the far side of a place or limit; more than a limit or amount,True
+A2,done,do,做过; 已完成,"the past participle of do, meaning performed or carried out; used to say that an action or task is complete",True
+A2,during,prep,在期间,at some time within or throughout a period,True
+A2,enough,r,足够地,as much as necessary,False
+A2,enough,det,足够的,As much or as many as needed.,True
+A2,enough,pron,足够的量,As much or as many as needed or wanted.,True
+A2,scale,n,刻度; 规模,an ordered reference standard; relative magnitude,False
+A2,feature,n,特征; 容貌,a prominent attribute or aspect of something; the characteristic parts of a person's face: eyes and nose and mouth and chin,False
+A2,feature,v,以之为特色; 炫耀,have as a feature; wear or display in an ostentatious or proud manner,False
+A2,apartment,n,公寓,a suite of rooms usually on one floor of an apartment house,False
+A2,champagne,n,香槟酒,a white sparkling wine either produced in Champagne or resembling that produced there,False
+A2,range,n,作用范围; 有效范围,an area in which something acts or operates or has power or control:; the limits within which something can be effective,False
+A2,range,v,在范围内变化; 四处游荡,"change or be different within limits; move about aimlessly or without any destination, often in search of food or employment",False
+A2,additional,a,额外的,further or added,False
+A2,boss,n,老板; 雇主,a person who exercises control over workers; a person responsible for hiring workers,False
+A2,energetic,a,精力充沛的; 积极的,possessing or exerting or displaying energy; working hard to promote an enterprise,False
+A2,communicate,v,交流; 传达,transmit information; transmit thoughts or feelings,False
+A2,barbecue,n,烤肉; 烧烤野餐,meat that has been barbecued or grilled in a highly seasoned sauce; a cookout in which food is cooked over an open fire; especially a whole animal carcass roasted on a spit,False
+A2,barbecue,v,烧烤,cook outdoors on a barbecue grill,False
+B1,aboard,r,在交通工具上; 在垒上,"on a ship, train, plane or other vehicle; on first or second or third base",False
+B1,aboard,prep,在船上; 在飞机上; 在车上,"On or inside a ship, plane, or other vehicle.",True
+B1,beneath,prep,下方; 低于; 不值得,under or at a lower place than something; lower than a level or amount; not suitable or worthy for someone,True
+B1,despite,prep,尽管,without being prevented by something; even though it is true,True
+B1,dozen,n,十二; 一打,the cardinal number that is the sum of eleven and one,False
+B1,dozen,det,一打,used before a noun to mean twelve or a group of twelve,True
+B1,gee,interj,哎呀; 天哪,Used to show surprise or excitement.; Used to express mild surprise.,True
+B1,goodness,interj,天哪; 我的天,"Used to express surprise, worry, or annoyance.",True
+B1,including,prep,包括; 连同,With something or someone as part of a group.; Containing something as one of its parts.,True
+B1,minus,prep,减去; 扣除; 没有,With an amount subtracted.; Without or excluding something.,True
+B1,none,pron,一个也没有; 没有一个,Not any of a group.; Not one.,True
+B1,nor,conj,也不,Used after a negative to add another negative idea.,True
+B1,limit,n,最大限度; 最终界限,the greatest possible degree of something; final or latest limiting point,False
+B1,limit,v,限制; 限定,place limits on (extent or amount or access); restrict or confine within limits,False
+B1,highly,r,非常; 高薪地,to a high degree or extent; favorably or with much respect; at a high rate or wage,False
+B1,genetic,a,遗传的; 基因的,occurring among members of a family usually by heredity; of or relating to or produced by or being a gene,False
+B1,compose,v,构成; 作曲,form the substance of; write music,False
+B1,artist,n,艺术家,a person whose creative work shows sensitivity and imagination,False
+B1,thunder,n,深沉持久的巨响; 雷声,a deep prolonged loud noise; a booming or crashing noise caused by air expanding along the path of a bolt of lightning,False
+B1,scold,v,严厉斥责; 表示不满,censure severely or angrily; show one's unhappiness or critical attitude,False
+B1,hasty,a,匆忙的; 草率的,excessively quick; done with very great haste and without due deliberation,False
+B1,necklace,n,项链,jewelry consisting of a cord or chain (often bearing gems) worn about the neck as an ornament (especially by women),False
+B1,district,n,行政区,a region marked off for administrative or other purposes,False
+B2,alongside,prep,在旁边; 并肩; 一同,Next to something or someone.; Together with someone or something.,True
+B2,amongst,prep,在之中; 其中,In or surrounded by a group of people or things.,True
+B2,concerning,prep,关于,about or relating to something,True
+B2,considering,conj,鉴于,given that a stated fact is true,True
+B2,considering,prep,考虑到,taking something into account,True
+B2,damn,a,该死的,used as expletives; expletives used informally as intensifiers,False
+B2,damn,r,非常,extremely,False
+B2,damn,interj,该死,"an exclamation showing anger, annoyance, or frustration",True
+B2,lest,conj,免得; 以免,For fear that something may happen.; So that something bad does not happen.,True
+B2,neither,conj,既不也不,Used with nor to join two negative choices.,True
+B2,neither,det,两者都不,"Not either of two people or things, before a noun.",True
+B2,neither,pron,两者都不,Not one and not the other of two people or things.,True
+B2,neither,r,也不,Used to add a second negative statement.,True
+B2,times,prep,乘以,"Used to show multiplication, as in three times four.",True
+B2,unto,prep,到,to or toward; a formal or old-fashioned form of to,True
+B2,versus,prep,对抗; 与相比,against an opponent; in comparison with,True
+B2,untie,v,解开; 松开,undo the ties of; cause to become loose,False
+B2,reprove,v,责备,take to task,False
+B2,partisan,n,热心拥护者; 党派支持者,a fervent and even militant proponent of something; an ardent and enthusiastic supporter of some person or activity,False
+B2,terrifying,a,骇人的,causing extreme terror,False
+B2,microcomputer,n,微型计算机,a small digital computer based on a microprocessor and designed to be used by one person at a time,False
+B2,pebble,n,卵石,a small smooth rounded rock,False
+B2,stimulation,n,刺激; 激励,the act of arousing an organism to action; any stimulating information or event; acts to arouse action,False
+B2,torch,n,火把; 毛蕊花,a light usually carried in the hand; consists of some flammable substance; tall-stalked very woolly mullein with densely packed yellow flowers; ancient Greeks and Romans dipped the stalks in tallow for funeral torches,False
+B2,execute,v,处决; 谋杀,kill as a means of socially sanctioned punishment; murder in a planned fashion,False
+B2,blur,v,变模糊; 使模糊,become glassy; lose clear vision; to make less distinct or clear,False
+C1,amid,prep,在中间; 处于其中,In the middle of or surrounded by something.,True
+C1,notwithstanding,prep,尽管; 虽然,Despite; in spite of.,True
+C1,whilst,conj,当; 而,during the time that; although or in contrast,True
+C1,abstraction,n,抽象概念; 抽取,a concept or idea not associated with any specific instance; the act of withdrawing or removing something,False
+C1,diversity,n,多样性; 变化性,noticeable heterogeneity; the condition or result of being changeable,False
+C1,macabre,a,恐怖骇人的,shockingly repellent; inspiring horror,False
+C1,contractor,n,承包商; 承包人,someone (a person or firm) who contracts to build things; the bridge player in contract bridge who wins the bidding and can declare which suit is to be trumps,False
+C1,digitalize,v,数字化; 洋地黄化,"put into digital form, as for use in a computer; administer digitalis such that the patient benefits maximally without getting adverse effects",False
+C1,dismal,a,阴郁的; 凄惨的,causing dejection,False
+C1,bearded,a,有胡须的; 有芒的,having hair on the cheeks and chin; having a growth of hairlike awns,False
+C1,reminiscent,a,令人想起的,serving to bring to mind,False
+C1,exotically,r,异国风情地,In a way that seems unusual or foreign.,True
+C1,disillusionment,n,幻灭,freeing from false belief or illusions,False
+C1,rudiments,n,基本原理; 入门知识,a statement of fundamental facts or principles; the elementary stages of any subject (usually plural),False
+C1,dynamically,r,充满活力地,in a forceful dynamic manner,False
+C1,uninspiring,a,令人沮丧的,depressing to the spirit,False
+C1,tedium,n,厌倦; 冗长乏味,the feeling of being bored by something tedious; dullness owing to length or slowness,False
+C1,amply,r,充足地; 充分地,to an ample degree or in an ample manner; sufficiently; more than adequately,False
+C1,snooze,v,打盹,sleep lightly or for a short period of time,False
+C1,torturous,a,极其痛苦的,extremely painful,False
+C2,vis-a-vis,prep,相对于; 面对,in relation to or compared with; facing someone or something,True
+C2,farcical,a,滑稽,broadly or extravagantly humorous; resembling farce,False
+C2,calamitous,a,灾难性的,(of events) having extremely unfortunate or dire consequences; bringing ruin,False
+C2,confabulate,v,虚构记忆; 闲谈,unconsciously replace fact with fantasy in one's memory; talk socially without exchanging too much information,False
+C2,fabrication,n,捏造; 虚构写作,a deliberately false or improbable account; writing in a fictional form,False
+C2,disparagement,n,贬低; 轻蔑,a communication that belittles somebody or something; the act of speaking contemptuously of,False
+C2,recourse,n,求助; 依靠对象,act of turning to for assistance; something or someone turned to for assistance or security,False
+C2,philanthropist,n,慈善家,someone who makes charitable donations intended to increase human well-being,False
+C2,rhetorical,a,修辞的; 重形式轻思想的,"of or relating to rhetoric; given to rhetoric, emphasizing style at the expense of thought",False
+C2,dribble,n,滴落; 流涎,flowing in drops; the formation and falling of drops of liquid; saliva spilling from the mouth,False
+C2,dribble,v,滴流; 使滴下,"run or flow slowly, as in drops or in an unsteady stream; let or cause to fall in drops",False
+C2,remorseful,a,悔恨的; 懊悔的,feeling or expressing pain or sorrow for sins or offenses,False
+C2,echo,n,厄科; 回声,(Greek mythology) a nymph who was spurned by Narcissus and pined away until only her voice remained; the repetition of a sound resulting from reflection of the sound waves,False
+C2,echo,v,重复; 回荡,to say again or imitate; ring or echo with sound,False
+C2,compellingly,r,令人信服地; 引人入胜地,in a way that strongly convinces people; in a way that holds attention and is very interesting,True
+C2,protrude,v,突出; 鼓出,extend out or project in space; bulge outward,False
+C2,embody,v,体现; 具体化; 饰演,"represent in bodily form; represent, as of a character on stage",False
+C2,interlude,n,间歇; 插曲; 幕间节目,an intervening period or episode; a brief show (music or dance etc.) inserted between the sections of a longer performance,False
+C2,laryngitis,n,喉炎,inflammation of the mucous membrane of the larynx; characterized by hoarseness or loss of voice and coughing,False
+C2,fabulation,n,虚构故事; 编造,The act of inventing stories or events.; An imagined story or account.,True
+C2,snobbery,n,势利,the trait of condescending to those of lower social status,False
+C2,ignominiously,r,可耻地,in a dishonorable manner or to a dishonorable degree,False

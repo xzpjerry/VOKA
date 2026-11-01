@@ -1,11 +1,11 @@
 {
   "cefrj.json": {
-    "raw": 136873,
-    "gzip": 27088
+    "raw": 182052,
+    "gzip": 31710
   },
   "octanove.json": {
-    "raw": 43256,
-    "gzip": 9183
+    "raw": 55662,
+    "gzip": 10380
   },
   "oewn.json": {
     "raw": 7591321,
@@ -28,7 +28,11 @@
     "gzip": 969513
   },
   "attributions.json": {
-    "raw": 30987,
-    "gzip": 9384
+    "raw": 33085,
+    "gzip": 10066
+  },
+  "gloss-leveled.json": {
+    "raw": 1522007,
+    "gzip": 501707
   }
 }

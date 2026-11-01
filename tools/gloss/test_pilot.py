@@ -12,8 +12,18 @@ class PilotTests(unittest.TestCase):
     def test_reproducible_strata_and_polysemy(self):
         path = pilot.OUT/'sample.json'
         before = path.read_bytes()
-        pilot.sample()
-        self.assertEqual(before,path.read_bytes())
+        # Source metadata/POS can evolve; the historical pilot words stay identical.
+        with tempfile.TemporaryDirectory() as tmp:
+            original = pilot.OUT
+            try:
+                pilot.OUT = Path(tmp)
+                pilot.sample()
+                after = (pilot.OUT/'sample.json').read_bytes()
+                self.assertEqual(json.loads(before)['words'], json.loads(after)['words'])
+                pilot.sample()
+                self.assertEqual(after, (pilot.OUT/'sample.json').read_bytes())
+            finally:
+                pilot.OUT = original
         words = json.loads(before)['words']
         self.assertEqual(len({w['lemma'] for w in words}),300)
         self.assertTrue(all(set(w['pos']) <= {'n','v','a','r'} for w in words))
