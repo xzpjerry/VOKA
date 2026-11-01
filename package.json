@@ -24,6 +24,7 @@
     "check:data": "tsx scripts/check-data.ts",
     "check:data:browser": "tsx scripts/check-data-browser.ts",
     "check:contexts": "tsx scripts/check-contexts.ts",
+    "test-anki:compact": "tsx scripts/compact-test-anki.ts",
     "check:scope": "tsx scripts/check-site-scope.ts",
     "check:gloss-data": "tsx scripts/check-gloss-data.ts",
     "check:gloss-upgrade": "tsx scripts/check-gloss-upgrade.ts",

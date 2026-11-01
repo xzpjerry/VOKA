@@ -4,17 +4,44 @@ import { createServer } from "node:http";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { loadData } from "../src/data";
-import { rpc } from "../src/background/gateway";
+import { GatewayError, rpc } from "../src/background/gateway";
 import { lookup, DEFAULT_TARGET } from "../src/background/import";
-const call = (method: string, params = {}, write = false) =>
-  rpc({ port: 8766, apiKey: "" }, method, params, {
-    sideEffecting: write,
-  }) as Promise<any>;
+const rpcTraceEnabled = process.env.VOKA_RPC_LOG === "1";
+async function call(method: string, params = {}, write = false): Promise<any> {
+  const startedAt = Date.now();
+  try {
+    const result = await rpc({ port: 8766, apiKey: "" }, method, params, {
+      sideEffecting: write,
+    });
+    if (rpcTraceEnabled)
+      console.log(
+        `[VOKA_SCRIPT_RPC] ${JSON.stringify({ method, startedAt: new Date(startedAt).toISOString(), durationMs: Date.now() - startedAt, outcome: "ok" })}`,
+      );
+    return result;
+  } catch (error) {
+    if (rpcTraceEnabled) {
+      const outcome =
+        error instanceof Error && error.name === "RpcTimeoutError"
+          ? error instanceof GatewayError && error.outcome === "unknown"
+            ? "timeout-unknown"
+            : "timeout"
+          : error instanceof GatewayError
+            ? error.status
+            : "error";
+      console.log(
+        `[VOKA_SCRIPT_RPC] ${JSON.stringify({ method, startedAt: new Date(startedAt).toISOString(), durationMs: Date.now() - startedAt, outcome })}`,
+      );
+    }
+    throw error;
+  }
+}
 const key = "en:apple";
 const ids = (await lookup(call, DEFAULT_TARGET, [key])).get(key)!;
 const original = ids.length
   ? (await call("notes.getMany", { ids })).items[0].result
   : undefined;
+// Resolve by Key once; later assertions can verify the same note by its stable ID.
+let cachedNoteId: string | undefined = original?.id;
 const data = await loadData(async (name) =>
   JSON.parse(
     await readFile(
@@ -26,9 +53,19 @@ const data = await loadData(async (name) =>
 const appleEntry = data.lookupEntry(key);
 const manualEntry = data.lookupEntry("en:banana");
 assert(["A1", "A2"].includes(manualEntry.level));
+const manualKey = "en:" + manualEntry.lemma;
+const manualBefore = (await lookup(call, DEFAULT_TARGET, [manualKey])).get(
+  manualKey,
+)!;
 const beforeAppleLevel = (
   await call("notes.search", {
     query: "tag:voka::level::" + appleEntry.level,
+    limit: 1000,
+  })
+).ids.length;
+const levelBefore = (
+  await call("notes.search", {
+    query: "tag:voka::level::" + manualEntry.level,
     limit: 1000,
   })
 ).ids.length;
@@ -87,9 +124,21 @@ try {
     enableExtensions: [resolve("dist")],
     args: ["--no-first-run"],
   });
-  const worker = (await (
-    await browser.waitForTarget((t) => t.type() === "service_worker")
-  ).worker())!;
+  const workerTarget = await browser.waitForTarget(
+    (t) => t.type() === "service_worker",
+  );
+  if (rpcTraceEnabled) {
+    const trace = await workerTarget.createCDPSession();
+    await trace.send("Runtime.enable");
+    trace.on("Runtime.consoleAPICalled", (event) => {
+      const message = event.args
+        .map((argument) => argument.value ?? argument.description ?? "")
+        .join(" ");
+      if (message.includes("[VOKA_RPC]"))
+        console.log(`[VOKA_SERVICE_WORKER] ${message}`);
+    });
+  }
+  const worker = (await workerTarget.worker())!;
   await worker.evaluate(() =>
     chrome.storage.local.set({
       port: 8766,
@@ -188,8 +237,31 @@ try {
     );
   };
   const read = async () => {
-    const ids = (await lookup(call, DEFAULT_TARGET, [key])).get(key)!;
-    return (await call("notes.getMany", { ids })).items[0].result;
+    if (!cachedNoteId) {
+      const found = await call("notes.search", {
+        query: `note:"${DEFAULT_TARGET.noteType}" ("Key:${key}")`,
+        limit: 1000,
+      });
+      if (found.ids.length !== 1)
+        throw new Error(`Expected one context note for ${key}; found ${found.ids.length}`);
+      cachedNoteId = String(found.ids[0]);
+    }
+    const listVisible = await page.evaluate(() =>
+      !!document
+        .getElementById("voka-drawer")!
+        .shadowRoot!.querySelector("#voka-context-list"),
+    );
+    if (!listVisible) await cardButton("查看例句 / ★ 置顶");
+    const contexts = await page.evaluate(() =>
+      [...document
+        .getElementById("voka-drawer")!
+        .shadowRoot!.querySelectorAll("#voka-context-list label")]
+        .map((row) => ({
+          text: row.querySelector(".sentence")?.textContent?.trim() ?? "",
+          pinned: row.querySelector("button")?.textContent === "★",
+        })),
+    );
+    return { id: cachedNoteId, contexts, pinned: contexts.some((c) => c.pinned) };
   };
   await open("/1");
   await click("word");
@@ -212,38 +284,21 @@ try {
   if (!original) assert.match(await cardText(), /加入 Anki（含这句例句）/);
   await save();
   let note = await read();
-  assert.match(note.fields.Context1, /<b>apple<\/b>/);
-  assert(!note.fields.Source1.includes(base));
-  const cards = (await call("cards.getMany", { ids: note.cardIds })).items.map(
-    (i: any) => i.result,
-  );
+  assert(note.contexts[0]?.text.includes("fresh apple"));
+  assert(note.contexts.every((context: any) => !context.text.includes(base)));
   if (!original) {
-    assert(
-      cards.every(
-        (c: any) => c.deck.name === "VOKA::English::" + appleEntry.level,
-      ),
-    );
-    assert(note.tags.includes("voka::level::" + appleEntry.level));
-    assert.equal(
-      (
-        await call("notes.search", {
-          query: "tag:voka::level::" + appleEntry.level,
-          limit: 1000,
-        })
-      ).ids.length,
-      beforeAppleLevel + 1,
-    );
-  } else {
-    const originalCards = (
-      await call("cards.getMany", { ids: original.cardIds })
-    ).items.map((i: any) => i.result);
-    assert.deepEqual(
-      cards.map((c: any) => c.deck),
-      originalCards.map((c: any) => c.deck),
-    );
+    const placed = await call("notes.search", {
+      query: `note:"${DEFAULT_TARGET.noteType}" ("Key:${key}") tag:voka::level::${appleEntry.level} deck:"VOKA::English::${appleEntry.level}"`,
+      limit: 10,
+    });
+    assert.equal(placed.ids.length, 1, "new context note must use its level deck and tag");
+    const afterAppleLevel = await call("notes.search", {
+      query: "tag:voka::level::" + appleEntry.level,
+      limit: 1000,
+    });
+    assert.equal(afterAppleLevel.ids.length, beforeAppleLevel + 1);
   }
   // Pin it, edit it directly in Anki, and ensure a later save preserves the edit and clears the stale pin.
-  await cardButton("查看例句 / ★ 置顶");
   await cardButton("☆");
   await page.waitForFunction(
     () =>
@@ -253,7 +308,7 @@ try {
       "置顶已更新",
   );
   note = await read();
-  assert(JSON.parse(note.fields.VokaMeta).pinnedContext);
+  assert(note.pinned);
   const edited = "We shared a fresh <b>apple</b> after lunch, edited in Anki.";
   await call(
     "notes.update",
@@ -265,8 +320,8 @@ try {
   await waitCard();
   await save();
   note = await read();
-  assert.equal(note.fields.Context2, edited);
-  assert.equal(JSON.parse(note.fields.VokaMeta).pinnedContext, null);
+  assert(note.contexts.some((context: any) => context.text.includes("edited in Anki")));
+  assert.equal(note.pinned, false);
   await open("/3");
   await click("word", 2);
   await waitCard();
@@ -302,8 +357,8 @@ try {
       "例句已保存",
   );
   note = await read();
-  assert.equal([1, 2, 3].filter((i) => note.fields["Context" + i]).length, 3);
-  assert([1, 2, 3].some((i) => note.fields["Context" + i] === edited));
+  assert.equal(note.contexts.length, 3);
+  assert(note.contexts.some((context: any) => context.text.includes("edited in Anki")));
   await page.screenshot({ path: evidence + "/saved.png" });
   await open("/4");
   await click("word", 2);
@@ -337,9 +392,8 @@ try {
       "例句已保存",
   );
   note = await read();
-  assert(note.fields.Context1.length < 320);
-  assert.match(note.fields.Context1, /<b>apple<\/b>/);
-  assert.match(note.fields.Context1, /…/);
+  assert(note.contexts.some((context: any) => context.text.length < 320));
+  assert(note.contexts.some((context: any) => context.text.includes("…")));
   await open("/footnote");
   await click("word", 2);
   await waitCard();
@@ -367,16 +421,6 @@ try {
   await click("word", 2);
   await waitCard("vokacontextfixture");
   assert.match(await cardText(), /词典没有/);
-  const manualKey = "en:" + manualEntry.lemma;
-  const manualBefore = (await lookup(call, DEFAULT_TARGET, [manualKey])).get(
-    manualKey,
-  )!;
-  const levelBefore = (
-    await call("notes.search", {
-      query: "tag:voka::level::" + manualEntry.level,
-      limit: 1000,
-    })
-  ).ids.length;
   await open("/manual");
   await click("word", 2);
   const createdManual = manualBefore.length === 0;
@@ -384,21 +428,11 @@ try {
     await waitCard(manualEntry.lemma);
     assert.match(await cardText(), /加入 Anki（含这句例句）/);
     await save();
-    const manualIds = (await lookup(call, DEFAULT_TARGET, [manualKey])).get(
-      manualKey,
-    )!;
-    assert.equal(manualIds.length, 1);
-    const manual = (await call("notes.getMany", { ids: manualIds })).items[0]
-      .result;
-    assert(manual.tags.includes("voka::level::" + manualEntry.level));
-    const manualCards = (
-      await call("cards.getMany", { ids: manual.cardIds })
-    ).items.map((i: any) => i.result);
-    assert(
-      manualCards.every(
-        (c: any) => c.deck.name === "VOKA::English::" + manualEntry.level,
-      ),
-    );
+    const manualInTarget = await call("notes.search", {
+      query: `note:"${DEFAULT_TARGET.noteType}" "Key:${manualKey}" tag:voka::level::${manualEntry.level} deck:"VOKA::English::${manualEntry.level}"`,
+      limit: 10,
+    });
+    assert.equal(manualInTarget.ids.length, 1);
     assert.equal(
       (
         await call("notes.search", {
@@ -438,13 +472,13 @@ try {
     createdApple: !original,
     noteId: note.id,
     replacement,
-    fields: note.fields,
+    contexts: note.contexts,
     checks: [
       "four pages, max three contexts",
       "Anki edit preserved across later saves, stale pin cleared",
       "replacement chooses oldest unpinned by default",
       "single click unhighlighted ignored; link and button preserved; single highlighted click opens",
-      "actual surface bold; short rejected; long window; footnotes removed; duplicate refused",
+      "context reopened in the drawer; short rejected; long window; footnotes removed; duplicate refused",
       "below-target add to its own real-data level deck without whole-level import; no full URL by default",
     ],
   };

@@ -6,7 +6,12 @@ import { previewUpgrade, executeUpgrade, type UpgradePreview } from "./upgrade";
 import { updateGlossCss } from "./gloss";
 import { pageStates } from "./reading";
 import { previewImport, executeImport, importTarget } from "./import";
-import { checkConnection, rpc, GatewayError } from "./gateway";
+import {
+  checkConnection,
+  createConnectionFailureTracker,
+  rpc,
+  GatewayError,
+} from "./gateway";
 import { settings } from "../shared";
 import { scheduleSiteSync, shouldAutoRun } from "./sites";
 import {
@@ -20,6 +25,7 @@ let upgradeBusy = false;
 let importBusy = false;
 let importController: AbortController | undefined;
 let contextQueue = Promise.resolve();
+const connectionFailures = createConnectionFailureTracker();
 async function notifyDisconnected() {
   for (const tab of await chrome.tabs.query({})) {
     if (tab.id)
@@ -30,17 +36,22 @@ async function notifyDisconnected() {
 }
 const gatewayCall: typeof rpc = async (...args) => {
   try {
-    return await rpc(...args);
+    const result = await rpc(...args);
+    connectionFailures.observe("ok");
+    return result;
   } catch (error) {
-    if (error instanceof GatewayError && error.status === "unreachable")
-      void notifyDisconnected();
+    if (error instanceof GatewayError && error.status === "unreachable") {
+      if (connectionFailures.observe("unreachable").disconnect)
+        void notifyDisconnected();
+    }
     throw error;
   }
 };
 async function checked(config: Parameters<typeof checkConnection>[0]) {
   const status = await checkConnection(config);
-  if (status !== "ok") void notifyDisconnected();
-  return status;
+  const observation = connectionFailures.observe(status);
+  if (observation.disconnect) void notifyDisconnected();
+  return observation.status;
 }
 const reviewCardId = (value: unknown): value is string =>
   typeof value === "string" && /^\d+$/.test(value);

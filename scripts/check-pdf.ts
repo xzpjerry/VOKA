@@ -5,7 +5,7 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import puppeteer, { type Browser, type Page } from "puppeteer";
-import { checkConnection, rpc } from "../src/background/gateway";
+import { checkConnection, GatewayError, rpc } from "../src/background/gateway";
 import { CORE_FIELDS, DEFAULT_TARGET, lookup, vokaMeta } from "../src/background/import";
 import { createData, type Entry } from "../src/data";
 import { normalizeKey } from "../src/key";
@@ -16,8 +16,33 @@ const TEST_DECK = "VOKA Test::86";
 const NOTE_TYPE = DEFAULT_TARGET.noteType;
 const TEST_PDF_TITLE = "VOKA PDF Test Document";
 const config = { port: PORT, apiKey: "" };
-const call = (method: string, params = {}, write = false) =>
-  rpc(config, method, params, { sideEffecting: write }) as Promise<any>;
+const rpcTraceEnabled = process.env.VOKA_RPC_LOG === "1";
+async function call(method: string, params = {}, write = false): Promise<any> {
+  const startedAt = Date.now();
+  try {
+    const result = await rpc(config, method, params, { sideEffecting: write });
+    if (rpcTraceEnabled)
+      console.log(
+        `[VOKA_SCRIPT_RPC] ${JSON.stringify({ method, startedAt: new Date(startedAt).toISOString(), durationMs: Date.now() - startedAt, outcome: "ok" })}`,
+      );
+    return result;
+  } catch (error) {
+    if (rpcTraceEnabled) {
+      const outcome =
+        error instanceof Error && error.name === "RpcTimeoutError"
+          ? error instanceof GatewayError && error.outcome === "unknown"
+            ? "timeout-unknown"
+            : "timeout"
+          : error instanceof GatewayError
+            ? error.status
+            : "error";
+      console.log(
+        `[VOKA_SCRIPT_RPC] ${JSON.stringify({ method, startedAt: new Date(startedAt).toISOString(), durationMs: Date.now() - startedAt, outcome })}`,
+      );
+    }
+    throw error;
+  }
+}
 const quote = (value: string) =>
   '"' + value.replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"';
 const escapeHtml = (value: string) =>
@@ -351,6 +376,17 @@ try {
     args: ["--no-first-run", "--lang=zh-CN"],
   });
   const workerTarget = await browser.waitForTarget((target) => target.type() === "service_worker");
+  if (rpcTraceEnabled) {
+    const trace = await workerTarget.createCDPSession();
+    await trace.send("Runtime.enable");
+    trace.on("Runtime.consoleAPICalled", (event) => {
+      const message = event.args
+        .map((argument) => argument.value ?? argument.description ?? "")
+        .join(" ");
+      if (message.includes("[VOKA_RPC]"))
+        console.log(`[VOKA_SERVICE_WORKER] ${message}`);
+    });
+  }
   const worker = (await workerTarget.worker())!;
   const extensionUrls = await worker.evaluate(() => ({
     reader: chrome.runtime.getURL("reader.html"),
