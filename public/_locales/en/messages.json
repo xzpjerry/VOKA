@@ -149,6 +149,63 @@
   "dueNone": {
     "message": "Nothing due today on this page"
   },
+  "reviewStart": {
+    "message": "Start review"
+  },
+  "reviewLoading": {
+    "message": "Loading card…"
+  },
+  "reviewLoadError": {
+    "message": "Could not load the review card"
+  },
+  "reviewShowAnswer": {
+    "message": "Show answer"
+  },
+  "reviewPreparing": {
+    "message": "Loading rating options…"
+  },
+  "reviewPrepareError": {
+    "message": "Could not load rating options"
+  },
+  "reviewRetry": {
+    "message": "Try again"
+  },
+  "reviewAgain": {
+    "message": "Again"
+  },
+  "reviewHard": {
+    "message": "Hard"
+  },
+  "reviewGood": {
+    "message": "Good"
+  },
+  "reviewEasy": {
+    "message": "Easy"
+  },
+  "reviewSubmitting": {
+    "message": "Submitting…"
+  },
+  "reviewConfirming": {
+    "message": "Checking whether the review was submitted…"
+  },
+  "reviewNotDue": {
+    "message": "Already completed in Anki; skipping"
+  },
+  "reviewConflict": {
+    "message": "Card state changed. Please rate again."
+  },
+  "reviewUnknown": {
+    "message": "Could not confirm whether it was submitted. Check Anki."
+  },
+  "reviewNext": {
+    "message": "Next"
+  },
+  "reviewFinished": {
+    "message": "You finished today's due words on this page"
+  },
+  "reviewReturn": {
+    "message": "Return to list"
+  },
   "drawerLearning": {
     "message": "Learning language"
   },

@@ -35,6 +35,7 @@ export class GatewayError extends Error {
   constructor(
     public status: Exclude<Status, "ok">,
     public outcome: "failed" | "unknown" = "failed",
+    public code?: number,
   ) {
     super(status);
   }
@@ -115,6 +116,8 @@ export async function rpc(
           (object(error.data) && error.data.type === "authenticationRequired")
           ? "auth"
           : "not-new-ankiconnect",
+        "failed",
+        error.code as number,
       );
     }
     return data.result;

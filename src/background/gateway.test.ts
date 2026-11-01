@@ -116,6 +116,29 @@ describe("v1 gateway", () => {
     );
     expect(await checkConnection(settings, { fetch })).toBe("auth");
   });
+  it("exposes JSON-RPC error codes for review conflict handling", async () => {
+    const fetch = vi.fn(
+      async (_url, init) =>
+        new Response(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            id: JSON.parse(init!.body as string).id,
+            error: {
+              code: 1008,
+              message: "Prediction/conversion token is stale.",
+              data: { type: "conflict" },
+            },
+          }),
+        ),
+    );
+    await expect(
+      rpc(settings, "scheduling.answer", {}, { fetch, sideEffecting: true }),
+    ).rejects.toMatchObject({
+      status: "not-new-ankiconnect",
+      outcome: "failed",
+      code: 1008,
+    });
+  });
   it("rejects non-JSON", async () => {
     expect(
       await checkConnection(settings, {

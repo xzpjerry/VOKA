@@ -60,9 +60,11 @@ export function createDrawer(
   retry: HTMLButtonElement,
   activate: (token: Token) => void,
   onExpanded: () => void = () => {},
+  onStartReview: (tokens: Token[]) => void = () => {},
+  reviewView?: HTMLElement,
 ) {
   const style = document.createElement("style");
-  style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-sort{display:flex;align-items:center;gap:8px;margin:8px 0}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
+  style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 8px 12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-due-summary{border:0;background:transparent;color:#285e9e;text-align:left;padding:8px 4px;white-space:nowrap}.drawer-due-summary:disabled{color:#566575;cursor:default}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-sort{display:flex;align-items:center;gap:8px;margin:8px 0}.drawer-start-review{margin:4px 0 8px}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
   root.append(style);
   const header = document.createElement("button");
   header.className = "drawer-toggle";
@@ -70,9 +72,12 @@ export function createDrawer(
   header.setAttribute("aria-expanded", "false");
   const brand = document.createElement("strong");
   brand.textContent = "VOKA";
-  const dueSlot = document.createElement("span");
+  const dueSlot = document.createElement("button");
+  dueSlot.type = "button";
+  dueSlot.className = "drawer-due-summary";
   dueSlot.dataset.slot = "due-summary";
   dueSlot.hidden = true;
+  dueSlot.disabled = true;
   const arrow = document.createElement("span");
   arrow.className = "chevron";
   arrow.textContent = t("drawerExpand");
@@ -85,23 +90,25 @@ export function createDrawer(
     event.preventDefault(); event.stopPropagation();
     void chrome.runtime.sendMessage({ type: "open-gloss-upgrade" });
   };
-  header.append(brand, summary, dueSlot, arrow);
+  header.append(brand, summary, arrow);
   const headerRow = document.createElement("div");
   headerRow.style.cssText = "display:flex;align-items:center";
   header.style.flex = "1";
+  dueSlot.style.flex = "0 0 auto";
   updateLink.style.cssText = "font:inherit;max-width:45%;padding:8px 12px 8px 0";
-  headerRow.append(header, updateLink);
+  headerRow.append(header, dueSlot, updateLink);
   const body = document.createElement("div");
   body.className = "drawer-body";
   body.id = "drawer-body";
   body.hidden = true;
   header.setAttribute("aria-controls", body.id);
-  header.onclick = () => {
-    body.hidden = !body.hidden;
-    header.setAttribute("aria-expanded", String(!body.hidden));
-    arrow.textContent = t(body.hidden ? "drawerExpand" : "drawerCollapse");
-    if (!body.hidden) onExpanded();
-  };
+  function setExpanded(expanded: boolean) {
+    body.hidden = !expanded;
+    header.setAttribute("aria-expanded", String(expanded));
+    arrow.textContent = t(expanded ? "drawerCollapse" : "drawerExpand");
+    if (expanded) onExpanded();
+  }
+  header.onclick = () => setExpanded(body.hidden);
   const connection = document.createElement("span");
   const row = document.createElement("div");
   row.className = "drawer-connection";
@@ -168,11 +175,18 @@ export function createDrawer(
   let words: Token[] = [],
     counts = new Map<string, number>(),
     active: Filter = "target",
-    sortOrder: PageWordSort = "first";
+    sortOrder: PageWordSort = "first",
+    dueCount = 0,
+    status = "ok",
+    reviewing = false;
   sortSelect.onchange = () => {
     sortOrder = sortSelect.value as PageWordSort;
     render();
   };
+  const startReview = document.createElement("button");
+  startReview.type = "button";
+  startReview.className = "drawer-start-review";
+  startReview.textContent = t("reviewStart");
   const buttons = filters.map((filter) => {
     const button = document.createElement("button");
     button.dataset.filter = filter;
@@ -226,9 +240,36 @@ export function createDrawer(
       item.append(button);
       list.append(item);
     }
-    empty.hidden = list.childElementCount > 0;
+    startReview.hidden =
+      reviewing || active !== "due" || dueCount === 0 || status !== "ok";
+    empty.hidden = reviewing || list.childElementCount > 0;
   }
-  body.append(row, language, controls, tabs, sortLabel, list, empty);
+  function setReviewing(value: boolean) {
+    reviewing = value;
+    for (const element of [row, language, controls, tabs, sortLabel, startReview, list, empty])
+      element.hidden = value;
+    if (reviewView) reviewView.hidden = !value;
+    if (!value) render();
+  }
+  function beginReview() {
+    if (status !== "ok" || dueCount === 0) return;
+    const queue = [...words];
+    setExpanded(true);
+    setReviewing(true);
+    onStartReview(queue);
+  }
+  dueSlot.onclick = () => {
+    if (dueSlot.disabled) return;
+    active = "due";
+    render();
+    beginReview();
+  };
+  startReview.onclick = beginReview;
+  body.append(row, language, controls, tabs, sortLabel, startReview, list, empty);
+  if (reviewView) {
+    reviewView.hidden = true;
+    body.append(reviewView);
+  }
   return {
     header: headerRow,
     body,
@@ -239,6 +280,7 @@ export function createDrawer(
       } catch { updateLink.hidden = true; }
     },
     update(tokens: Token[], config?: ReadingSettings, status = "ok") {
+      thisStatus(status);
       if (status !== "ok") updateLink.hidden = true;
       words = pageWords(tokens);
       counts = pageWordCounts(tokens);
@@ -253,12 +295,16 @@ export function createDrawer(
               ),
             )
           : t(status === "checking" ? "checking" : "notRunning");
-      const dueCount = words.filter((word) => isDueToday(word.state)).length;
+      dueCount = words.filter((word) => isDueToday(word.state)).length;
       dueSlot.textContent =
         dueCount > 0
           ? t("dueSummary").replace("{count}", String(dueCount))
           : t("dueNone");
       dueSlot.hidden = status !== "ok";
+      dueSlot.disabled = status !== "ok" || dueCount === 0;
+      dueSlot.setAttribute("aria-label", dueSlot.textContent);
+      startReview.hidden =
+        reviewing || active !== "due" || dueCount === 0 || status !== "ok";
       for (const input of [gloss, advanced, hover, sortSelect])
         input.disabled = status !== "ok";
       if (config) {
@@ -274,5 +320,12 @@ export function createDrawer(
         hover.value = config.hoverScope;
       }
     },
+    showList() {
+      setReviewing(false);
+    },
   };
+
+  function thisStatus(value: string) {
+    status = value;
+  }
 }
