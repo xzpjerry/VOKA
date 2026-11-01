@@ -9,9 +9,29 @@ const pageWordId = (token: Token) =>
     : token.range.toString().toLocaleLowerCase("en");
 /** Keep the first occurrence in document order, including after incremental rescans. */
 export function pageWords(tokens: Token[]) {
-  const sorted = [...tokens].sort((a, b) =>
-    a.range.compareBoundaryPoints(Range.START_TO_START, b.range),
-  );
+  const documentOrder = new Map<Document, number>();
+  for (const token of tokens) {
+    const doc = token.range.startContainer.ownerDocument;
+    if (doc && !documentOrder.has(doc)) documentOrder.set(doc, documentOrder.size);
+  }
+  const sorted = tokens
+    .map((token, index) => ({ token, index }))
+    .sort((a, b) => {
+      const aDoc = a.token.range.startContainer.ownerDocument;
+      const bDoc = b.token.range.startContainer.ownerDocument;
+      if (aDoc !== bDoc)
+        return (
+          (aDoc ? documentOrder.get(aDoc) ?? 0 : 0) -
+          (bDoc ? documentOrder.get(bDoc) ?? 0 : 0)
+        );
+      return (
+        a.token.range.compareBoundaryPoints(
+          Range.START_TO_START,
+          b.token.range,
+        ) || a.index - b.index
+      );
+    })
+    .map(({ token }) => token);
   const seen = new Set<string>();
   return sorted.filter((token) => {
     const id = pageWordId(token);
@@ -201,6 +221,9 @@ export function createDrawer(
   function render() {
     buttons.forEach((button, index) => {
       const filter = filters[index];
+      if (filter === "due" && dueCount === 0)
+        button.removeAttribute("data-filter");
+      else button.dataset.filter = filter;
       button.textContent =
         t("drawerFilter_" + filter) +
         " " +
@@ -293,6 +316,8 @@ export function createDrawer(
       if (status !== "ok") updateLink.hidden = true;
       words = pageWords(tokens);
       counts = pageWordCounts(tokens);
+      dueCount = words.filter((word) => isDueToday(word.state)).length;
+      if (active === "due" && dueCount === 0) active = "target";
       render();
       connection.textContent = t(status === "ok" ? "connected" : "notRunning");
       summary.textContent =
@@ -304,7 +329,6 @@ export function createDrawer(
               ),
             )
           : t(status === "checking" ? "checking" : "notRunning");
-      dueCount = words.filter((word) => isDueToday(word.state)).length;
       dueSlot.textContent =
         dueCount > 0
           ? t("dueSummary").replace("{count}", String(dueCount))

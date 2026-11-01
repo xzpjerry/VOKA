@@ -105,12 +105,21 @@ type StreamMatch = {
   candidates?: Token["entry"][];
 };
 
+export type TextStreamSource = {
+  document: Document;
+  text: string;
+  rangeFor(start: number, end: number): Range;
+};
+
 /** Extract tokens from the joined text, preserving ranges across split nodes. */
 export function extractFromStream(
-  root: Element,
+  root: Element | TextStreamSource,
   recognizeWord: (surface: string) => StreamMatch | null = () => null,
 ): Token[] {
-  const stream = textStream(root);
+  const stream =
+    "nodeType" in root && root.nodeType === 1
+      ? textStream(root as Element)
+      : (root as TextStreamSource);
   const segmenter = new Intl.Segmenter("en", { granularity: "word" });
   const tokens: Token[] = [];
   for (const part of segmenter.segment(stream.text)) {
