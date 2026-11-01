@@ -19,6 +19,7 @@
     "check:practice": "tsx scripts/check-practice.ts",
     "check:epub": "tsx scripts/check-epub.ts",
     "check:pdf": "tsx scripts/check-pdf.ts",
+    "check:p1": "tsx scripts/check-p1-acceptance.ts",
     "data:build": "python3 tools/data/build.py",
     "check:data": "tsx scripts/check-data.ts",
     "check:data:browser": "tsx scripts/check-data-browser.ts",
