@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "VOKA YouTube Probe",
+  "version": "0.1.0",
+  "description": "本地匿名记录 YouTube 字幕与播放器行为，供维护者手动测量。",
+  "minimum_chrome_version": "111",
+  "permissions": ["storage"],
+  "host_permissions": ["*://www.youtube.com/*"],
+  "action": {
+    "default_title": "YouTube Probe",
+    "default_popup": "summary.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/watch*",
+        "https://www.youtube.com/shorts/*"
+      ],
+      "js": ["main-world.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/watch*",
+        "https://www.youtube.com/shorts/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    }
+  ]
+}
