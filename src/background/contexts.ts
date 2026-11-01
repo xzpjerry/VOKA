@@ -58,6 +58,7 @@ export type ContextRequest = {
   hash?: string;
   url?: string;
   title?: string;
+  sourceLabel?: { site: string; title: string };
 };
 async function readNote(call: Call, key: string) {
   const ids = (await lookup(call, DEFAULT_TARGET, [key])).get(key) || [];
@@ -241,12 +242,14 @@ export async function cardContext(
         text,
         hash: await sentenceHash(html),
         source: escapeHtml(
-          contextSource(
-            request.url!,
-            request.title || "",
-            new Date().toISOString().slice(0, 10),
-            config.storeFullUrl,
-          ),
+          request.sourceLabel
+            ? `${request.sourceLabel.site} · ${request.sourceLabel.title} · ${new Date().toISOString().slice(0, 10)}`
+            : contextSource(
+                request.url!,
+                request.title || "",
+                new Date().toISOString().slice(0, 10),
+                config.storeFullUrl,
+              ),
         ),
       },
       request.replace,

@@ -281,6 +281,9 @@
   "popupAuto": {
     "message": "在 {host} 上自动运行"
   },
+  "popupOpenReader": {
+    "message": "打开电子书 / PDF…"
+  },
   "popupPause": {
     "message": "本页暂停"
   },
@@ -316,5 +319,47 @@
   },
   "popupPaused": {
     "message": "本页已暂停，刷新后按站点规则恢复"
+  },
+  "readerPageTitle": {
+    "message": "VOKA 阅读器"
+  },
+  "readerOpenFile": {
+    "message": "打开文件"
+  },
+  "readerNoBook": {
+    "message": "尚未打开书籍"
+  },
+  "readerContents": {
+    "message": "目录"
+  },
+  "readerPreviousChapter": {
+    "message": "上一章"
+  },
+  "readerNextChapter": {
+    "message": "下一章"
+  },
+  "readerChooseFile": {
+    "message": "请选择 EPUB 或 PDF 文件。"
+  },
+  "readerLoading": {
+    "message": "正在打开 EPUB…"
+  },
+  "readerFileTooLarge": {
+    "message": "文件太大（上限 100 MB）"
+  },
+  "readerExpandedTooLarge": {
+    "message": "文件太大（解压后上限 100 MB）"
+  },
+  "readerPdfSoon": {
+    "message": "PDF 支持即将推出"
+  },
+  "readerInvalidFile": {
+    "message": "文件格式不受支持，请选择 EPUB 或 PDF。"
+  },
+  "readerOpenFailed": {
+    "message": "无法打开此 EPUB，请检查文件是否有效。"
+  },
+  "readerChapter": {
+    "message": "第 {number} 章"
   }
 }

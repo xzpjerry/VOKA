@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+  </head>
+  <body>
+    <header class="toolbar">
+      <button id="open-file" type="button"></button>
+      <input
+        id="file-input"
+        type="file"
+        accept=".epub,.pdf,application/epub+zip,application/pdf"
+        hidden
+      />
+      <h1 id="book-title"></h1>
+      <label class="toc-label" for="toc"></label>
+      <select id="toc" disabled></select>
+      <button id="previous-chapter" type="button" disabled></button>
+      <button id="next-chapter" type="button" disabled></button>
+    </header>
+    <p id="reader-status" role="status" aria-live="polite"></p>
+    <main>
+      <iframe id="epub-frame" title="" sandbox="allow-same-origin" hidden></iframe>
+      <section id="pdf-placeholder" hidden></section>
+    </main>
+    <script type="module" src="/src/reader/index.ts"></script>
+  </body>
+</html>

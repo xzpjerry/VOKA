@@ -26,6 +26,7 @@ export function fullCard(
   updated: (key: string, fields: Record<string, string>) => void,
   stateFor: (key: string) => WordState | undefined = () => undefined,
   choose: (token: Token, entry: Token["entry"]) => Promise<void> = async () => {},
+  getSourceLabel?: () => { site: string; title: string },
 ) {
   const card = document.createElement("aside");
   card.id = "voka-card";
@@ -42,7 +43,8 @@ export function fullCard(
     busy = false,
     list = false,
     selected: string | undefined,
-    message = "";
+    message = "",
+    activeSourceLabel: { site: string; title: string } | undefined;
   const text = (html: string) => {
     const t = document.createElement("template");
     t.innerHTML = html;
@@ -53,6 +55,7 @@ export function fullCard(
       type: "card-context",
       key: active!.key,
       action,
+      ...(activeSourceLabel ? { sourceLabel: activeSourceLabel } : {}),
       ...extra,
     });
     if (response.error) throw new Error(response.error);
@@ -321,6 +324,7 @@ export function fullCard(
   async function open(token: Token) {
     const current = ++epoch;
     active = token;
+    activeSourceLabel = getSourceLabel?.();
     busy = true;
     list = false;
     message = "";

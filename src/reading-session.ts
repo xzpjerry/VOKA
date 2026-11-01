@@ -39,6 +39,9 @@ export type ReadingSessionOptions = {
   sourceLabel?: () => { site: string; title: string };
 };
 
+export const READING_HIGHLIGHT_CSS =
+  "::highlight(voka-flash){background:#ffad45;color:inherit}::highlight(voka-target){background:#ffe89a;color:inherit}::highlight(voka-learning){background:#c9e4ff;color:inherit}::highlight(voka-unknown){background:#ffc9c9;color:inherit}::highlight(voka-weak){background:#fff4cf;color:inherit}::highlight(voka-due){text-decoration:underline solid 2px;text-underline-offset:3px}";
+
 type Match = {
   key: string;
   entry: Token["entry"];
@@ -86,14 +89,7 @@ export function createReadingSession(options: ReadingSessionOptions) {
     (source, index, all) =>
       all.findIndex((candidate) => sameSource(source, candidate)) === index,
   );
-  const sourceLabel =
-    options.sourceLabel ??
-    (() => ({
-      site: uiDocument.location?.hostname ?? "",
-      title: uiDocument.title,
-    }));
-  // Kept as part of the session contract for readers that supply a source later.
-  void sourceLabel;
+  const sourceLabel = options.sourceLabel;
 
   const host = uiDocument.createElement("div");
   host.id = "voka-drawer";
@@ -116,8 +112,7 @@ export function createReadingSession(options: ReadingSessionOptions) {
   tooltip.style.cssText =
     "position:fixed;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100vw - 24px);padding:7px 10px;border-radius:6px;background:#17212b;color:white;font:14px system-ui;box-shadow:0 2px 10px #0003";
   const pageStyle = uiDocument.createElement("style");
-  pageStyle.textContent =
-    "::highlight(voka-flash){background:#ffad45;color:inherit}::highlight(voka-target){background:#ffe89a;color:inherit}::highlight(voka-learning){background:#c9e4ff;color:inherit}::highlight(voka-unknown){background:#ffc9c9;color:inherit}::highlight(voka-weak){background:#fff4cf;color:inherit}::highlight(voka-due){text-decoration:underline solid 2px;text-underline-offset:3px}";
+  pageStyle.textContent = READING_HIGHLIGHT_CSS;
   host.append(pageStyle);
 
   let config: ReadingSettings;
@@ -620,6 +615,7 @@ export function createReadingSession(options: ReadingSessionOptions) {
       updateDrawer();
       tooltip.hidden = true;
     },
+    sourceLabel,
   );
 
   function handleDisconnect() {

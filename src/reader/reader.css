@@ -1,0 +1,108 @@
+:root {
+  color: #1d2935;
+  background: #f4f6f8;
+  font: 16px/1.5 system-ui, sans-serif;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 360px;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr) auto minmax(150px, 240px) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 10px 18px;
+  background: #fff;
+  border-bottom: 1px solid #d7dfe7;
+}
+
+.toolbar h1 {
+  overflow: hidden;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toolbar button,
+.toolbar select {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid #aeb9c5;
+  border-radius: 7px;
+  background: #fff;
+  color: #17212b;
+  font: inherit;
+}
+
+.toolbar button {
+  cursor: pointer;
+}
+
+.toolbar button:disabled,
+.toolbar select:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.toolbar select {
+  min-width: 0;
+}
+
+#reader-status {
+  min-height: 24px;
+  margin: 8px 20px 0;
+  color: #536271;
+}
+
+main {
+  height: calc(100vh - 104px);
+  min-height: 400px;
+  padding: 10px 18px 18px;
+}
+
+#epub-frame {
+  display: block;
+  width: min(100%, 1040px);
+  height: 100%;
+  margin: 0 auto;
+  border: 1px solid #d7dfe7;
+  background: #fff;
+  box-shadow: 0 2px 16px #192d401c;
+}
+
+#pdf-placeholder {
+  width: min(100%, 1040px);
+  height: 100%;
+  margin: 0 auto;
+  padding: 40px;
+  background: #fff;
+  box-shadow: 0 2px 16px #192d401c;
+  font-size: 20px;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .toolbar {
+    grid-template-columns: auto minmax(100px, 1fr) auto auto;
+  }
+
+  .toc-label {
+    display: none;
+  }
+
+  .toolbar select {
+    grid-column: 2 / -1;
+    grid-row: 2;
+  }
+}
