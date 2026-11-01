@@ -365,6 +365,9 @@
   "youtubeDiagnostics": {
     "message": "YouTube diagnostics"
   },
+  "youtubeAutoResume": {
+    "message": "Resume playback when the pointer leaves subtitles"
+  },
   "youtubeNoSubtitles": {
     "message": "No readable English subtitles for this video"
   },

@@ -1,4 +1,5 @@
 import type { ReadingSource } from "../reading-session";
+import { settings as readSettings } from "../shared";
 import {
   chooseEnglishTrack,
   cueAtTime,
@@ -7,6 +8,7 @@ import {
   type CaptionTrack,
   type TimedTextCapture,
 } from "./captions";
+import { createHoverPause } from "./hover-pause";
 
 export type CaptionMethod = 1 | 2 | 3 | 4;
 export type CaptionScope = "full-track" | "played-part-only" | "none";
@@ -336,6 +338,7 @@ type SessionHandle = {
   isRunning: () => boolean;
   addSource: (source: ReadingSource) => void;
   removeSource: (source: ReadingSource) => void;
+  getHoverZones?: () => Element[];
   destroy: () => void;
 };
 
@@ -345,6 +348,7 @@ type ControllerOptions = {
   adapter?: YouTubeCaptionAdapter;
   readHref?: () => string;
   diagnosticsEnabled?: () => Promise<boolean>;
+  autoResumeEnabled?: () => Promise<boolean>;
   pollMs?: number;
   timedTextTimeoutMs?: number;
   screenTimeoutMs?: number;
@@ -445,6 +449,9 @@ export function createYouTubeController(options: ControllerOptions) {
       const value = await chrome.storage.local.get({ youtubeDiagnostics: false });
       return value.youtubeDiagnostics === true;
     });
+  const getAutoResume =
+    options.autoResumeEnabled ??
+    (async () => (await readSettings()).youtubeAutoResume);
   const events = new win.EventTarget();
   const pollMs = options.pollMs ?? 500;
   const timedTextTimeoutMs = options.timedTextTimeoutMs ?? 8000;
@@ -469,10 +476,12 @@ export function createYouTubeController(options: ControllerOptions) {
   let error: string | undefined;
   let videoId: string | undefined;
   let diagnosticsEnabled = false;
+  let youtubeAutoResume = true;
   let closedByUser = false;
   let activeCueSignature = "";
   let screenRecorder: ScreenCueRecorder | undefined;
   let displayBusy = false;
+  let hoverPause: ReturnType<typeof createHoverPause> | undefined;
 
   function dispatchCuesChanged() {
     const CustomEventConstructor = win.CustomEvent;
@@ -533,6 +542,26 @@ export function createYouTubeController(options: ControllerOptions) {
     activeCueSignature = "";
   }
 
+  function stopHoverPause() {
+    const controller = hoverPause;
+    hoverPause = undefined;
+    controller?.reset();
+    controller?.stop();
+  }
+
+  function startHoverPause(subtitleRoot: HTMLElement) {
+    if (hoverPause) return;
+    hoverPause = createHoverPause({
+      video: () => uiDocument.querySelector("video"),
+      zones: () => [
+        subtitleRoot,
+        ...(activeSession?.getHoverZones?.() ?? []),
+      ],
+      autoResume: () => youtubeAutoResume,
+    });
+    hoverPause.start();
+  }
+
   function stopDisplayLoop() {
     if (displayTimer !== undefined) win.clearInterval(displayTimer);
     displayTimer = undefined;
@@ -543,11 +572,15 @@ export function createYouTubeController(options: ControllerOptions) {
   function closeLine() {
     closedByUser = true;
     stopDisplayLoop();
+    stopHoverPause();
     removeLine();
   }
 
-  function createLine(player: HTMLElement) {
-    if (line?.root.isConnected) return line;
+  function createLine(player: HTMLElement, pauseOnHover = true) {
+    if (line?.root.isConnected) {
+      if (pauseOnHover) startHoverPause(line.root);
+      return line;
+    }
     const root = uiDocument.createElement("div");
     root.id = "voka-subtitle";
     root.setAttribute("role", "status");
@@ -572,6 +605,7 @@ export function createYouTubeController(options: ControllerOptions) {
     root.append(text, close, diagnostic);
     player.append(root);
     line = { root, text, close, diagnostic };
+    if (pauseOnHover) startHoverPause(root);
     updateDiagnostic();
     return line;
   }
@@ -594,7 +628,7 @@ export function createYouTubeController(options: ControllerOptions) {
   }
 
   function showNoSubtitles(player: HTMLElement, methodNumber: CaptionMethod, failure?: string) {
-    const subtitle = createLine(player);
+    const subtitle = createLine(player, false);
     subtitle.root.hidden = false;
     subtitle.text.textContent = formatText(
       "youtubeNoSubtitles",
@@ -746,6 +780,7 @@ export function createYouTubeController(options: ControllerOptions) {
     abortController = undefined;
     adapter.clearTimedTextWaiters();
     stopDisplayLoop();
+    stopHoverPause();
     removeLine();
     screenRecorder = undefined;
     cues = [];
@@ -798,9 +833,13 @@ export function createYouTubeController(options: ControllerOptions) {
     changes: { [key: string]: chrome.storage.StorageChange },
     area: string,
   ) => {
-    if (area !== "local" || !changes.youtubeDiagnostics) return;
-    diagnosticsEnabled = changes.youtubeDiagnostics.newValue === true;
-    updateDiagnostic();
+    if (area !== "local") return;
+    if (changes.youtubeDiagnostics) {
+      diagnosticsEnabled = changes.youtubeDiagnostics.newValue === true;
+      updateDiagnostic();
+    }
+    if (changes.youtubeAutoResume)
+      youtubeAutoResume = changes.youtubeAutoResume.newValue !== false;
   };
 
   async function start() {
@@ -818,6 +857,11 @@ export function createYouTubeController(options: ControllerOptions) {
       diagnosticsEnabled = await getDiagnostics();
     } catch {
       diagnosticsEnabled = false;
+    }
+    try {
+      youtubeAutoResume = await getAutoResume();
+    } catch {
+      youtubeAutoResume = true;
     }
     await refreshLocation();
   }
