@@ -171,8 +171,8 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     (["preview-upgrade", "execute-upgrade"].includes(message?.type) &&
       sender.url?.split("?")[0] === chrome.runtime.getURL("options.html"))
   ) {
-    if (upgradeBusy || importBusy) { reply({ error: "正在处理，请稍后再试" }); return; }
-    upgradeBusy = true;
+    if (message.type !== "upgrade-summary" && (upgradeBusy || importBusy)) { reply({ error: "正在处理，请稍后再试" }); return; }
+    if (message.type !== "upgrade-summary") upgradeBusy = true;
     const work = async () => {
       const config = await settings();
       if ((await checked(config)) !== "ok") throw new Error("unreachable");
@@ -199,7 +199,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     // Context saves and upgrades share VokaMeta; serialize their fresh-read/merge/write.
     contextQueue = contextQueue.catch(() => {}).then(async () => {
       try { reply({ data: await work() }); } catch (error) { reply({ error: String(error) }); }
-      finally { upgradeBusy = false; }
+      finally { if (message.type !== "upgrade-summary") upgradeBusy = false; }
     });
   } else if (
     ["preview-import", "execute-import", "cancel-import"].includes(

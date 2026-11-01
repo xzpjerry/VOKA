@@ -1,3 +1,4 @@
+import { readUpgradeKept } from "../upgrade-kept";
 import { DATA_VERSION, loadData, type Entry } from "../data";
 import { contentHash, type Call } from "./import";
 
@@ -44,12 +45,15 @@ function metadata(raw: string) {
     throw new Error("VokaMeta 无效；未修改");
   return meta;
 }
-/** Collection-wide, independent of deck and note-type names. Never writes. */
+/** Collection-wide; never writes to Anki. May prune obsolete local keep decisions. */
 export async function previewUpgrade(
   call: Call,
   nativeLanguage: "zh" | "en" = "zh",
   resolve?: (key: string) => Entry,
 ): Promise<UpgradePreview> {
+  const kept = await readUpgradeKept();
+  const matching = new Set<string>();
+  let complete = true;
   const entry = resolve ?? (await loadData()).lookupEntry;
   const preview: UpgradePreview = {
     version: DATA_VERSION,
@@ -70,10 +74,15 @@ export async function previewUpgrade(
       for (const item of batch.items) {
         const note = item.result;
         try {
-          if (item.error || !note) throw new Error(JSON.stringify(item.error));
+          if (item.error || !note) {
+            complete = false;
+            throw new Error(JSON.stringify(item.error));
+          }
           const fields = note.fields;
           if (!fields.Key?.startsWith("en:") || !note.tags?.includes("voka"))
             continue;
+          matching.add(note.id);
+          if (kept[note.id] === DATA_VERSION) continue;
           const meta = metadata(fields.VokaMeta);
           if (meta.data === DATA_VERSION) continue;
           if (!generatedFields.every((f) => typeof fields[f] === "string"))
@@ -110,6 +119,12 @@ export async function previewUpgrade(
     }
     cursor = page.nextCursor ?? undefined;
   } while (cursor);
+  // Only prune after a complete scan; failed reads must not erase decisions.
+  const pruned = Object.fromEntries(Object.entries(kept).filter(([id, version]) =>
+    version === DATA_VERSION && (!complete || matching.has(id)),
+  ));
+  if (JSON.stringify(pruned) !== JSON.stringify(kept))
+    await chrome.storage.local.set({ upgradeKept: pruned });
   return preview;
 }
 export type UpgradeResult = {
@@ -132,6 +147,10 @@ export async function executeUpgrade(
   if (preview.version !== DATA_VERSION)
     throw new Error("数据包已变更，请重新预览");
   const selectedIds = new Set(selected);
+  const kept = await readUpgradeKept();
+  for (const row of preview.rows)
+    if (!selectedIds.has(row.id)) kept[row.id] = preview.version;
+  await chrome.storage.local.set({ upgradeKept: kept });
   const rows = preview.rows.filter((r) => selectedIds.has(r.id));
   const result: UpgradeResult = {
     results: [],
