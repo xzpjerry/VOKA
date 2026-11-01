@@ -638,6 +638,12 @@ $("youtubeDiagnosticsLabel").textContent = t("youtubeDiagnostics");
 youtubeDiagnostics.addEventListener("change", () =>
   chrome.storage.local.set({ youtubeDiagnostics: youtubeDiagnostics.checked }),
 );
+const youtubeAutoResume = $("youtubeAutoResume") as HTMLInputElement;
+youtubeAutoResume.checked = initial.youtubeAutoResume;
+$("youtubeAutoResumeLabel").textContent = t("youtubeAutoResume");
+youtubeAutoResume.addEventListener("change", () =>
+  chrome.storage.local.set({ youtubeAutoResume: youtubeAutoResume.checked }),
+);
 
 // Upgrade confirmation is separate from level import: neither preview writes notes.
 $("checkUpgrade").onclick = () => void upgradeUI.preview();

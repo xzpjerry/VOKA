@@ -110,7 +110,7 @@ export function createReadingSession(options: ReadingSessionOptions) {
   tooltip.setAttribute("role", "tooltip");
   tooltip.hidden = true;
   tooltip.style.cssText =
-    "position:fixed;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100vw - 24px);padding:7px 10px;border-radius:6px;background:#17212b;color:white;font:14px system-ui;box-shadow:0 2px 10px #0003";
+    "position:fixed;pointer-events:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100vw - 24px);padding:7px 10px;border-radius:6px;background:#17212b;color:white;font:14px system-ui;box-shadow:0 2px 10px #0003";
   const pageStyle = uiDocument.createElement("style");
   pageStyle.textContent = READING_HIGHLIGHT_CSS;
   host.append(pageStyle);
@@ -778,6 +778,10 @@ export function createReadingSession(options: ReadingSessionOptions) {
     addSource,
     removeSource,
     isRunning: () => running,
+    getHoverZones: () => {
+      const fullCard = root.querySelector("#voka-card");
+      return fullCard ? [tooltip, fullCard] : [tooltip];
+    },
     destroy,
   };
 }

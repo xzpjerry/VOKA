@@ -15,7 +15,7 @@ import { normalizeKey } from "../src/key";
 import { answerHtml, css, questionHtml } from "../src/data/template";
 
 const PORT = 8766;
-const TEST_DECK = "VOKA Test::94";
+const TEST_DECK = "VOKA Test::95";
 const config = { port: PORT, apiKey: "" };
 const call = (method: string, params = {}, write = false) =>
   rpc(config, method, params, { sideEffecting: write }) as Promise<any>;
@@ -200,6 +200,7 @@ async function loadExtensionAndFindWorker() {
       showAdvanced: false,
       hoverScope: "highlighted",
       youtubeDiagnostics: false,
+      youtubeAutoResume: true,
       siteScope: "activeTab",
     }),
   );
@@ -365,6 +366,88 @@ async function runBrowserCheck() {
     {},
     testWord,
   );
+  await page.waitForFunction(
+    (word) =>
+      [...(CSS.highlights.get("voka-target") ?? [])].some((range) =>
+        range.toString().includes(word),
+      ),
+    {},
+    testWord,
+  );
+
+  // T-20: stay paused across the subtitle line, tooltip, and full card, then
+  // resume only after leaving every VOKA zone.
+  await page.evaluate(() => (document.querySelector("video") as HTMLVideoElement).play());
+  await page.waitForFunction(() => !(document.querySelector("video") as HTMLVideoElement).paused);
+  let lineBox = await (await page.$("#voka-subtitle"))!.boundingBox();
+  assert(lineBox, "subtitle line is not visible for the hover check");
+  await page.mouse.move(lineBox.x + lineBox.width / 2, lineBox.y + lineBox.height / 2);
+  await page.waitForFunction(() => (document.querySelector("video") as HTMLVideoElement).paused);
+  const wordRect = await page.evaluate((word) => {
+    const range = [...(CSS.highlights.get("voka-target") ?? [])].find(
+      (item) => item.toString().includes(word),
+    );
+    if (!range) return null;
+    const rect = range.getBoundingClientRect();
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+  }, testWord);
+  assert(wordRect, "the fixture word is not highlighted in the subtitle line");
+  await page.mouse.move(wordRect.x + wordRect.width / 2, wordRect.y + wordRect.height / 2);
+  await page.waitForFunction((word) => {
+    const tooltip = document.getElementById("voka-drawer")?.shadowRoot?.querySelector("[role=tooltip]") as HTMLElement | null;
+    return !!tooltip && !tooltip.hidden && tooltip.textContent?.includes(word);
+  }, {}, testWord);
+  await page.mouse.click(wordRect.x + wordRect.width / 2, wordRect.y + wordRect.height / 2);
+  await page.waitForFunction(() => {
+    const card = document.getElementById("voka-drawer")?.shadowRoot?.querySelector("#voka-card") as HTMLElement | null;
+    return !!card && !card.hidden;
+  });
+  assert.equal(
+    await page.$eval("video", (video) => (video as HTMLVideoElement).paused),
+    true,
+    "opening the full card resumed the video",
+  );
+  const cardRect = await page.evaluate(() => {
+    const card = document.getElementById("voka-drawer")?.shadowRoot?.querySelector("#voka-card");
+    if (!card) return null;
+    const rect = card.getBoundingClientRect();
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+  });
+  assert(cardRect, "full card is missing from the session Shadow DOM");
+  await page.mouse.move(cardRect.x + Math.min(24, cardRect.width / 2), cardRect.y + 24);
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  assert.equal(
+    await page.$eval("video", (video) => (video as HTMLVideoElement).paused),
+    true,
+    "moving from the subtitle line to the full card resumed the video",
+  );
+  await page.mouse.move(10, 10);
+  await page.waitForFunction(() => !(document.querySelector("video") as HTMLVideoElement).paused);
+
+  // T-21: a user pause event while VOKA has paused playback prevents delayed
+  // recovery when the pointer leaves the subtitle zones.
+  await page.evaluate(() => (document.querySelector("video") as HTMLVideoElement).play());
+  lineBox = await (await page.$("#voka-subtitle"))!.boundingBox();
+  assert(lineBox, "subtitle line is not visible for the user-pause check");
+  await page.mouse.move(lineBox.x + lineBox.width / 2, lineBox.y + lineBox.height / 2);
+  await page.waitForFunction(() => (document.querySelector("video") as HTMLVideoElement).paused);
+  const pauseBox = await (await page.$("#fake-player-pause"))!.boundingBox();
+  assert(pauseBox, "fake player pause button is missing");
+  await page.mouse.move(pauseBox.x + pauseBox.width / 2, pauseBox.y + pauseBox.height / 2);
+  await page.mouse.click(pauseBox.x + pauseBox.width / 2, pauseBox.y + pauseBox.height / 2);
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  assert.equal(
+    await page.$eval("video", (video) => (video as HTMLVideoElement).paused),
+    true,
+    "a user pause during hover was undone after leaving the subtitle line",
+  );
+  await page.mouse.move(10, 10);
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  assert.equal(
+    await page.$eval("video", (video) => (video as HTMLVideoElement).paused),
+    true,
+    "the video resumed after the user paused it",
+  );
 
   await page.evaluate(() => (window as any).__vokaSetVideo("fixture2"));
   await page.waitForFunction(() => {
@@ -424,6 +507,8 @@ async function runBrowserCheck() {
         testDeck: TEST_DECK,
         checks: [
           "fixture1 human English captions use method 1 and highlight a test word from 8766",
+          "T-20 pauses across the subtitle word, tooltip, and full card, then resumes after all zones are left",
+          "T-21 preserves a user pause and does not resume after leaving the subtitle line",
           "subtitle line follows video.currentTime and native captions hide with opacity",
           "diagnostics default off, then show method and cue count without cue text, ID, or title",
           "fixture2 automatic English captions use token-preserving method 2 after a wrong-language response",

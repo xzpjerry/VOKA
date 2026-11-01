@@ -365,6 +365,9 @@
   "youtubeDiagnostics": {
     "message": "YouTube 诊断信息"
   },
+  "youtubeAutoResume": {
+    "message": "离开字幕后自动继续播放"
+  },
   "youtubeNoSubtitles": {
     "message": "此视频没有可读取的英文字幕"
   },
