@@ -140,21 +140,6 @@
   "dictionaryMissing": {
     "message": "词典没有"
   },
-  "rememberSiteButton": {
-    "message": "记住这个网站"
-  },
-  "rememberSiteDescription": {
-    "message": "是否记住 {host}？允许网站访问权限后，VOKA 会在刷新或再次访问时自动运行。禁用名单仍然生效。"
-  },
-  "rememberSiteClose": {
-    "message": "暂不记住 / 关闭"
-  },
-  "rememberSiteSaved": {
-    "message": "已记住。可以关闭此页并返回阅读。"
-  },
-  "rememberSiteDenied": {
-    "message": "未获得权限，网站尚未记住。可以重试。"
-  },
   "upgradeNotice": {
     "message": "释义数据有更新 · 查看"
   },
@@ -193,5 +178,44 @@
   },
   "upgradeFinished": {
     "message": "更新完成；回读确认"
+  },
+  "popupAuto": {
+    "message": "在 {host} 上自动运行"
+  },
+  "popupPause": {
+    "message": "本页暂停"
+  },
+  "popupOptions": {
+    "message": "打开设置"
+  },
+  "popupRemoveDeny": {
+    "message": "从禁用名单移除"
+  },
+  "popupUnsupported": {
+    "message": "当前页面不支持"
+  },
+  "popupDenied": {
+    "message": "在禁用名单里"
+  },
+  "popupAutomatic": {
+    "message": "已自动运行"
+  },
+  "popupManual": {
+    "message": "仅手动"
+  },
+  "popupBlocked": {
+    "message": "在禁用名单中，自动运行被阻止"
+  },
+  "popupSaved": {
+    "message": "已保存"
+  },
+  "popupPermissionDenied": {
+    "message": "未授予网站权限"
+  },
+  "popupFailed": {
+    "message": "操作失败，请重试"
+  },
+  "popupPaused": {
+    "message": "本页已暂停，刷新后按站点规则恢复"
   }
 }

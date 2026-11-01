@@ -288,7 +288,7 @@ for (const radio of siteScopeRadios)
         siteScope === "activeTab"
           ? "已改为点图标才运行；不会自动运行任何网站。"
           : siteScope === "remembered"
-            ? "已改为记住启用过的网站；下次点工具栏图标时会申请当前网站权限。"
+            ? "已改为记住启用过的网站；请在工具栏菜单中打开当前网站的自动运行开关。"
             : "已改为所有网站；自动运行遵循当前网站授权和禁用名单。",
       );
     } catch (error) {

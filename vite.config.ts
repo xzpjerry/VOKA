@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     rollupOptions: {
-      input: { background: "src/background/index.ts", options: "options.html", remember: "remember.html" },
+      input: { background: "src/background/index.ts", options: "options.html", popup: "popup.html" },
       output: { entryFileNames: "[name].js" },
     },
   },

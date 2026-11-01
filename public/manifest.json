@@ -8,6 +8,6 @@
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": ["http://127.0.0.1/*"],
   "optional_host_permissions": ["*://*/*"],
-  "action": { "default_title": "VOKA" },
+  "action": { "default_title": "VOKA", "default_popup": "popup.html" },
   "options_page": "options.html"
 }

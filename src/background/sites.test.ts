@@ -62,23 +62,15 @@ it("registers remembered sites covered by a broader grant", async () => {
   expect(register).not.toHaveBeenCalled();
 });
 
-it("offers recovery only for an unready remembered toolbar without a grant", async () => {
-  const { recoverColdToolbar } = await import("./sites");
-  const offer = vi.fn(async () => {});
-  granted = false;
-  await recoverColdToolbar(false, "new.example", offer);
-  expect(offer).toHaveBeenCalledOnce();
-  expect(request).not.toHaveBeenCalled();
-  offer.mockClear();
-  config.siteScope = "activeTab";
-  await recoverColdToolbar(false, "new.example", offer);
-  expect(offer).not.toHaveBeenCalled();
-  config.siteScope = "remembered";
-  await recoverColdToolbar(true, "new.example", offer);
-  expect(offer).not.toHaveBeenCalled();
-  granted = true;
-  await recoverColdToolbar(false, "new.example", offer);
-  expect(offer).not.toHaveBeenCalled();
-  expect(config.rememberedSites).toContain("new.example");
-  expect(request).not.toHaveBeenCalled();
+
+it("removes remembered access and denies this host when all-sites permission remains", async () => {
+  const { forgetSite } = await import("./sites");
+  const remove = vi.fn(async () => true);
+  (chrome.permissions as unknown as { remove: typeof remove }).remove = remove;
+  config.siteScope = "all";
+  await forgetSite("example.com");
+  expect(config.rememberedSites).toEqual([]);
+  expect(config.denyList).toContain("example.com");
+  expect(remove).toHaveBeenCalledWith({ origins: ["*://example.com/*"] });
+  expect(await shouldAutoRun("https://example.com/")).toBe(false);
 });

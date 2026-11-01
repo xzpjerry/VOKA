@@ -68,7 +68,7 @@ export function scheduleSiteSync(): Promise<void> {
 }
 
 /**
- * Called from the toolbar click, inside its user gesture. Requests host access
+ * Called from the popup toggle click, inside its user gesture. Requests host access
  * for the current site and records it for remembered mode.
  */
 export async function rememberSite(host: string): Promise<boolean> {
@@ -88,22 +88,20 @@ async function recordRememberedSite(host: string): Promise<void> {
   const config = await settings();
   await chrome.storage.local.set({
     rememberedSites: [...new Set([...config.rememberedSites, host])],
+    ...(config.siteScope === "activeTab" ? { siteScope: "remembered" } : {}),
   });
   await scheduleSiteSync();
 }
 
-/** Recover a toolbar gesture that arrived before the scope cache was ready. */
-export async function recoverColdToolbar(
-  cacheReady: boolean,
-  host: string,
-  offer: () => Promise<unknown>,
-): Promise<void> {
-  if (cacheReady || (await settings()).siteScope !== "remembered") return;
-  if (await chrome.permissions.contains({ origins: [sitePattern(host)] })) {
-    await recordRememberedSite(host);
-    return;
-  }
-  await offer();
+/** Disable this host, including when a broader all-sites grant remains. */
+export async function forgetSite(host: string): Promise<void> {
+  const config = await settings();
+  await chrome.storage.local.set({
+    rememberedSites: config.rememberedSites.filter(site => site !== host),
+    ...(config.siteScope === "all" ? { denyList: [...new Set([...config.denyList, host])] } : {}),
+  });
+  await chrome.permissions.remove({ origins: [sitePattern(host)] });
+  await scheduleSiteSync();
 }
 
 /** Guard used by content-auto.js before it starts reading a page. */

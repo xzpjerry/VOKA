@@ -80,6 +80,7 @@ function start() {
     globalThis as unknown as { Highlight: new (...ranges: Range[]) => unknown }
   ).Highlight;
   const styles: HighlightStyle[] = ["target", "learning", "unknown", "weak"];
+  let paused = false;
   let session: DynamicReading | undefined;
   let config: ReadingSettings;
   let running = false,
@@ -240,10 +241,18 @@ function start() {
     ],
   });
   chrome.storage.onChanged.addListener((_changes, area) => {
-    if (area === "local") void refresh();
+    if (area === "local" && !paused) void refresh();
   });
-  chrome.runtime.onMessage.addListener((message) => {
-    if (message?.type === "connection-lost") {
+  chrome.runtime.onMessage.addListener((message, _sender, reply) => {
+    if (message?.type === "pause-reading") {
+      paused = true;
+      ++generation;
+      clear();
+      summary.textContent = t("popupPaused");
+      retry.hidden = true;
+      reply({ ok: true });
+    }
+    if (message?.type === "connection-lost" && !paused) {
       ++generation;
       clear();
       summary.textContent = t("notRunning");
@@ -252,6 +261,7 @@ function start() {
     }
   });
   async function refresh() {
+    paused = false;
     const epoch = ++generation;
     clear();
     retry.disabled = true;

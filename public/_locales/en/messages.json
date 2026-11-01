@@ -140,21 +140,6 @@
   "dictionaryMissing": {
     "message": "Not in dictionary"
   },
-  "rememberSiteButton": {
-    "message": "Remember this website"
-  },
-  "rememberSiteDescription": {
-    "message": "Remember {host}? After you allow website access, VOKA runs automatically on reload or your next visit. The deny list still applies."
-  },
-  "rememberSiteClose": {
-    "message": "Close"
-  },
-  "rememberSiteSaved": {
-    "message": "Website remembered. Close this tab to return to reading."
-  },
-  "rememberSiteDenied": {
-    "message": "Access was not granted. The website was not remembered. You can retry."
-  },
   "upgradeNotice": {
     "message": "Gloss data updated · View"
   },
@@ -193,5 +178,44 @@
   },
   "upgradeFinished": {
     "message": "Finished; verified by reading back"
+  },
+  "popupAuto": {
+    "message": "Run automatically on {host}"
+  },
+  "popupPause": {
+    "message": "Pause this page"
+  },
+  "popupOptions": {
+    "message": "Open settings"
+  },
+  "popupRemoveDeny": {
+    "message": "Remove from deny list"
+  },
+  "popupUnsupported": {
+    "message": "This page is not supported"
+  },
+  "popupDenied": {
+    "message": "On the deny list"
+  },
+  "popupAutomatic": {
+    "message": "Automatic reading enabled"
+  },
+  "popupManual": {
+    "message": "Manual only"
+  },
+  "popupBlocked": {
+    "message": "The deny list blocks automatic reading"
+  },
+  "popupSaved": {
+    "message": "Saved"
+  },
+  "popupPermissionDenied": {
+    "message": "Website permission was not granted"
+  },
+  "popupFailed": {
+    "message": "Could not complete the action; try again"
+  },
+  "popupPaused": {
+    "message": "Paused on this page; reload to follow site rules"
   }
 }

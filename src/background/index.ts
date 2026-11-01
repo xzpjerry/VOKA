@@ -8,25 +8,7 @@ import { pageStates } from "./reading";
 import { previewImport, executeImport, importTarget } from "./import";
 import { checkConnection, rpc, GatewayError } from "./gateway";
 import { settings } from "../shared";
-import { httpHost, isSiteScope, type SiteScope } from "../site-scope";
-import {
-  rememberSite,
-  recoverColdToolbar,
-  scheduleSiteSync,
-  shouldAutoRun,
-} from "./sites";
-// Permission requests must remain synchronous with the toolbar user gesture.
-// Warm this cache on every worker start; storage events keep it current without
-// requiring a storage read in the click handler.
-let toolbarSiteScope: SiteScope = "activeTab";
-let scopeRevision = 0;
-let toolbarScopeReady = false;
-void chrome.storage.local.get({ siteScope: "activeTab" }).then((value) => {
-  // An intervening storage event is newer than this startup snapshot.
-  if (scopeRevision === 0)
-    toolbarSiteScope = isSiteScope(value.siteScope) ? value.siteScope : "activeTab";
-  toolbarScopeReady = true;
-}).catch((error) => console.error("VOKA site-scope cache failed", error));
+import { scheduleSiteSync, shouldAutoRun } from "./sites";
 const upgradePreviews = new Map<string, { preview: UpgradePreview; created: number }>();
 let upgradeBusy = false;
 let importBusy = false;
@@ -259,41 +241,10 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   } else return;
   return true;
 });
-chrome.action.onClicked.addListener(async (tab) => {
-  if (!tab.id) return;
-  const host = httpHost(tab.url);
-  const cacheReady = toolbarScopeReady;
-  // Start the optional permission request before awaiting injection. A denied
-  // site can still be remembered; its deny-list entry only prevents auto-run.
-  const remembering = toolbarSiteScope === "remembered" && host
-    ? rememberSite(host)
-    : Promise.resolve(false);
-  try {
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ["content.js"],
-    });
-  } catch {
-    /* Chrome internal pages and other protected tabs cannot be injected. */
-  }
-  await remembering;
-  if (host) {
-    await recoverColdToolbar(cacheReady, host, () => chrome.tabs.create({
-      url: chrome.runtime.getURL(`remember.html?host=${encodeURIComponent(host)}`),
-    }));
-  }
-});
-
 // Serialize changes so quick successive selections cannot finish out of order.
 let glossUpdate = Promise.resolve();
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return;
-  if (changes.siteScope) {
-    ++scopeRevision;
-    toolbarScopeReady = true;
-    toolbarSiteScope = isSiteScope(changes.siteScope.newValue)
-      ? changes.siteScope.newValue : "activeTab";
-  }
   if (
     changes.siteScope ||
     changes.denyList ||
