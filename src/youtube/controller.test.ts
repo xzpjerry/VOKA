@@ -173,6 +173,90 @@ describe("caption acquisition order", () => {
     expect(result).toMatchObject({ method: 4, scope: "none", error: "TimedTextTimeout" });
     expect(order).toEqual(["timedtext", "enable", "screen"]);
   });
+
+  it("waits for an ad to finish before enabling captions", async () => {
+    const order: string[] = [];
+    let adShowing = true;
+    const result = await acquireCaptions(track, {
+      waitForAdEnd: async (_signal, onWaiting) => {
+        onWaiting?.(true);
+        order.push("wait-ad");
+        adShowing = false;
+        onWaiting?.(false);
+      },
+      isAdShowing: () => adShowing,
+      waitForTimedText: async () => {
+        order.push("wait");
+        return timed("en", cueBody("after ad"));
+      },
+      enable: async () => void order.push("enable"),
+      refetch: async () => ({ ok: true, status: 200, body: "" }),
+      readScreen: async () => [],
+    });
+    expect(order).toEqual(["wait-ad", "wait", "enable"]);
+    expect(result.method).toBe(1);
+  });
+
+  it("uses a resource-timing token when no post-hook request arrives", async () => {
+    const result = await acquireCaptions(track, {
+      getTokenSource: async () => "resource-timing",
+      waitForTimedText: async () => undefined,
+      enable: async () => {},
+      refetch: async () => ({
+        ok: true,
+        status: 200,
+        body: cueBody("cached English track"),
+        tokenSource: "resource-timing",
+        responseBytes: 123,
+      }),
+      readScreen: async () => [],
+    });
+    expect(result).toMatchObject({
+      method: 2,
+      tokenSource: "resource-timing",
+      httpStatus: 200,
+      responseBytes: 123,
+    });
+    expect(result.cues[0].text).toBe("cached English track");
+  });
+
+  it("forces a player refresh at most once for the shared video state", async () => {
+    const state = { forcedRefreshUsed: false };
+    let waits = 0;
+    let disables = 0;
+    let reloads = 0;
+    const adapter = {
+      waitForTimedText: async () => {
+        waits++;
+        return waits === 3 ? timed("en", cueBody("forced English track")) : undefined;
+      },
+      enable: async () => {},
+      disableCaptions: async () => {
+        disables++;
+      },
+      reloadCaptions: async () => {
+        reloads++;
+      },
+      refetch: async () => ({ ok: true, status: 200, body: "" }),
+      readScreen: async () => [],
+    };
+    const options = {
+      state,
+      timedTextTimeoutMs: 0,
+      forceRefreshDelayMs: 0,
+      forceRefreshFirstWaitMs: 0,
+      forceRefreshTotalWaitMs: 0,
+    };
+    const first = await acquireCaptions(track, adapter, options);
+    expect(first).toMatchObject({ method: 1 });
+    expect(state.forcedRefreshUsed).toBe(true);
+    expect(disables).toBe(1);
+    expect(reloads).toBe(1);
+
+    const second = await acquireCaptions(track, adapter, options);
+    expect(second.method).toBe(4);
+    expect(disables).toBe(1);
+  });
 });
 
 describe("YouTube video lifecycle", () => {
@@ -239,6 +323,64 @@ describe("YouTube video lifecycle", () => {
       expect(destroyed).toEqual([0]);
       expect(controller.getCues()[0].text).toBe("second cue");
       expect(sources).toHaveLength(1);
+    } finally {
+      controller.stop();
+    }
+  });
+
+  it("retries method 4 once after playback starts", async () => {
+    document.body.innerHTML = '<div id="movie_player"></div><video></video>';
+    let waitCount = 0;
+    let enableCount = 0;
+    const adapter: YouTubeCaptionAdapter = {
+      inject: async () => {},
+      tracks: async () => ({ tracks: [{ languageCode: "en" }] }),
+      enable: async () => {
+        enableCount++;
+      },
+      waitForTimedText: async () => {
+        waitCount++;
+        return waitCount === 2
+          ? {
+              url: "https://www.youtube.com/api/timedtext?pot=proof&lang=en",
+              lang: "en",
+              body: cueBody("recovered"),
+              status: 200,
+              responseBytes: 48,
+            }
+          : undefined;
+      },
+      refetch: async () => ({ ok: true, status: 200, body: "" }),
+      readScreen: async () => [],
+      getCurrentTime: async () => 1,
+      readCaptionText: () => "",
+      clearTimedTextWaiters: () => {},
+      dispose: () => {},
+    };
+    const controller = createYouTubeController({
+      uiDocument: document,
+      createSession: () => ({
+        start: async () => {},
+        isRunning: () => true,
+        addSource: () => {},
+        removeSource: () => {},
+        destroy: () => {},
+      }),
+      adapter,
+      readHref: () => "https://www.youtube.com/watch?v=retry",
+      diagnosticsEnabled: async () => false,
+      timedTextTimeoutMs: 0,
+      screenTimeoutMs: 0,
+      pollMs: 60000,
+    });
+    try {
+      await controller.start();
+      expect(controller.getMethod()).toBe(4);
+      const video = document.querySelector("video")!;
+      video.dispatchEvent(new Event("play"));
+      video.dispatchEvent(new Event("play"));
+      await vi.waitFor(() => expect(controller.getMethod()).toBe(1));
+      expect(enableCount).toBe(2);
     } finally {
       controller.stop();
     }

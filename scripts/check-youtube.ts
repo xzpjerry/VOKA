@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import puppeteer from "puppeteer";
+import puppeteer, { type Page } from "puppeteer";
 import { checkConnection, rpc } from "../src/background/gateway";
 import {
   CORE_FIELDS,
@@ -15,7 +15,7 @@ import { normalizeKey } from "../src/key";
 import { answerHtml, css, questionHtml } from "../src/data/template";
 
 const PORT = 8766;
-const TEST_DECK = "VOKA Test::96";
+const TEST_DECK = "VOKA Test::115";
 const config = { port: PORT, apiKey: "" };
 const call = (method: string, params = {}, write = false) =>
   rpc(config, method, params, { sideEffecting: write }) as Promise<any>;
@@ -263,121 +263,119 @@ async function runBrowserCheck() {
     "ok",
     "8766 must remain reachable during the browser check",
   );
-  const page = await browser!.newPage();
-  await page.setViewport({ width: 1280, height: 900 });
   const blockedOutsideMachine: string[] = [];
   const refetchUrls: string[] = [];
-  await page.setRequestInterception(true);
-  page.on("request", (request) => {
-    let url: URL;
-    try {
-      url = new URL(request.url());
-    } catch {
-      blockedOutsideMachine.push(request.url());
-      void request.abort("blockedbyclient");
-      return;
-    }
-    if (url.hostname !== "www.youtube.com") {
-      blockedOutsideMachine.push(request.url());
-      void request.abort("blockedbyclient");
-      return;
-    }
-    if (url.pathname === "/watch") {
-      void request.respond({
-        status: 200,
-        contentType: "text/html; charset=utf-8",
-        body: fixtureHtml,
-      });
-      return;
-    }
-    if (url.pathname.includes("/api/timedtext")) {
-      const lang = url.searchParams.get("lang") ?? "";
-      const videoId = url.searchParams.get("v") ?? "fixture1";
-      const hasPlayerToken =
-        url.searchParams.has("pot") && url.searchParams.get("c") === "WEB";
-      if (
-        videoId === "fixture2" &&
-        lang.startsWith("en") &&
-        url.searchParams.get("fmt") === "json3"
-      )
-        refetchUrls.push(request.url());
-      let body = emptyJson3;
-      if (hasPlayerToken) {
-        if (videoId === "fixture1") {
-          body = JSON.stringify({
-            events: [
-              {
-                tStartMs: 1000,
-                dDurationMs: 4000,
-                segs: [{ utf8: `The ${testWord} is ready.` }],
-              },
-              {
-                tStartMs: 12000,
-                dDurationMs: 5000,
-                segs: [{ utf8: `A ${dueWord} shines in bright light.` }],
-              },
-              {
-                tStartMs: 35000,
-                dDurationMs: 5000,
-                segs: [{ utf8: `Another ${testWord} waits nearby.` }],
-              },
-              {
-                tStartMs: 65000,
-                dDurationMs: 5000,
-                segs: [{ utf8: `The ${testWord} returns before sunset.` }],
-              },
-            ],
-          });
-        } else {
-          const caption =
-            videoId === "fixture2" && lang.startsWith("en")
+  const fullHumanTrack = () => JSON.stringify({
+    events: [
+      { tStartMs: 1000, dDurationMs: 4000, segs: [{ utf8: `The ${testWord} is ready.` }] },
+      { tStartMs: 12000, dDurationMs: 5000, segs: [{ utf8: `A ${dueWord} shines in bright light.` }] },
+      { tStartMs: 35000, dDurationMs: 5000, segs: [{ utf8: `Another ${testWord} waits nearby.` }] },
+      { tStartMs: 65000, dDurationMs: 5000, segs: [{ utf8: `The ${testWord} returns before sunset.` }] },
+    ],
+  });
+  const interceptFixturePage = async (page: Page) => {
+    await page.setRequestInterception(true);
+    page.on("request", (request) => {
+      let url: URL;
+      try {
+        url = new URL(request.url());
+      } catch {
+        blockedOutsideMachine.push(request.url());
+        void request.abort("blockedbyclient");
+        return;
+      }
+      if (url.hostname !== "www.youtube.com") {
+        blockedOutsideMachine.push(request.url());
+        void request.abort("blockedbyclient");
+        return;
+      }
+      if (url.pathname === "/watch") {
+        void request.respond({
+          status: 200,
+          contentType: "text/html; charset=utf-8",
+          body: fixtureHtml,
+        });
+        return;
+      }
+      if (url.pathname.includes("/api/timedtext")) {
+        const lang = url.searchParams.get("lang") ?? "";
+        const videoId = url.searchParams.get("v") ?? "fixture1";
+        const hasPlayerToken =
+          url.searchParams.has("pot") && url.searchParams.get("c") === "WEB";
+        if (
+          ["fixture2", "fixture-prehook"].includes(videoId) &&
+          lang.startsWith("en") &&
+          url.searchParams.get("fmt") === "json3"
+        ) refetchUrls.push(request.url());
+        let body = emptyJson3;
+        if (hasPlayerToken) {
+          if (["fixture1", "fixture-ad", "fixture-prehook", "fixture-forced"].includes(videoId)) {
+            body = fullHumanTrack();
+          } else {
+            const caption = videoId === "fixture2" && lang.startsWith("en")
               ? `Auto ${testWord} is ready.`
               : videoId === "fixture2" && lang === "fr"
                 ? "French fixture caption."
                 : "Other fixture caption.";
-          body = JSON.stringify({
-            events: [
-              {
-                tStartMs: 0,
-                dDurationMs: 4000,
-                segs: [{ utf8: caption }],
-              },
-            ],
-          });
+            body = JSON.stringify({
+              events: [{ tStartMs: 0, dDurationMs: 4000, segs: [{ utf8: caption }] }],
+            });
+          }
         }
+        void request.respond({
+          status: 200,
+          contentType: "application/json; charset=utf-8",
+          body,
+        });
+        return;
       }
-      void request.respond({
-        status: 200,
-        contentType: "application/json; charset=utf-8",
-        body,
-      });
-      return;
-    }
-    if (url.pathname === "/favicon.ico") {
-      void request.respond({ status: 204, body: "" });
-      return;
-    }
-    void request.abort("blockedbyclient");
-  });
-
-  await page.goto("https://www.youtube.com/watch?v=fixture1");
-  await page.bringToFront();
-  const tabId = await worker.evaluate(async () => {
-    const tabs = await chrome.tabs.query({});
-    return tabs.find((tab) => tab.url?.startsWith("https://www.youtube.com/watch?v=fixture1"))?.id;
-  });
-  assert.equal(typeof tabId, "number", "fixture tab was not visible to the extension");
-  await worker.evaluate(
-    async (id) =>
-      chrome.scripting.executeScript({
+      if (url.pathname === "/favicon.ico") {
+        void request.respond({ status: 204, body: "" });
+        return;
+      }
+      void request.abort("blockedbyclient");
+    });
+  };
+  const openFixturePage = async (videoId: string) => {
+    const page = await browser!.newPage();
+    await page.setViewport({ width: 1280, height: 900 });
+    await interceptFixturePage(page);
+    await page.goto(`https://www.youtube.com/watch?v=${videoId}`);
+    await page.bringToFront();
+    if (videoId === "fixture-prehook")
+      await page.evaluate(() => (window as any).__vokaPrehookReady);
+    const tabId = await worker.evaluate(async (id) => {
+      const tabs = await chrome.tabs.query({});
+      return tabs.find((tab) => tab.url?.startsWith(`https://www.youtube.com/watch?v=${id}`))?.id;
+    }, videoId);
+    assert.equal(typeof tabId, "number", `${videoId} fixture tab was not visible to the extension`);
+    await worker.evaluate(
+      async (id) => chrome.scripting.executeScript({
         target: { tabId: id },
         files: ["content.js"],
       }),
-    tabId!,
-  );
+      tabId!,
+    );
+    return page;
+  };
+  const page = await openFixturePage("fixture1");
 
   const lineText = () =>
     page.$eval("#voka-subtitle .voka-subtitle-text", (element) => element.textContent ?? "");
+  const assertDiagnosticFields = (diagnostic: string, videoId: string) => {
+    assert.match(diagnostic, /(?:方法|Method) [1-4]/);
+    assert.match(diagnostic, /(?:广告|Ad) (?:是|否|Yes|No)/);
+    assert.match(diagnostic, /(?:令牌|Token) (?:hook|resource-timing|none)/);
+    assert.match(diagnostic, /HTTP (?:\d+|-)/);
+    assert.match(diagnostic, /(?:长度|Length) (?:\d+|-)(?: 字节| bytes)?/);
+    assert.match(diagnostic, /(?:重试|Retry) \d/);
+    assert(!diagnostic.includes(testWord));
+    assert(!diagnostic.includes(dueWord));
+    assert(!diagnostic.includes("The "));
+    assert(!diagnostic.includes("Auto "));
+    assert(!diagnostic.includes("Fixture YouTube video"));
+    assert(!diagnostic.includes(videoId));
+  };
   await page.waitForFunction(
     (word) =>
       document.querySelector("#voka-subtitle .voka-subtitle-text")?.textContent?.includes(word),
@@ -417,6 +415,7 @@ async function runBrowserCheck() {
   assert(!diagnosticText.includes("The "));
   assert(!diagnosticText.includes("fixture1"));
   assert.match(diagnosticText, /4 条|4 cues/);
+  assertDiagnosticFields(diagnosticText, "fixture1");
   await page.evaluate(() => {
     const video = document.querySelector("video")!;
     Object.defineProperty(video, "currentTime", { configurable: true, writable: true, value: 5 });
@@ -497,6 +496,12 @@ async function runBrowserCheck() {
     true,
     "moving from the subtitle line to the full card resumed the video",
   );
+  await page.waitForFunction(() => {
+    const save = document
+      .getElementById("voka-drawer")
+      ?.shadowRoot?.querySelector("#voka-save-context") as HTMLButtonElement | null;
+    return !!save && !save.disabled;
+  });
   await page.mouse.move(10, 10);
   await page.waitForFunction(() => !(document.querySelector("video") as HTMLVideoElement).paused);
 
@@ -762,12 +767,15 @@ async function runBrowserCheck() {
 
   for (const videoId of ["fixture3", "fixture4"]) {
     await page.evaluate((id) => (window as any).__vokaSetVideo(id), videoId);
-    await page.waitForFunction(() => {
+    const expectedMessage = videoId === "fixture3"
+      ? /此视频没有英文字幕|This video has no English subtitles/
+      : /此视频没有字幕|This video has no subtitles/;
+    await page.waitForFunction((pattern) => {
       const text = document.querySelector("#voka-subtitle .voka-subtitle-text")?.textContent ?? "";
-      return text.includes("此视频没有可读取的英文字幕") || text.includes("No readable English subtitles");
-    });
+      return new RegExp(pattern).test(text);
+    }, {}, expectedMessage.source);
     const text = await lineText();
-    assert.match(text, /此视频没有可读取的英文字幕|No readable English subtitles/);
+    assert.match(text, expectedMessage);
     diagnosticText = await page.$eval(
       "#voka-subtitle .voka-youtube-diagnostic",
       (element) => element.textContent ?? "",
@@ -776,6 +784,60 @@ async function runBrowserCheck() {
     assert.match(diagnosticText, /0 条|0 cues/);
     assert(!diagnosticText.includes(testWord));
     assert(!diagnosticText.includes(videoId));
+    assertDiagnosticFields(diagnosticText, videoId);
+  }
+
+  await page.close();
+  for (const [videoId, requiredMethod] of [
+    ["fixture-ad", undefined],
+    ["fixture-prehook", 2],
+    ["fixture-forced", 1],
+  ] as const) {
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      const scenarioPage = await openFixturePage(videoId);
+      if (videoId === "fixture-ad") {
+        await scenarioPage.waitForFunction(() => {
+          const diagnostic = document.querySelector("#voka-subtitle .voka-youtube-diagnostic");
+          return /Waiting for the ad to finish|等待广告结束/.test(diagnostic?.textContent ?? "");
+        }, { timeout: 7000 });
+      }
+      await scenarioPage.waitForFunction(({ method }) => {
+        const diagnostic = document.querySelector("#voka-subtitle .voka-youtube-diagnostic");
+        const text = diagnostic?.textContent ?? "";
+        return /(?:方法|Method) [12]/.test(text) &&
+          /4 条|4 cues/.test(text) &&
+          (method === undefined || new RegExp(`(?:方法|Method) ${method}`).test(text));
+      }, { timeout: 45000 }, { method: requiredMethod });
+      const diagnostic = await scenarioPage.$eval(
+        "#voka-subtitle .voka-youtube-diagnostic",
+        (element) => element.textContent ?? "",
+      );
+      assertDiagnosticFields(diagnostic, videoId);
+      if (videoId === "fixture-ad")
+        assert.match(diagnostic, /(?:广告|Ad) (?:否|No)/);
+      if (videoId === "fixture-prehook") {
+        assert.match(diagnostic, /(?:令牌|Token) resource-timing/);
+        const refetch = refetchUrls
+          .map((url) => new URL(url))
+          .find((url) => url.searchParams.get("v") === videoId && url.searchParams.get("fmt") === "json3");
+        assert(refetch, "the resource-timing token was not used for the step-2 refetch");
+        assert.equal(refetch.searchParams.get("pot"), "fixture-proof-token");
+        assert.equal(refetch.searchParams.get("c"), "WEB");
+        assert.equal(refetch.searchParams.get("lang"), "en");
+        assert.equal(refetch.searchParams.has("tlang"), false);
+        assert.equal(refetch.searchParams.get("keep"), "fixture-value");
+      }
+      if (videoId === "fixture-forced") {
+        assert.match(diagnostic, /(?:令牌|Token) hook/);
+        assert.equal(
+          await scenarioPage.evaluate(() => (window as any).__vokaSetOptionCalls >= 3),
+          true,
+          "the ignored first setOption did not lead to an off/on forced request",
+        );
+      }
+      await scenarioPage.close();
+      console.log(`${videoId} fresh tab ${attempt}/5 passed`);
+    }
   }
 
   assert.equal(blockedOutsideMachine.length, 0, `blocked non-fixture requests: ${blockedOutsideMachine.join(", ")}`);
@@ -799,7 +861,8 @@ async function runBrowserCheck() {
           "diagnostics default off, then show method and cue count without cue text, ID, or title",
           "fixture2 automatic English captions use token-preserving method 2 after a wrong-language response",
           "closing VOKA subtitles restores native captions",
-          "fixture3 other-language-only and fixture4 no-track pages show the no-English message",
+          "fixture3 other-language-only and fixture4 no-track pages show separate messages",
+          "fixture-ad, fixture-prehook and fixture-forced each pass in five fresh tabs",
           "SPA video changes reset the source and cue list",
           "all page requests were intercepted or aborted; no request left the machine",
         ],

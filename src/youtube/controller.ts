@@ -3,9 +3,11 @@ import { settings as readSettings } from "../shared";
 import {
   chooseEnglishTrack,
   cueAtTime,
+  hasPlayerToken,
   parseJson3,
   type CaptionCue,
   type CaptionTrack,
+  type TokenSource,
   type TimedTextCapture,
 } from "./captions";
 import { createHoverPause } from "./hover-pause";
@@ -18,7 +20,12 @@ export type AcquisitionResult = {
   scope: CaptionScope;
   cues: CaptionCue[];
   error?: string;
+  tokenSource: TokenSource;
+  httpStatus?: number;
+  responseBytes?: number;
 };
+
+export type CaptionAcquisitionState = { forcedRefreshUsed: boolean };
 
 export class YouTubeCaptionError extends Error {
   constructor(public readonly code: string) {
@@ -32,14 +39,29 @@ export type CaptionAcquisitionAdapter = {
   waitForTimedText: (
     timeoutMs: number,
     signal?: AbortSignal,
+    onAdStateChange?: (showing: boolean) => void,
   ) => Promise<TimedTextCapture | undefined>;
   refetch: (
     track: CaptionTrack,
-  ) => Promise<{ ok: boolean; status: number; body: string }>;
+  ) => Promise<{
+    ok: boolean;
+    status: number;
+    body: string;
+    tokenSource?: TokenSource;
+    responseBytes?: number;
+  }>;
   readScreen: (
     timeoutMs: number,
     signal?: AbortSignal,
   ) => Promise<CaptionCue[]>;
+  isAdShowing?: () => boolean;
+  waitForAdEnd?: (
+    signal?: AbortSignal,
+    onWaiting?: (waiting: boolean) => void,
+  ) => Promise<void>;
+  getTokenSource?: () => Promise<TokenSource>;
+  disableCaptions?: () => Promise<void>;
+  reloadCaptions?: (track: CaptionTrack) => Promise<void>;
 };
 
 function diagnosticError(error: unknown): string {
@@ -55,7 +77,33 @@ function diagnosticError(error: unknown): string {
   return "Error";
 }
 
-/** Implements the timed-text → token refetch → visible caption fallback order. */
+function bodyBytes(body: string) {
+  return new TextEncoder().encode(body).byteLength;
+}
+
+function aborted(signal?: AbortSignal) {
+  if (signal?.aborted) throw new YouTubeCaptionError("Aborted");
+}
+
+function delay(ms: number, signal?: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new YouTubeCaptionError("Aborted"));
+      return;
+    }
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(new YouTubeCaptionError("Aborted"));
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+/** Implements ad-aware timed-text → token refetch → forced refresh → screen fallback. */
 export async function acquireCaptions(
   track: CaptionTrack | undefined,
   adapter: CaptionAcquisitionAdapter,
@@ -63,75 +111,181 @@ export async function acquireCaptions(
     timedTextTimeoutMs?: number;
     screenTimeoutMs?: number;
     signal?: AbortSignal;
+    initialTokenSource?: TokenSource;
+    state?: CaptionAcquisitionState;
+    onAdWaiting?: (waiting: boolean) => void;
+    forceRefreshDelayMs?: number;
+    forceRefreshFirstWaitMs?: number;
+    forceRefreshTotalWaitMs?: number;
   } = {},
 ): Promise<AcquisitionResult> {
+  const state = options.state ?? { forcedRefreshUsed: false };
+  const signal = options.signal;
+  let tokenSource: TokenSource = options.initialTokenSource ?? "none";
+  let httpStatus: number | undefined;
+  let responseBytes: number | undefined;
+  const result = (
+    method: CaptionMethod,
+    cues: CaptionCue[],
+    error?: string,
+  ): AcquisitionResult => ({
+    method,
+    scope: method === 1 || method === 2
+      ? "full-track"
+      : method === 3
+        ? "played-part-only"
+        : "none",
+    cues,
+    ...(error ? { error } : {}),
+    tokenSource,
+    ...(httpStatus === undefined ? {} : { httpStatus }),
+    ...(responseBytes === undefined ? {} : { responseBytes }),
+  });
+
   if (!track)
-    return {
-      method: 4,
-      scope: "none",
-      cues: [],
-      error: "NoEnglishTrack",
-    };
+    return result(4, [], "NoEnglishTrack");
 
   const timedTextTimeoutMs = options.timedTextTimeoutMs ?? 8000;
   const screenTimeoutMs = options.screenTimeoutMs ?? 8000;
+  const waitForAdEnd = async () => {
+    if (adapter.waitForAdEnd) {
+      await adapter.waitForAdEnd(signal, options.onAdWaiting);
+      return;
+    }
+    options.onAdWaiting?.(!!adapter.isAdShowing?.());
+    aborted(signal);
+  };
+  const getTokenSource = async (): Promise<TokenSource> => {
+    try {
+      return await adapter.getTokenSource?.() ?? tokenSource;
+    } catch {
+      return tokenSource;
+    }
+  };
+  const waitAndEnable = async (timeoutMs: number) => {
+    await waitForAdEnd();
+    tokenSource = await getTokenSource();
+    const waiting = adapter.waitForTimedText(
+      timeoutMs,
+      signal,
+      options.onAdWaiting,
+    );
+    try {
+      await adapter.enable(track);
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      return { capture: undefined, failure: diagnosticError(error) };
+    }
+    return { capture: await waiting, failure: undefined };
+  };
+
   let failure = "TimedTextTimeout";
   let captured: TimedTextCapture | undefined;
-  const waiting = adapter.waitForTimedText(timedTextTimeoutMs, options.signal);
   try {
-    await adapter.enable(track);
-    captured = await waiting;
+    const first = await waitAndEnable(timedTextTimeoutMs);
+    captured = first.capture;
+    if (first.failure) failure = first.failure;
   } catch (error) {
-    if (options.signal?.aborted) throw error;
+    if (signal?.aborted) throw error;
     failure = diagnosticError(error);
     captured = undefined;
   }
 
-  if (captured) {
-    const parsed = parseJson3(captured.body);
-    const languageMatches =
-      captured.lang?.toLowerCase() === track.languageCode.toLowerCase();
-    if (languageMatches && parsed.length) {
-      return { method: 1, scope: "full-track", cues: parsed };
+  const tryCapturedOrRefetch = async (capture: TimedTextCapture | undefined) => {
+    if (capture) {
+      httpStatus = capture.status;
+      responseBytes = capture.responseBytes ?? bodyBytes(capture.body);
+      if (hasPlayerToken(capture.url)) tokenSource = "hook";
     }
-    if (!languageMatches || parsed.length === 0) {
+    const parsed = capture ? parseJson3(capture.body) : [];
+    if (capture) {
+      const languageMatches =
+        capture.lang?.toLowerCase() === track.languageCode.toLowerCase();
+      if (languageMatches && parsed.length) return result(1, parsed);
+    }
+    await waitForAdEnd();
+    const sourceBeforeRefetch = await getTokenSource();
+    if (sourceBeforeRefetch !== "none") tokenSource = sourceBeforeRefetch;
+    if (tokenSource !== "none") {
       try {
-        const result = await adapter.refetch(track);
-        if (!result.ok) failure = `HTTP_${result.status}`;
+        const refetched = await adapter.refetch(track);
+        tokenSource = refetched.tokenSource ?? tokenSource;
+        httpStatus = refetched.status;
+        responseBytes = refetched.responseBytes ?? bodyBytes(refetched.body);
+        if (!refetched.ok) failure = `HTTP_${refetched.status}`;
         else {
-          const refetched = parseJson3(result.body);
-          if (refetched.length)
-            return { method: 2, scope: "full-track", cues: refetched };
+          const cues = parseJson3(refetched.body);
+          if (cues.length) return result(2, cues);
           failure = "EmptyRefetch";
         }
       } catch (error) {
-        if (options.signal?.aborted) throw error;
+        if (signal?.aborted) throw error;
         failure = diagnosticError(error);
       }
     }
+    return undefined;
+  };
+
+  const capturedResult = await tryCapturedOrRefetch(captured);
+  if (capturedResult) return capturedResult;
+
+  // A request may have been cached before the MAIN-world hook was installed.
+  // Resource timing supplies its token; only force the player when neither path
+  // found a token and step 1 produced no request at all.
+  if (
+    !captured &&
+    tokenSource === "none" &&
+    !state.forcedRefreshUsed &&
+    adapter.disableCaptions &&
+    adapter.reloadCaptions
+  ) {
+    state.forcedRefreshUsed = true;
+    try {
+      await waitForAdEnd();
+      await adapter.disableCaptions();
+      const offDelay = options.forceRefreshDelayMs ?? 300;
+      await delay(offDelay, signal);
+      const firstWaitMs = options.forceRefreshFirstWaitMs ?? 5000;
+      const firstWaiting = adapter.waitForTimedText(
+        firstWaitMs,
+        signal,
+        options.onAdWaiting,
+      );
+      await adapter.enable(track);
+      captured = await firstWaiting;
+      if (!captured) {
+        const totalWaitMs = options.forceRefreshTotalWaitMs ?? 8000;
+        const secondWaitMs = Math.max(0, totalWaitMs - offDelay - firstWaitMs);
+        await waitForAdEnd();
+        const secondWaiting = adapter.waitForTimedText(
+          secondWaitMs,
+          signal,
+          options.onAdWaiting,
+        );
+        await adapter.reloadCaptions(track);
+        captured = await secondWaiting;
+      }
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      failure = diagnosticError(error);
+    }
+    const forcedResult = await tryCapturedOrRefetch(captured);
+    if (forcedResult) return forcedResult;
   }
 
   try {
+    await waitForAdEnd();
     const screenCues = await adapter.readScreen(screenTimeoutMs, options.signal);
     if (screenCues.length)
-      return {
-        method: 3,
-        scope: "played-part-only",
-        cues: screenCues,
-      };
+      return result(3, screenCues, failure);
   } catch (error) {
-    if (options.signal?.aborted) throw error;
+    if (signal?.aborted) throw error;
     failure = diagnosticError(error);
   }
-  return {
-    method: 4,
-    scope: "none",
-    cues: [],
-    error: failure || "NoSubtitles",
-  };
+  return result(4, [], failure || "NoSubtitles");
 }
 
-type MainRequestType = "tracks" | "enable" | "refetch" | "time" | "seek";
+type MainRequestType = "tracks" | "enable" | "disable" | "reload" | "refetch" | "time" | "seek";
 type MainRequest = {
   source: "voka-yt-req";
   type: MainRequestType;
@@ -143,6 +297,8 @@ type MainRequest = {
 type MainTimedText = TimedTextCapture & {
   source: "voka-yt";
   type: "timedtext";
+  status?: number;
+  responseBytes?: number;
 };
 type MainResponse = {
   source: "voka-yt";
@@ -161,7 +317,11 @@ type PendingRequest = {
 
 export type YouTubeCaptionAdapter = CaptionAcquisitionAdapter & {
   inject: () => Promise<void>;
-  tracks: () => Promise<{ tracks: CaptionTrack[]; videoId?: string }>;
+  tracks: () => Promise<{
+    tracks: CaptionTrack[];
+    videoId?: string;
+    tokenSource?: TokenSource;
+  }>;
   getCurrentTime: () => Promise<number>;
   seekTo?: (timeSeconds: number) => Promise<void>;
   readCaptionText: () => string;
@@ -175,11 +335,113 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
   const win = pageWindow;
   const pending = new Map<string, PendingRequest>();
   const timedTextWaiters = new Set<(value: TimedTextCapture) => void>();
+  const cancelTimedTextWaiters = new Set<() => void>();
+
+  function isAdShowing() {
+    const player = doc.getElementById("movie_player");
+    return !!player?.classList.contains("ad-showing") ||
+      !!player?.classList.contains("ad-interrupting");
+  }
+
+  function observeAdClass(callback: () => void) {
+    const player = doc.getElementById("movie_player");
+    if (!player) return () => {};
+    const observer = new win.MutationObserver(callback);
+    observer.observe(player, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }
+
+  function waitForAdEnd(
+    signal?: AbortSignal,
+    onWaiting?: (waiting: boolean) => void,
+  ) {
+    return new Promise<void>((resolve, reject) => {
+      if (signal?.aborted) {
+        reject(new YouTubeCaptionError("Aborted"));
+        return;
+      }
+      let done = false;
+      let stopObserving = () => {};
+      const finish = (error?: Error) => {
+        if (done) return;
+        done = true;
+        stopObserving();
+        signal?.removeEventListener("abort", onAbort);
+        if (error) reject(error);
+        else resolve();
+      };
+      const check = () => {
+        const waiting = isAdShowing();
+        onWaiting?.(waiting);
+        if (!waiting) finish();
+      };
+      const onAbort = () => finish(new YouTubeCaptionError("Aborted"));
+      signal?.addEventListener("abort", onAbort, { once: true });
+      if (!isAdShowing()) {
+        onWaiting?.(false);
+        finish();
+      } else {
+        onWaiting?.(true);
+        stopObserving = observeAdClass(check);
+        check();
+      }
+    });
+  }
+
+  /** Resolves after `durationMs` of non-ad time, pausing while an ad is active. */
+  function activeDelay(
+    durationMs: number,
+    signal?: AbortSignal,
+    onAdStateChange?: (showing: boolean) => void,
+  ) {
+    return new Promise<number | undefined>((resolve) => {
+      let remaining = Math.max(0, durationMs);
+      let timer: number | undefined;
+      let activeSince = 0;
+      let done = false;
+      let stopObserving = () => {};
+      const finish = (elapsed: number | undefined) => {
+        if (done) return;
+        done = true;
+        if (timer !== undefined) win.clearTimeout(timer);
+        stopObserving();
+        signal?.removeEventListener("abort", onAbort);
+        resolve(elapsed);
+      };
+      const start = () => {
+        if (done || timer !== undefined || isAdShowing()) return;
+        if (remaining <= 0) {
+          finish(durationMs);
+          return;
+        }
+        activeSince = Date.now();
+        timer = win.setTimeout(() => finish(durationMs), remaining);
+      };
+      const update = () => {
+        const showing = isAdShowing();
+        onAdStateChange?.(showing);
+        if (showing && timer !== undefined) {
+          win.clearTimeout(timer);
+          timer = undefined;
+          remaining = Math.max(0, remaining - (Date.now() - activeSince));
+        } else if (!isAdShowing()) start();
+      };
+      const onAbort = () => finish(undefined);
+      if (signal?.aborted) {
+        finish(undefined);
+        return;
+      }
+      signal?.addEventListener("abort", onAbort, { once: true });
+      stopObserving = observeAdClass(update);
+      onAdStateChange?.(isAdShowing());
+      start();
+    });
+  }
 
   function clearPending() {
     for (const request of pending.values()) win.clearTimeout(request.timer);
     pending.clear();
-    timedTextWaiters.clear();
+    for (const cancel of [...cancelTimedTextWaiters]) cancel();
   }
 
   const onMessage = (event: MessageEvent<unknown>) => {
@@ -189,7 +451,8 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
     if (data.source !== "voka-yt") return;
     if (data.type === "timedtext") {
       const capture = data as MainTimedText;
-      for (const waiter of [...timedTextWaiters]) waiter(capture);
+      if (!isAdShowing())
+        for (const waiter of [...timedTextWaiters]) waiter(capture);
       return;
     }
     if (data.type !== "response" || typeof data.requestId !== "string") return;
@@ -239,6 +502,9 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
         ...(typeof response.videoId === "string"
           ? { videoId: response.videoId }
           : {}),
+        tokenSource: response.tokenSource === "hook" || response.tokenSource === "resource-timing"
+          ? response.tokenSource
+          : "none",
       };
     },
     async enable(track) {
@@ -247,23 +513,51 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
         ...(track.kind ? { kind: track.kind } : {}),
       });
     },
-    waitForTimedText(timeoutMs, signal) {
+    waitForTimedText(timeoutMs, signal, onAdStateChange) {
       return new Promise((resolve) => {
         let finished = false;
+        const timeoutController = new win.AbortController();
         const finish = (value?: TimedTextCapture) => {
           if (finished) return;
           finished = true;
-          win.clearTimeout(timer);
+          timeoutController.abort();
           signal?.removeEventListener("abort", onAbort);
           timedTextWaiters.delete(waiter);
+          cancelTimedTextWaiters.delete(cancel);
+          stopObserving();
           resolve(value);
         };
-        const waiter = (value: TimedTextCapture) => finish(value);
+        const waiter = (value: TimedTextCapture) => {
+          if (!isAdShowing()) finish(value);
+        };
+        const cancel = () => finish(undefined);
         const onAbort = () => finish(undefined);
-        const timer = win.setTimeout(() => finish(undefined), timeoutMs);
+        let stopObserving = () => {};
+        stopObserving = observeAdClass(() => {});
         timedTextWaiters.add(waiter);
+        cancelTimedTextWaiters.add(cancel);
         signal?.addEventListener("abort", onAbort, { once: true });
         if (signal?.aborted) finish(undefined);
+        else void activeDelay(timeoutMs, timeoutController.signal, onAdStateChange).then((elapsed) => {
+          if (elapsed !== undefined) finish(undefined);
+        });
+      });
+    },
+    isAdShowing,
+    waitForAdEnd,
+    async getTokenSource() {
+      const response = await request("tracks");
+      return response.tokenSource === "hook" || response.tokenSource === "resource-timing"
+        ? response.tokenSource
+        : "none";
+    },
+    async disableCaptions() {
+      await request("disable");
+    },
+    async reloadCaptions(track) {
+      await request("reload", {
+        languageCode: track.languageCode,
+        ...(track.kind ? { kind: track.kind } : {}),
       });
     },
     async refetch(track) {
@@ -275,10 +569,17 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
         ok: response.ok === true,
         status: typeof response.status === "number" ? response.status : 0,
         body: typeof response.body === "string" ? response.body : "",
+        tokenSource: response.tokenSource === "hook" || response.tokenSource === "resource-timing"
+          ? response.tokenSource
+          : "none",
+        responseBytes: typeof response.responseBytes === "number"
+          ? response.responseBytes
+          : undefined,
       };
     },
     async readScreen(timeoutMs, signal) {
-      const deadline = Date.now() + timeoutMs;
+      let activeRemaining = timeoutMs;
+      let firstRead = true;
       const video = () => doc.querySelector("video");
       const readText = () => {
         const container = doc.querySelector(".ytp-caption-window-container");
@@ -289,7 +590,9 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
           .replace(/\s+/g, " ")
           .trim();
       };
-      while (Date.now() <= deadline && !signal?.aborted) {
+      while ((firstRead || activeRemaining > 0) && !signal?.aborted) {
+        await waitForAdEnd(signal);
+        firstRead = false;
         const text = readText();
         if (text) {
           const currentTime = (await this.getCurrentTime()) * 1000;
@@ -302,7 +605,9 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
           ];
         }
         if (!video() && timeoutMs === 0) return [];
-        await new Promise<void>((resolve) => win.setTimeout(resolve, 200));
+        const elapsed = await activeDelay(Math.min(200, Math.max(1, activeRemaining)), signal);
+        if (elapsed === undefined) return [];
+        activeRemaining -= elapsed;
       }
       return [];
     },
@@ -329,7 +634,7 @@ function createPageCaptionAdapter(doc: Document): YouTubeCaptionAdapter {
         .trim();
     },
     clearTimedTextWaiters() {
-      timedTextWaiters.clear();
+      for (const cancel of [...cancelTimedTextWaiters]) cancel();
     },
     dispose() {
       clearPending();
@@ -487,6 +792,13 @@ export function createYouTubeController(options: ControllerOptions) {
   let screenRecorder: ScreenCueRecorder | undefined;
   let displayBusy = false;
   let hoverPause: ReturnType<typeof createHoverPause> | undefined;
+  let tokenSource: TokenSource = "none";
+  let httpStatus: number | undefined;
+  let responseBytes: number | undefined;
+  let retryCount = 0;
+  let adWaiting = false;
+  let retryCleanup: (() => void) | undefined;
+  let acquisitionState: CaptionAcquisitionState = { forcedRefreshUsed: false };
 
   function dispatchCuesChanged() {
     const CustomEventConstructor = win.CustomEvent;
@@ -516,12 +828,27 @@ export function createYouTubeController(options: ControllerOptions) {
     line.diagnostic.hidden = !diagnosticsEnabled;
     if (diagnosticsEnabled) {
       const status = error ?? formatText("youtubeDiagnosticOk", "OK");
-      line.diagnostic.textContent = formatText(
+      const diagnostic = formatText(
         "youtubeDiagnosticLine",
-        "方法 $1 · $2 条 · $3",
-        [String(method ?? 4), String(cues.length), status],
+        "方法 $1 · $2 条 · $3 · 广告 $4 · 令牌 $5 · HTTP $6 · 长度 $7 · 重试 $8",
+        [
+          String(method ?? 4),
+          String(cues.length),
+          status,
+          adapter.isAdShowing?.()
+            ? formatText("youtubeDiagnosticYes", "Yes")
+            : formatText("youtubeDiagnosticNo", "No"),
+          tokenSource,
+          httpStatus === undefined ? "-" : String(httpStatus),
+          responseBytes === undefined ? "-" : String(responseBytes),
+          String(retryCount),
+        ],
       );
+      line.diagnostic.textContent = adWaiting
+        ? `${formatText("youtubeAdWaiting", "Waiting for the ad to finish")} · ${diagnostic}`
+        : diagnostic;
     }
+    if (adWaiting) line.root.hidden = !diagnosticsEnabled;
   }
 
   function removeNativeCaptionStyle() {
@@ -576,6 +903,8 @@ export function createYouTubeController(options: ControllerOptions) {
 
   function closeLine() {
     closedByUser = true;
+    retryCleanup?.();
+    retryCleanup = undefined;
     stopDisplayLoop();
     stopHoverPause();
     removeLine();
@@ -637,10 +966,18 @@ export function createYouTubeController(options: ControllerOptions) {
   function showNoSubtitles(player: HTMLElement, methodNumber: CaptionMethod, failure?: string) {
     const subtitle = createLine(player, false);
     subtitle.root.hidden = false;
-    subtitle.text.textContent = formatText(
-      "youtubeNoSubtitles",
-      "No readable English subtitles for this video",
-    );
+    const message = failure === "NoCaptionTracks"
+      ? formatText("youtubeNoSubtitles", "This video has no subtitles")
+      : failure === "NoEnglishTrack"
+        ? formatText(
+            "youtubeNoEnglishSubtitles",
+            "This video has no English subtitles",
+          )
+        : formatText(
+            "youtubeNoReadableSubtitles",
+            "No readable English subtitles for this video",
+          );
+    subtitle.text.textContent = message;
     removeNativeCaptionStyle();
     updateDiagnostic();
     if (method !== methodNumber || error !== failure) {
@@ -712,11 +1049,51 @@ export function createYouTubeController(options: ControllerOptions) {
     throw new YouTubeCaptionError("NoPlayer");
   }
 
+  function watchForOneRetry(
+    player: HTMLElement,
+    video: HTMLVideoElement | null,
+    epoch: number,
+    href: string,
+    retry: () => void,
+  ) {
+    retryCleanup?.();
+    let triggered = false;
+    let wasAd = adapter.isAdShowing?.() ?? false;
+    const run = () => {
+      if (
+        triggered || epoch !== generation || readHref() !== href ||
+        adapter.isAdShowing?.()
+      ) return;
+      triggered = true;
+      retryCleanup?.();
+      retryCleanup = undefined;
+      retry();
+    };
+    const observer = new win.MutationObserver(() => {
+      const nowAd = adapter.isAdShowing?.() ?? false;
+      if (wasAd && !nowAd) run();
+      wasAd = nowAd;
+    });
+    observer.observe(player, { attributes: true, attributeFilter: ["class"] });
+    const onPlay = () => run();
+    video?.addEventListener("play", onPlay);
+    retryCleanup = () => {
+      observer.disconnect();
+      video?.removeEventListener("play", onPlay);
+    };
+  }
+
   async function startCurrentVideo(href: string) {
     const epoch = ++generation;
     const abort = new AbortController();
     abortController = abort;
     closedByUser = false;
+    tokenSource = "none";
+    httpStatus = undefined;
+    responseBytes = undefined;
+    retryCount = 0;
+    adWaiting = false;
+    acquisitionState = { forcedRefreshUsed: false };
     const session = options.createSession();
     activeSession = session;
     try {
@@ -732,44 +1109,102 @@ export function createYouTubeController(options: ControllerOptions) {
       const current = await currentTracks(abort.signal);
       if (epoch !== generation || abort.signal.aborted) return;
       videoId = current.videoId;
-      const track = chooseEnglishTrack(current.tracks);
+      tokenSource = current.tokenSource ?? "none";
       const player = uiDocument.getElementById("movie_player");
       if (!player) throw new YouTubeCaptionError("NoPlayer");
-      if (!track) {
-        setCues([], 4, "none", "NoEnglishTrack");
-        showNoSubtitles(player, 4, "NoEnglishTrack");
-        return;
-      }
+      let currentTracksResult = current;
 
-      const recorder = new ScreenCueRecorder(adapter, uiDocument);
-      screenRecorder = recorder;
-      const acquisition = await acquireCaptions(
-        track,
-        {
-          enable: (selected) => adapter.enable(selected),
-          waitForTimedText: (timeout, signal) =>
-            adapter.waitForTimedText(timeout, signal),
-          refetch: (selected) => adapter.refetch(selected),
-          readScreen: makeScreenReader(recorder),
-        },
-        {
-          timedTextTimeoutMs,
-          screenTimeoutMs,
-          signal: abort.signal,
-        },
-      );
-      if (epoch !== generation || abort.signal.aborted || readHref() !== href)
-        return;
-      setCues(acquisition.cues, acquisition.method, acquisition.scope, acquisition.error);
-      if (acquisition.method === 4 || !acquisition.cues.length) {
-        showNoSubtitles(player, acquisition.method, acquisition.error ?? "NoSubtitles");
-        return;
-      }
-      const subtitle = createLine(player);
-      source = { kind: "dom", root: subtitle.root, listed: false };
-      activeSession.addSource(source);
-      if (acquisition.method !== 3) screenRecorder = undefined;
-      startDisplayLoop();
+      const runAttempt = async (retry: boolean) => {
+        if (retry) currentTracksResult = await currentTracks(abort.signal);
+        const track = chooseEnglishTrack(currentTracksResult.tracks);
+        const recorder = new ScreenCueRecorder(adapter, uiDocument);
+        screenRecorder = recorder;
+        const acquisition = await acquireCaptions(
+          track,
+          {
+            enable: (selected) => adapter.enable(selected),
+            waitForTimedText: (timeout, signal, onAdStateChange) =>
+              adapter.waitForTimedText(timeout, signal, onAdStateChange),
+            refetch: (selected) => adapter.refetch(selected),
+            readScreen: makeScreenReader(recorder),
+            isAdShowing: () => adapter.isAdShowing?.() ?? false,
+            waitForAdEnd: (signal, onWaiting) =>
+              adapter.waitForAdEnd?.(signal, onWaiting) ?? Promise.resolve(),
+            getTokenSource: () => adapter.getTokenSource?.() ?? Promise.resolve(tokenSource),
+            disableCaptions: adapter.disableCaptions
+              ? () => adapter.disableCaptions!()
+              : undefined,
+            reloadCaptions: adapter.reloadCaptions
+              ? (selected) => adapter.reloadCaptions!(selected)
+              : undefined,
+          },
+          {
+            timedTextTimeoutMs,
+            screenTimeoutMs,
+            signal: abort.signal,
+            initialTokenSource: currentTracksResult.tokenSource ?? tokenSource,
+            state: acquisitionState,
+            onAdWaiting: (waiting) => {
+              adWaiting = waiting;
+              if (waiting && !line) {
+                const waitingLine = createLine(player, false);
+                waitingLine.root.hidden = !diagnosticsEnabled;
+              }
+              updateDiagnostic();
+            },
+          },
+        );
+        if (epoch !== generation || abort.signal.aborted || readHref() !== href)
+          return;
+        videoId = currentTracksResult.videoId;
+        tokenSource = acquisition.tokenSource;
+        httpStatus = acquisition.httpStatus;
+        responseBytes = acquisition.responseBytes;
+        adWaiting = false;
+        setCues(acquisition.cues, acquisition.method, acquisition.scope, acquisition.error);
+        if (acquisition.method === 4 || !acquisition.cues.length) {
+          if (source && activeSession) activeSession.removeSource(source);
+          source = undefined;
+          screenRecorder = undefined;
+          const failure = acquisition.error ?? "NoSubtitles";
+          showNoSubtitles(
+            player,
+            acquisition.method,
+            track ? failure : currentTracksResult.tracks.length ? "NoEnglishTrack" : "NoCaptionTracks",
+          );
+        } else {
+          const subtitle = createLine(player);
+          if (!source) {
+            source = { kind: "dom", root: subtitle.root, listed: false };
+            activeSession?.addSource(source);
+          }
+          if (acquisition.method !== 3) screenRecorder = undefined;
+          startDisplayLoop();
+        }
+        if (!retry && (acquisition.method === 3 || acquisition.method === 4)) {
+          watchForOneRetry(
+            player,
+            uiDocument.querySelector("video"),
+            epoch,
+            href,
+            () => {
+              retryCount = 1;
+              updateDiagnostic();
+              void runAttempt(true).catch((failure) => {
+                if (epoch !== generation || abort.signal.aborted) return;
+                const code = diagnosticError(failure);
+                tokenSource = currentTracksResult.tokenSource ?? tokenSource;
+                setCues([], 4, "none", code);
+                showNoSubtitles(player, 4, code);
+              });
+            },
+          );
+        }
+      };
+
+      const waitingLine = createLine(player, false);
+      waitingLine.root.hidden = true;
+      await runAttempt(false);
     } catch (failure) {
       if (epoch !== generation || abort.signal.aborted) return;
       const player = uiDocument.getElementById("movie_player");
@@ -786,6 +1221,8 @@ export function createYouTubeController(options: ControllerOptions) {
     abortController?.abort();
     abortController = undefined;
     adapter.clearTimedTextWaiters();
+    retryCleanup?.();
+    retryCleanup = undefined;
     stopDisplayLoop();
     stopHoverPause();
     removeLine();

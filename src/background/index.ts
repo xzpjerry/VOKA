@@ -196,6 +196,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
           reply({ error: String(error) });
         }
       });
+    return true;
   } else if (
     ["review-render", "review-prepare", "review-submit"].includes(
       message?.type,
@@ -313,6 +314,13 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       upgradePreviews.set(token, { preview, created: Date.now() });
       return { ...preview, token };
     };
+    if (message.type === "upgrade-summary") {
+      void work().then(
+        (data) => reply({ data }),
+        (error) => reply({ error: String(error) }),
+      );
+      return true;
+    }
     // Context saves and upgrades share VokaMeta; serialize their fresh-read/merge/write.
     contextQueue = contextQueue.catch(() => {}).then(async () => {
       try { reply({ data: await work() }); } catch (error) { reply({ error: String(error) }); }

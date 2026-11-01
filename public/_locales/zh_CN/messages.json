@@ -402,10 +402,25 @@
     "message": "离开字幕后自动继续播放"
   },
   "youtubeNoSubtitles": {
+    "message": "此视频没有字幕"
+  },
+  "youtubeNoEnglishSubtitles": {
+    "message": "此视频没有英文字幕"
+  },
+  "youtubeNoReadableSubtitles": {
     "message": "此视频没有可读取的英文字幕"
   },
+  "youtubeAdWaiting": {
+    "message": "等待广告结束"
+  },
+  "youtubeDiagnosticYes": {
+    "message": "是"
+  },
+  "youtubeDiagnosticNo": {
+    "message": "否"
+  },
   "youtubeDiagnosticLine": {
-    "message": "方法 $1 · $2 条 · $3"
+    "message": "方法 $1 · $2 条 · $3 · 广告 $4 · 令牌 $5 · HTTP $6 · 长度 $7 字节 · 重试 $8"
   },
   "youtubeDiagnosticOk": {
     "message": "OK"

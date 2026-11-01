@@ -1,4 +1,9 @@
-import { buildRefetchUrl, type CaptionTrack } from "./captions";
+import {
+  buildRefetchUrl,
+  hasPlayerToken,
+  type CaptionTrack,
+  type TokenSource,
+} from "./captions";
 
 type PlayerResponse = {
   captions?: {
@@ -12,12 +17,13 @@ type PlayerResponse = {
 type YouTubePlayer = HTMLElement & {
   getPlayerResponse?: () => PlayerResponse | undefined;
   loadModule?: (name: string) => unknown;
+  unloadModule?: (name: string) => unknown;
   setOption?: (module: string, option: string, value: unknown) => unknown;
 };
 
 type RequestMessage = {
   source: "voka-yt-req";
-  type: "tracks" | "enable" | "refetch" | "time" | "seek";
+  type: "tracks" | "enable" | "disable" | "reload" | "refetch" | "time" | "seek";
   requestId?: string;
   languageCode?: string;
   kind?: string;
@@ -36,6 +42,27 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
   const nativeFetch = window.fetch;
   const xhrUrls = new WeakMap<XMLHttpRequest, string>();
 
+  function tokenUrl(): { url: string; tokenSource: Exclude<TokenSource, "none"> } | undefined {
+    if (hasPlayerToken(latestTimedTextUrl))
+      return { url: latestTimedTextUrl!, tokenSource: "hook" };
+    try {
+      const resources = performance.getEntriesByType("resource");
+      for (let index = resources.length - 1; index >= 0; index--) {
+        const entry = resources[index] as PerformanceResourceTiming;
+        const details = timedTextDetails(entry.name);
+        if (details && hasPlayerToken(details.url))
+          return { url: details.url, tokenSource: "resource-timing" };
+      }
+    } catch {
+      /* Resource timing may be unavailable in restricted page contexts. */
+    }
+    return undefined;
+  }
+
+  function responseBytes(body: string) {
+    return new TextEncoder().encode(body).byteLength;
+  }
+
   function timedTextDetails(rawUrl: string) {
     try {
       const url = new URL(rawUrl, location.href);
@@ -50,14 +77,17 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
     }
   }
 
-  function postTimedText(rawUrl: string, body: string) {
+  function postTimedText(rawUrl: string, body: string, status: number) {
     const details = timedTextDetails(rawUrl);
     if (!details) return;
     latestTimedTextUrl = details.url;
-    window.postMessage(
-      { source: "voka-yt", type: "timedtext", ...details, body },
-      location.origin,
-    );
+    const capture = {
+      ...details,
+      body,
+      status,
+      responseBytes: responseBytes(body),
+    };
+    window.postMessage({ source: "voka-yt", type: "timedtext", ...capture }, location.origin);
   }
 
   function requestUrl(input: RequestInfo | URL) {
@@ -78,7 +108,7 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
       void value
         .clone()
         .text()
-        .then((body) => postTimedText(details.url, body))
+        .then((body) => postTimedText(details.url, body, value.status))
         .catch(() => {});
       return value;
     });
@@ -112,7 +142,7 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
           } catch {
             return;
           }
-          postTimedText(details.url, responseBody);
+          postTimedText(details.url, responseBody, this.status);
         },
         { once: true },
       );
@@ -170,6 +200,7 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
       : [];
     return {
       tracks: result,
+      tokenSource: tokenUrl()?.tokenSource ?? "none",
       videoId:
         typeof current?.videoDetails?.videoId === "string"
           ? current.videoDetails.videoId
@@ -235,20 +266,45 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
         postReply(message, { ok: true });
         return;
       }
+      if (message.type === "disable") {
+        const current = player();
+        if (!current?.setOption) throw new Error("NoPlayer");
+        await current.setOption("captions", "track", {});
+        postReply(message, { ok: true });
+        return;
+      }
+      if (message.type === "reload") {
+        if (!message.languageCode) throw new Error("MissingLanguage");
+        const current = player();
+        if (!current?.unloadModule || !current.loadModule || !current.setOption)
+          throw new Error("NoPlayer");
+        await current.unloadModule("captions");
+        await current.loadModule("captions");
+        await current.setOption("captions", "track", {
+          languageCode: message.languageCode,
+          ...(message.kind ? { kind: message.kind } : {}),
+        });
+        postReply(message, { ok: true });
+        return;
+      }
       if (message.type === "refetch") {
-        if (!latestTimedTextUrl) throw new Error("NoTimedTextUrl");
+        const token = tokenUrl();
+        if (!token) throw new Error("NoTimedTextUrl");
         const track: CaptionTrack = {
           languageCode: message.languageCode ?? "",
           ...(message.kind ? { kind: message.kind } : {}),
         };
-        const url = buildRefetchUrl(latestTimedTextUrl, track);
+        const url = buildRefetchUrl(token.url, track);
         const response = await window.fetch(url, {
           credentials: "include",
         });
+        const body = await response.text();
         postReply(message, {
           status: response.status,
           ok: response.ok,
-          body: await response.text(),
+          body,
+          tokenSource: token.tokenSource,
+          responseBytes: responseBytes(body),
         });
       }
     } catch (error) {
@@ -262,7 +318,7 @@ if (!hookWindow.__VOKA_YOUTUBE_MAIN_INSTALLED__) {
     if (
       !message ||
       message.source !== "voka-yt-req" ||
-      !["tracks", "enable", "refetch", "time", "seek"].includes(message.type ?? "")
+      !["tracks", "enable", "disable", "reload", "refetch", "time", "seek"].includes(message.type ?? "")
     )
       return;
     void handleRequest(message as RequestMessage);

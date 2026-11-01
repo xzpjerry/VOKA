@@ -7,6 +7,8 @@ import {
 } from "../site-scope";
 
 const SCRIPT_ID = "voka-site-auto";
+const YOUTUBE_MAIN_SCRIPT_ID = "voka-youtube-main";
+const YOUTUBE_MATCH = "https://www.youtube.com/*";
 
 async function syncNow() {
   let registered: chrome.scripting.RegisteredContentScript[] = [];
@@ -16,7 +18,7 @@ async function syncNow() {
     /* scripting is a required permission; keep the failure non-fatal. */
   }
   const stale = registered
-    .filter((script) => script.id === SCRIPT_ID)
+    .filter((script) => script.id === SCRIPT_ID || script.id === YOUTUBE_MAIN_SCRIPT_ID)
     .map((script) => script.id);
   if (stale.length) {
     try {
@@ -42,17 +44,38 @@ async function syncNow() {
     config.denyList,
     effectiveOrigins,
   );
-  if (!matches.length) return;
+  const youtubeHost = "www.youtube.com";
+  const youtubeRemembered = config.siteScope === "remembered" &&
+    !hostMatchesDeny(youtubeHost, config.denyList) &&
+    config.rememberedSites.includes(youtubeHost) &&
+    await chrome.permissions.contains({ origins: [YOUTUBE_MATCH] });
+  const youtubeAllowedByAll = config.siteScope === "all" &&
+    !hostMatchesDeny(youtubeHost, config.denyList) &&
+    await chrome.permissions.contains({ origins: [YOUTUBE_MATCH] });
+  const scripts: chrome.scripting.RegisteredContentScript[] = [];
+  if (matches.length) {
+    scripts.push({
+      id: SCRIPT_ID,
+      matches,
+      js: ["content-auto.js"],
+      runAt: "document_idle",
+      persistAcrossSessions: true,
+    });
+  }
+  if (youtubeRemembered || youtubeAllowedByAll) {
+    scripts.push({
+      id: YOUTUBE_MAIN_SCRIPT_ID,
+      matches: [YOUTUBE_MATCH],
+      js: ["youtube-main.js"],
+      runAt: "document_start",
+      world: "MAIN",
+      allFrames: false,
+      persistAcrossSessions: true,
+    });
+  }
+  if (!scripts.length) return;
   try {
-    await chrome.scripting.registerContentScripts([
-      {
-        id: SCRIPT_ID,
-        matches,
-        js: ["content-auto.js"],
-        runAt: "document_idle",
-        persistAcrossSessions: true,
-      },
-    ]);
+    await chrome.scripting.registerContentScripts(scripts);
   } catch (error) {
     console.error("VOKA could not register automatic content scripts", error);
   }
