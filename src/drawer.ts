@@ -85,7 +85,7 @@ export function createDrawer(
   onStartPractice: (token: Token, cardId: string) => void = () => {},
 ) {
   const style = document.createElement("style");
-  style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 8px 12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-due-summary{border:0;background:transparent;color:#285e9e;text-align:left;padding:8px 4px;white-space:nowrap}.drawer-due-summary:disabled{color:#566575;cursor:default}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-sort{display:flex;align-items:center;gap:8px;margin:8px 0}.drawer-start-review{margin:4px 0 8px}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
+  style.textContent = `[hidden]{display:none!important}section{width:min(600px,calc(100vw - 64px));display:block!important;padding:0!important}button,select{font:inherit}button:focus-visible,select:focus-visible{outline:2px solid #285e9e;outline-offset:2px}.drawer-toggle{width:100%;border:0;background:transparent;text-align:left;padding:12px 8px 12px 16px;display:flex;gap:12px;align-items:center}.drawer-toggle strong{color:#285e9e}.drawer-toggle .chevron{margin-left:auto}.drawer-due-summary{border:0;background:transparent;color:#285e9e;text-align:left;padding:8px 4px;white-space:nowrap}.drawer-due-summary:disabled{color:#566575;cursor:default}.drawer-review-button{border:1px solid #ccd3dc;border-radius:6px;background:white;color:#285e9e;padding:6px 10px;white-space:nowrap}.drawer-review-button[hidden]{display:none}.drawer-body{padding:0 16px 16px;max-height:46vh;overflow:auto}.drawer-body[hidden]{display:none}.drawer-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.drawer-settings label{display:flex;gap:6px;align-items:center}.drawer-filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.drawer-filters button{border:1px solid #ccd3dc;border-radius:20px;background:white}.drawer-filters button[aria-pressed=true]{background:#e9f2ff;border-color:#285e9e}.drawer-sort{display:flex;align-items:center;gap:8px;margin:8px 0}.drawer-start-review{margin:4px 0 8px}.drawer-review-message{margin:8px 0;color:#566575}.drawer-list{list-style:none;padding:0;margin:0}.drawer-list button{border:0;border-bottom:1px solid #edf0f3;background:white;width:100%;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 4px}.drawer-list button:hover{background:#f4f7fb}.drawer-list small{color:#607080}.drawer-connection{display:flex;align-items:center;gap:12px}`;
   root.append(style);
   const header = document.createElement("button");
   header.className = "drawer-toggle";
@@ -99,6 +99,12 @@ export function createDrawer(
   dueSlot.dataset.slot = "due-summary";
   dueSlot.hidden = true;
   dueSlot.disabled = true;
+  const reviewButton = document.createElement("button");
+  reviewButton.type = "button";
+  reviewButton.className = "drawer-review-button";
+  reviewButton.dataset.slot = "review-button";
+  reviewButton.textContent = t("reviewButton");
+  reviewButton.hidden = true;
   const arrow = document.createElement("span");
   arrow.className = "chevron";
   arrow.textContent = t("drawerExpand");
@@ -117,7 +123,7 @@ export function createDrawer(
   header.style.flex = "1";
   dueSlot.style.flex = "0 0 auto";
   updateLink.style.cssText = "font:inherit;max-width:45%;padding:8px 12px 8px 0";
-  headerRow.append(header, dueSlot, updateLink);
+  headerRow.append(header, reviewButton, dueSlot, updateLink);
   const body = document.createElement("div");
   body.className = "drawer-body";
   body.id = "drawer-body";
@@ -193,6 +199,10 @@ export function createDrawer(
   sortLabel.append(sortSelect);
   const empty = document.createElement("p");
   empty.textContent = t("drawerEmpty");
+  const reviewMessage = document.createElement("p");
+  reviewMessage.className = "drawer-review-message";
+  reviewMessage.setAttribute("role", "status");
+  reviewMessage.hidden = true;
   let words: Token[] = [],
     counts = new Map<string, number>(),
     active: Filter = "target",
@@ -270,6 +280,7 @@ export function createDrawer(
   }
   function setReviewing(value: boolean) {
     reviewing = value;
+    if (value) reviewMessage.hidden = true;
     for (const element of [row, language, controls, tabs, sortLabel, startReview, list, empty])
       element.hidden = value;
     if (reviewView) reviewView.hidden = !value;
@@ -278,10 +289,25 @@ export function createDrawer(
   function beginReview() {
     if (status !== "ok" || dueCount === 0) return;
     const queue = [...words];
+    reviewMessage.hidden = true;
     setExpanded(true);
     setReviewing(true);
     onStartReview(queue);
   }
+  reviewButton.onclick = (event) => {
+    event.stopPropagation();
+    if (status !== "ok") return;
+    if (dueCount > 0) {
+      active = "due";
+      render();
+      beginReview();
+      return;
+    }
+    setExpanded(true);
+    setReviewing(false);
+    reviewMessage.textContent = t("reviewNothingDue");
+    reviewMessage.hidden = false;
+  };
   root.addEventListener("voka-start-practice", (event) => {
     const detail = (event as CustomEvent<{ token?: Token; cardId?: string }>)
       .detail;
@@ -297,7 +323,7 @@ export function createDrawer(
     beginReview();
   };
   startReview.onclick = beginReview;
-  body.append(row, language, controls, tabs, sortLabel, startReview, list, empty);
+  body.append(reviewMessage, row, language, controls, tabs, sortLabel, startReview, list, empty);
   if (reviewView) {
     reviewView.hidden = true;
     body.append(reviewView);
@@ -336,6 +362,7 @@ export function createDrawer(
       dueSlot.hidden = status !== "ok";
       dueSlot.disabled = status !== "ok" || dueCount === 0;
       dueSlot.setAttribute("aria-label", dueSlot.textContent);
+      reviewButton.hidden = status !== "ok";
       startReview.hidden =
         reviewing || active !== "due" || dueCount === 0 || status !== "ok";
       for (const input of [gloss, advanced, hover, sortSelect])
